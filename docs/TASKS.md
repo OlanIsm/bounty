@@ -430,21 +430,60 @@ lint warnings; local mock balances are reset by clearing app data. M10 not start
 
 # M10 — External API
 
-- [ ] Create RandomUserApi interface
-- [ ] Create Retrofit client
-- [ ] Create response model
-- [ ] GET `/api/?results=10`
-- [ ] Parse response
-- [ ] Display API user/avatar
-- [ ] Load image using Glide
-- [ ] Add loading state
-- [ ] Add error/fallback state
+- [x] Create RandomUserApi interface
+- [x] Create Retrofit client
+- [x] Create response model
+- [x] GET `/api/?results=10`
+- [x] Parse response
+- [x] Display API user/avatar
+- [x] Load image using Glide
+- [x] Add loading state
+- [x] Add error/fallback state
 
 Target:
 
 ```text
 Aplikasi berhasil consume external REST API.
 ```
+
+Verified M10: canonical `assembleDebug`, `assembleDebugAndroidTest`, and
+`lintDebug` passed with 0 errors and 4 existing warnings. Ten of eleven tests
+passed in the full Pixel_7 API 37 suite, including ExternalApiTest. The existing
+SubmitProofTest failed during native picker cancellation/focus. Its fixed-delay
+Back was replaced with package readiness checks for both AOSP and Google
+DocumentsUI; the focused final picker rerun passed. The API test also passed in
+a focused rerun. Low host RAM was relieved by stopping the idle build daemon and
+using a smaller temporary build heap, without restarting the user emulator.
+
+RandomUserApi, ApiClient, and RandomUserResponse implement the documented HTTPS
+GET api/?results=10 with Retrofit/Gson and a 20-second call timeout. Only UUID,
+name, email, and large avatar are modeled. Valid profiles map to read-only User
+objects, capped at ten; invalid avatar URLs use the local placeholder. Credentials
+are neither modeled nor persisted. No new dependency, Room migration, or API
+mutation of local accounts/challenges/proofs/balances.
+
+Profile shows User demo below account controls, with native rows and Glide avatars.
+A nested ViewModel retains a single in-flight request/result across rotation and
+tab changes, guards repeated loads, and cancels its call when cleared. Loading,
+HTTP/network failure, invalid JSON, API error, and empty/unusable results are
+handled. Failure shows Bounty User/local avatar and Coba lagi. Results stay in
+memory for the current MainActivity; a fresh launch fetches again.
+
+ExternalApiTest exercises the real Retrofit path/query/converter with deterministic
+OkHttp fixtures, loading, duplicate guard, held request/recreation/tab changes,
+rendered names/emails, malformed/empty/API-error payloads, HTTP 503, offline error,
+recovery, ten-row cap, unsafe avatar fallback, and unchanged local identity/balance.
+
+A real request returned ten usable profiles. Manual emulator checks confirmed real
+API names/photos, light mode, dark mode with 1.3x font scale, offline fallback, Home
+availability offline, and recovery through the actual retry button after restoring
+connectivity. Tests/QA used an isolated app ID. Network/font/night/animation settings
+were restored, isolated installations removed, and the canonical APK updated without
+clearing existing Bounty data. Changed: MainActivity, User documentation, ApiClient,
+RandomUserApi, RandomUserResponse, Profile/user-row XML, strings, ExternalApiTest,
+SubmitProofTest synchronization, README, and this ledger. Remaining: four existing
+lint warnings; public service/photo availability uses the documented fallback.
+M11 has not started.
 
 ---
 

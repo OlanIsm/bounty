@@ -2,8 +2,9 @@
 
 Android coursework MVP using Java and XML. M0 project setup, M1 mock
 authentication, M2 main navigation, M3 local database, M4 challenge feed,
-M5 challenge publishing, M6 challenge acceptance, M7 proof submission, and
-M8 proof review are implemented. M9 and later features are not implemented.
+M5 challenge publishing, M6 challenge acceptance, M7 proof submission,
+M8 proof review, M9 mock reward, and M10 external demo profiles are implemented.
+M11 and later features are not implemented.
 
 ## Requirements
 
@@ -28,7 +29,8 @@ Back behavior, logout, the signed-in screen guard, Room seed/CRUD/persistence,
 feed/detail navigation, recreation, refresh, empty states, missing IDs,
 Create validation, draft restoration, single-insert publishing, and acceptance
 with rotation, duplicate protection, persistence, and current-user filtering,
-plus native image picking, transactional proof submission, and creator review.
+plus native image picking, transactional proof submission, creator review,
+mock reward/recovery, and external API parsing/loading/fallback behavior.
 Run the suite on a disposable test installation: authentication resets local
 mock accounts, and the feed test temporarily deletes challenges (including
 related proofs) before restoring the original challenge records.
@@ -284,3 +286,46 @@ passed separately. Canonical app/test builds and lint pass with 0 errors and 4
 existing warnings. Light/dark screenshots and 1.3x font scale were checked in an
 isolated installation; temporary QA artifacts/settings were cleaned up, and the
 canonical app was updated without clearing existing data. M10 has not started.
+
+
+## M10 external demo profiles
+
+Open Profile and scroll to User demo, below the local account controls. Retrofit
+requests `https://randomuser.me/api/?results=10`; Gson maps UUID, first/last name,
+email, and large picture to read-only User models. Glide loads HTTPS avatars with
+a local placeholder if the photo fails. This list never registers API users or
+changes local account identity, challenges, proofs, or Demo Balance.
+
+The request starts on the first Profile visit. A native ViewModel retains the
+in-flight call and result across rotation and tab changes, ignores duplicate
+loads, and cancels the call when cleared. The HTTP call has a 20-second timeout.
+Loading shows a progress indicator. Network/HTTP errors, invalid JSON, API error
+payloads, empty results, or no usable profiles show Bounty User with a local avatar
+and a retry button. The main challenge flow remains local and available offline.
+Results remain in memory for the current MainActivity; a fresh launch fetches again.
+
+Reference: [RandomUser documentation](https://randomuser.me/documentation).
+Only the documented demo fields are modeled; credentials from the API response
+are neither mapped nor stored. The list is capped at ten native rows without
+pagination, a new dependency, account mutation, or Room schema change.
+
+`ExternalApiTest` uses the existing OkHttp interceptor support to exercise actual
+Retrofit request construction and Gson conversion without relying on the public
+service. It checks path/query, loading, one request through rotation/tab changes,
+profile rendering, malformed/empty/API-error responses, HTTP failure, offline
+failure, successful recovery, ten-row limit, unsafe avatar fallback, and unchanged
+local account/balance. M11 UI polish and confirmation dialogs remain separate.
+
+
+M10 verification: canonical debug app/test APK builds and lint pass with 0 errors
+and 4 existing warnings. Ten tests passed in the full suite; the existing native
+picker check failed during cancellation/focus, then passed separately after waiting
+for either AOSP or Google DocumentsUI and return to the app instead of a fixed
+500ms delay. The focused API test also passed. Tests used a temporary application
+ID, and a smaller temporary build heap relieved host RAM pressure.
+
+Manual checks confirmed real API profiles and Glide photos, light mode, dark mode
+at 1.3x font scale, offline fallback, local Home while offline, and the actual retry
+button loading profiles after connectivity returned. Emulator network/appearance/
+animation settings were restored and the isolated app removed. The canonical APK
+was installed without clearing existing Bounty data. M11 has not started.

@@ -82,8 +82,9 @@ public class SubmitProofTest {
                 assertNull(db.proofDao().getProofByChallengeId(challenge.id));
                 onView(withId(R.id.choose_proof_photo)).perform(scrollTo(), click());
                 // Cancel the system picker without losing the description.
-                SystemClock.sleep(500);
-                instrumentation.getUiAutomation().performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK);
+                waitForPackage(instrumentation, ".documentsui");
+                assertTrue(instrumentation.getUiAutomation().performGlobalAction(AccessibilityService.GLOBAL_ACTION_BACK));
+                waitForPackage(instrumentation, context.getPackageName());
                 instrumentation.waitForIdleSync();
                 waitForLoad();
                 onView(withId(R.id.proof_description_input)).check(matches(withText(" Completed challenge with photo. ")));
@@ -146,6 +147,17 @@ public class SubmitProofTest {
         proof.imageUri = uri;
         proof.submittedAt = System.currentTimeMillis();
         return proof;
+    }
+    private void waitForPackage(Instrumentation instrumentation, String packageName) {
+        long end = SystemClock.uptimeMillis() + 10000;
+        do {
+            AccessibilityNodeInfo root = instrumentation.getUiAutomation().getRootInActiveWindow();
+            // DocumentsUI can use the AOSP or Google package on different emulator images.
+            if (root != null && root.getPackageName() != null
+                    && root.getPackageName().toString().endsWith(packageName)) return;
+            SystemClock.sleep(100);
+        } while (SystemClock.uptimeMillis() < end);
+        throw new AssertionError("Native window did not become ready: " + packageName);
     }
     private void chooseNativeImage(Instrumentation instrumentation) {
         long end = SystemClock.uptimeMillis() + 10000;
