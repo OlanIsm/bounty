@@ -153,11 +153,24 @@ public class SubmitProofTest {
             AccessibilityNodeInfo root = instrumentation.getUiAutomation().getRootInActiveWindow();
             AccessibilityNodeInfo node = findImage(root);
             if (node != null) {
-                while (node != null && !node.isClickable()) node = node.getParent();
-                if (node != null && node.performAction(AccessibilityNodeInfo.ACTION_CLICK)) {
-                    instrumentation.waitForIdleSync();
-                    return;
-                }
+                android.graphics.Rect bounds = new android.graphics.Rect();
+                node.getBoundsInScreen(bounds);
+                try (android.os.ParcelFileDescriptor command = instrumentation.getUiAutomation()
+                        .executeShellCommand("input tap " + bounds.centerX() + " " + bounds.centerY());
+                     java.io.InputStream output = new java.io.FileInputStream(command.getFileDescriptor())) {
+                    while (output.read() != -1) { }
+                } catch (java.io.IOException error) { throw new AssertionError(error); }
+                long returned = SystemClock.uptimeMillis() + 5000;
+                do {
+                    AccessibilityNodeInfo active = instrumentation.getUiAutomation().getRootInActiveWindow();
+                    if (active != null && instrumentation.getTargetContext().getPackageName().contentEquals(active.getPackageName())) {
+                        instrumentation.waitForIdleSync();
+                        return;
+                    }
+                    SystemClock.sleep(100);
+                } while (SystemClock.uptimeMillis() < returned);
+                throw new AssertionError("Picker did not return after tapping " + bounds);
+
             }
             SystemClock.sleep(100);
         } while (SystemClock.uptimeMillis() < end);
@@ -165,7 +178,8 @@ public class SubmitProofTest {
     }
     private AccessibilityNodeInfo findImage(AccessibilityNodeInfo node) {
         if (node == null) return null;
-        if (node.getText() != null && node.getText().toString().contains("M7-proof")) return node;
+        if ((node.getText() != null && node.getText().toString().contains("M7-proof"))
+                || (node.getContentDescription() != null && node.getContentDescription().toString().startsWith("M7-proof"))) return node;
         for (int i = 0; i < node.getChildCount(); i++) {
             AccessibilityNodeInfo found = findImage(node.getChild(i));
             if (found != null) return found;

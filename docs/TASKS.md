@@ -277,18 +277,47 @@ XML, strings, AcceptChallengeTest, README, and this task ledger. M7 has not star
 
 # M7 — Submit Proof
 
-- [ ] Create SubmitProofActivity
-- [ ] Implement image picker
-- [ ] Show selected image
-- [ ] Add proof description
-- [ ] Insert Proof into Room
-- [ ] Update challenge ACCEPTED → SUBMITTED
+- [x] Create SubmitProofActivity
+- [x] Implement image picker
+- [x] Show selected image
+- [x] Add proof description
+- [x] Insert Proof into Room
+- [x] Update challenge ACCEPTED → SUBMITTED
 
 Target:
 
 ```text
 Hunter dapat submit proof.
 ```
+
+Verified M7: canonical `assembleDebug`, `assembleDebugAndroidTest`, and
+`lintDebug` passed with 0 errors and 4 existing warnings. Seven existing tests
+passed in the full emulator suite. The focused `SubmitProofTest` passed after
+correcting native picker automation to match the file's accessibility description
+and use Android's input command. No production picker change was needed.
+
+Checks cover required description/photo, native picker cancellation/selection,
+photo/description restoration, held write and rotation, duplicate-click protection,
+stored PENDING proof fields, persisted URI read access, SUBMITTED status, rejection
+of another hunter and duplicate submission, insert-failure transaction rollback,
+and unchanged demo balance. Tests ran on Pixel_7 API 37 with a temporary application
+ID to preserve existing Bounty accounts and challenge data.
+
+SubmitProofActivity uses OpenDocument with persistent URI read permission, Glide
+preview, a required description capped at 2000 characters, background image bounds
+validation, and retained saving state. Only the assigned hunter of an ACCEPTED
+challenge sees the detail action. The Room transaction conditionally changes status
+and inserts proof together; a failed insert cannot leave SUBMITTED without proof.
+No new dependency, broad storage permission, schema migration, review, or reward.
+
+Manual checks confirmed detail-to-form navigation, native image selection/preview,
+keyboard insets, retained image/text in dark mode at 1.3x font scale, a reachable
+Submit action, and return to detail with SUBMITTED status. Emulator settings were
+restored, temporary app removed, and canonical APK installed without clearing data.
+Changed: SubmitProofActivity, ChallengeDetailActivity, AppDatabase, ChallengeDao,
+manifest, proof/detail XML, strings, SubmitProofTest, README, and this ledger.
+Remaining: moving/deleting the selected source photo can invalidate its local URI.
+M8 has not started.
 
 ---
 
