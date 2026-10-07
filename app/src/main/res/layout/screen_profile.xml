@@ -14,5 +14,20 @@
         <com.google.android.material.button.MaterialButton
             android:id="@+id/logout_button" style="@style/BountyButton"
             android:layout_marginTop="32dp" android:text="@string/logout_action" />
+        <com.google.android.material.textview.MaterialTextView style="@style/BountySection"
+            android:layout_marginTop="32dp" android:text="@string/demo_users_title" />
+        <com.google.android.material.textview.MaterialTextView style="@style/BountyCaption"
+            android:layout_marginTop="8dp" android:text="@string/demo_users_note" />
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/demo_users_loading" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="16dp"
+            android:indeterminate="true" android:contentDescription="@string/demo_users_loading" />
+        <com.google.android.material.textview.MaterialTextView android:id="@+id/demo_users_error"
+            style="@style/BountyBody" android:layout_marginTop="16dp"
+            android:text="@string/demo_users_error" android:visibility="gone" />
+        <com.google.android.material.button.MaterialButton android:id="@+id/demo_users_retry"
+            style="@style/BountyButton" android:text="@string/retry_action" android:visibility="gone" />
+        <LinearLayout android:id="@+id/demo_users_list" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:orientation="vertical" />
     </LinearLayout>
 </ScrollView>

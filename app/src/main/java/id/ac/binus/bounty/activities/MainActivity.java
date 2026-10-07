@@ -4,6 +4,9 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.widget.TextView;
 import android.widget.FrameLayout;
+import android.widget.LinearLayout;
+import android.widget.ImageView;
+import com.bumptech.glide.Glide;
 import android.view.View;
 import android.util.Log;
 import android.app.DatePickerDialog;
@@ -33,6 +36,13 @@ import id.ac.binus.bounty.adapters.ChallengeAdapter;
 import id.ac.binus.bounty.database.AppDatabase;
 import id.ac.binus.bounty.models.Challenge;
 import java.util.List;
+import java.util.Collections;
+import id.ac.binus.bounty.network.ApiClient;
+import id.ac.binus.bounty.network.RandomUserApi;
+import id.ac.binus.bounty.network.RandomUserResponse;
+import retrofit2.Call;
+import retrofit2.Callback;
+import retrofit2.Response;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
@@ -50,6 +60,7 @@ public class MainActivity extends AppCompatActivity {
     private View createScreen;
     private SparseArray<Parcelable> createState;
     private PublishModel publishModel;
+    private DemoUsersModel demoUsersModel;
     private final OnBackPressedCallback backToHome = new OnBackPressedCallback(false) {
         @Override
         public void handleOnBackPressed() {
@@ -68,6 +79,7 @@ public class MainActivity extends AppCompatActivity {
         ScreenInsets.apply(this);
         navigation = findViewById(R.id.bottom_navigation);
         publishModel = new ViewModelProvider(this).get(PublishModel.class);
+        demoUsersModel = new ViewModelProvider(this).get(DemoUsersModel.class);
         createState = savedInstanceState == null ? null : savedInstanceState.getSparseParcelableArray("create_state");
         getOnBackPressedDispatcher().addCallback(this, backToHome);
         navigation.setOnItemSelectedListener(item -> showScreen(item.getItemId()));
@@ -82,6 +94,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onPostCreate(Bundle savedInstanceState) {
         super.onPostCreate(savedInstanceState);
         if (navigation == null) return;
+        demoUsersModel.state.observe(this, state -> bindDemoUsers());
         // Consume publish results after Android has restored the navigation/view hierarchy.
         publishModel.state.observe(this, state -> {
             updatePublishState();
@@ -177,6 +190,9 @@ public class MainActivity extends AppCompatActivity {
             bindUser(user);
         }
         if (destination == R.id.nav_profile) {
+            findViewById(R.id.demo_users_retry).setOnClickListener(view -> demoUsersModel.load(ApiClient.getApi()));
+            if (demoUsersModel.state.getValue() == null) demoUsersModel.load(ApiClient.getApi());
+            bindDemoUsers();
             findViewById(R.id.logout_button).setOnClickListener(view -> {
                 new SessionManager(this).logout();
                 openLogin();
@@ -360,6 +376,65 @@ public class MainActivity extends AppCompatActivity {
             ((TextView) findViewById(R.id.profile_name)).setText(user.name);
             ((TextView) findViewById(R.id.user_email)).setText(user.email);
         }
+    }
+
+    // ponytail: at most ten demo rows; use RecyclerView if pagination is introduced.
+    private void bindDemoUsers() {
+        LinearLayout list = findViewById(R.id.demo_users_list);
+        DemoUsersModel.State state = demoUsersModel.state.getValue();
+        if (list == null || state == null) return;
+        findViewById(R.id.demo_users_loading).setVisibility(state.loading ? View.VISIBLE : View.GONE);
+        findViewById(R.id.demo_users_error).setVisibility(state.failed ? View.VISIBLE : View.GONE);
+        findViewById(R.id.demo_users_retry).setVisibility(state.failed ? View.VISIBLE : View.GONE);
+        list.removeAllViews();
+        for (User user : state.users) {
+            View row = getLayoutInflater().inflate(R.layout.item_demo_user, list, false);
+            ((TextView) row.findViewById(R.id.demo_user_name)).setText(user.name);
+            TextView email = row.findViewById(R.id.demo_user_email);
+            email.setText(user.email);
+            email.setVisibility(user.email.isEmpty() ? View.GONE : View.VISIBLE);
+            ImageView avatar = row.findViewById(R.id.demo_user_avatar);
+            Glide.with(avatar).load(user.avatarUrl).placeholder(R.drawable.ic_avatar)
+                    .error(R.drawable.ic_avatar).circleCrop().into(avatar);
+            list.addView(row);
+        }
+    }
+
+    /** Retains one request and its result across rotation and tab changes. */
+    public static class DemoUsersModel extends ViewModel {
+        public static class State {
+            public final List<User> users;
+            public final boolean loading, failed;
+            State(List<User> users, boolean loading, boolean failed) {
+                this.users = users; this.loading = loading; this.failed = failed;
+            }
+        }
+        public final MutableLiveData<State> state = new MutableLiveData<>();
+        private Call<RandomUserResponse> request;
+        public void load(RandomUserApi api) {
+            if (state.getValue() != null && state.getValue().loading) return;
+            state.setValue(new State(Collections.emptyList(), true, false));
+            request = api.getUsers(10);
+            request.enqueue(new Callback<RandomUserResponse>() {
+                @Override public void onResponse(Call<RandomUserResponse> call, Response<RandomUserResponse> response) {
+                    if (call != request || call.isCanceled()) return;
+                    List<User> users = response.isSuccessful() && response.body() != null
+                            ? response.body().toUsers() : Collections.emptyList();
+                    if (users.isEmpty()) fallback();
+                    else state.setValue(new State(users, false, false));
+                }
+                @Override public void onFailure(Call<RandomUserResponse> call, Throwable error) {
+                    if (call != request || call.isCanceled()) return;
+                    Log.w("BountyApi", "Unable to load demo users", error);
+                    fallback();
+                }
+            });
+        }
+        private void fallback() {
+            state.setValue(new State(Collections.singletonList(
+                    new User("api_fallback", "Bounty User", "", "", 0)), false, true));
+        }
+        @Override protected void onCleared() { if (request != null) request.cancel(); }
     }
 
     private void openLogin() {

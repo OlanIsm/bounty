@@ -87,4 +87,8 @@
     <string name="reward_pending">Bukti disetujui. Reward demo akan dicoba ulang saat hunter membuka Home atau Profile.</string>
     <string name="reward_refresh_error">Reward demo belum tersimpan. Buka ulang Home atau Profile untuk mencoba lagi.</string>
     <string name="reward_result_paid">Reward demo %1$s masuk ke saldo %2$s.</string>
+    <string name="demo_users_title">User demo</string>
+    <string name="demo_users_note">Contoh profil dari RandomUser. Akun login tetap akun lokal kamu.</string>
+    <string name="demo_users_loading">Memuat user demo</string>
+    <string name="demo_users_error">User demo gagal dimuat. Profil contoh lokal ditampilkan; coba lagi.</string>
 </resources>

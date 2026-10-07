@@ -1,6 +1,6 @@
 package id.ac.binus.bounty.models;
 
-/** Local mock user; no credentials or real payment data. */
+/** Local mock account or read-only API demo profile; no credentials or real payment data. */
 public class User {
     public final String id;
     public final String name;
