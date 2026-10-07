@@ -37,6 +37,8 @@ public class ChallengeDetailActivity extends AppCompatActivity {
                 acceptModel.accept(AppDatabase.getInstance(this), currentChallenge.id, user);
             }
         });
+        findViewById(R.id.submit_proof_button).setOnClickListener(view -> startActivity(
+                new Intent(this, SubmitProofActivity.class).putExtra(EXTRA_CHALLENGE_ID, currentChallenge.id)));
         acceptModel.state.observe(this, state -> {
             bindAccept();
             if (state != AcceptModel.IDLE && state != AcceptModel.SAVING) {
@@ -110,6 +112,9 @@ public class ChallengeDetailActivity extends AppCompatActivity {
                 && challenge.participantId == null;
         button.setEnabled(user != null && available && !own && !saving);
         button.setText(saving ? R.string.accepting_challenge : R.string.accept_action);
+        findViewById(R.id.submit_proof_button).setVisibility(challenge != null && user != null
+                && Challenge.ACCEPTED.equals(challenge.status) && user.id.equals(challenge.participantId)
+                ? View.VISIBLE : View.GONE);
         TextView message = findViewById(R.id.accept_message);
         if (challenge != null && challenge.participantId != null) {
             message.setText(getString(R.string.accept_hunter, challenge.participantName));

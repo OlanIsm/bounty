@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical">
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/proof_toolbar"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize" app:title="@string/submit_proof_action"
+        app:navigationIcon="@drawable/ic_back" app:navigationContentDescription="@string/back_action" />
+    <com.google.android.material.progressindicator.LinearProgressIndicator android:id="@+id/proof_loading"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:indeterminate="true" android:contentDescription="@string/loading_challenges" />
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1" android:fillViewport="true" android:padding="16dp">
+        <LinearLayout style="@style/BountyScreenContent">
+            <com.google.android.material.textview.MaterialTextView android:id="@+id/proof_message"
+                style="@style/BountyBody" android:visibility="gone" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/proof_retry"
+                style="@style/BountyButton" android:text="@string/retry_action" android:visibility="gone" />
+            <LinearLayout android:id="@+id/proof_form" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone">
+                <com.google.android.material.textview.MaterialTextView android:id="@+id/proof_challenge_title"
+                    style="@style/BountyHeading" />
+                <ImageView android:id="@+id/proof_photo" android:layout_width="match_parent"
+                    android:layout_height="220dp" android:layout_marginTop="24dp"
+                    android:scaleType="fitCenter" android:visibility="gone"
+                    android:contentDescription="@string/proof_photo_preview" />
+                <com.google.android.material.textview.MaterialTextView android:id="@+id/proof_photo_message"
+                    style="@style/BountyBody" android:layout_marginTop="16dp"
+                    android:text="@string/proof_photo_required" android:accessibilityLiveRegion="polite" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/choose_proof_photo"
+                    style="@style/BountyButton" android:layout_marginTop="16dp" android:text="@string/choose_proof_photo" />
+                <com.google.android.material.textfield.TextInputLayout android:id="@+id/proof_description_layout"
+                    style="@style/BountyTextInput" android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp" android:hint="@string/proof_description_label">
+                    <com.google.android.material.textfield.TextInputEditText android:id="@+id/proof_description_input"
+                        android:layout_width="match_parent" android:layout_height="wrap_content"
+                        android:inputType="textMultiLine|textCapSentences" android:minLines="3"
+                        android:maxLength="2000" android:gravity="top|start" />
+                </com.google.android.material.textfield.TextInputLayout>
+                <com.google.android.material.progressindicator.LinearProgressIndicator android:id="@+id/proof_saving"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp" android:indeterminate="true" android:visibility="gone"
+                    android:contentDescription="@string/proof_submitting" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/proof_submit"
+                    style="@style/BountyButton" android:layout_marginTop="24dp" android:text="@string/submit_proof_action" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>

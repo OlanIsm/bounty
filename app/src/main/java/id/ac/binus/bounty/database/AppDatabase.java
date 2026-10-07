@@ -50,6 +50,19 @@ public abstract class AppDatabase extends RoomDatabase {
         return instance;
     }
 
+    /** Changes status and inserts proof together; failure rolls back both operations. */
+    public long submitProof(Proof proof) {
+        if (proof.challengeId <= 0 || proof.hunterId.trim().isEmpty()
+                || proof.description.trim().isEmpty() || proof.description.length() > 2000
+                || proof.imageUri.isEmpty() || !Proof.PENDING.equals(proof.status) || proof.submittedAt <= 0) {
+            throw new IllegalArgumentException("Invalid proof");
+        }
+        return runInTransaction(() -> {
+            if (challengeDao().markSubmitted(proof.challengeId, proof.hunterId) != 1) return 0L;
+            return proofDao().insertProof(proof);
+        });
+    }
+
     public abstract ChallengeDao challengeDao();
     public abstract ProofDao proofDao();
 }

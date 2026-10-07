@@ -34,6 +34,9 @@ public interface ChallengeDao {
             + "WHERE id = :id AND status = 'OPEN' AND participantId IS NULL AND creatorId != :hunterId")
     int acceptChallenge(int id, String hunterId, String hunterName);
 
+    @Query("UPDATE challenges SET status = 'SUBMITTED' WHERE id = :id AND status = 'ACCEPTED' AND participantId = :hunterId")
+    int markSubmitted(int id, String hunterId);
+
     @Update
     int updateChallenge(Challenge challenge);
 

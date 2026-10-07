@@ -61,4 +61,15 @@
     <string name="accept_own">Kamu pembuat challenge ini.</string>
     <string name="accept_hunter">Hunter: %1$s</string>
     <string name="accept_ready">Challenge ini tersedia untuk diterima.</string>
+    <string name="submit_proof_action">Submit proof</string>
+    <string name="proof_description_label">Deskripsi bukti</string>
+    <string name="proof_description_required">Deskripsi bukti wajib diisi, maksimal 2000 karakter.</string>
+    <string name="choose_proof_photo">Pilih foto</string>
+    <string name="proof_photo_preview">Foto bukti yang dipilih</string>
+    <string name="proof_photo_required">Pilih foto bukti sebelum submit.</string>
+    <string name="proof_photo_error">Foto tidak dapat dibaca. Pilih foto lain.</string>
+    <string name="proof_unavailable">Hanya hunter pada challenge ACCEPTED yang dapat submit bukti.</string>
+    <string name="proof_submitting">Menyimpan bukti&#8230;</string>
+    <string name="proof_saved">Bukti tersimpan. Status challenge: SUBMITTED.</string>
+    <string name="proof_save_error">Gagal menyimpan bukti. Coba lagi.</string>
 </resources>
