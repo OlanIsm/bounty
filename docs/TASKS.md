@@ -380,17 +380,51 @@ can become unavailable; retry/error handling is present. M9 has not started.
 
 # M9 — Mock Reward
 
-- [ ] Add Demo Balance
-- [ ] Save balance with SharedPreferences
-- [ ] Tambahkan reward setelah approval
-- [ ] Prevent duplicate reward
-- [ ] Show reward result
+- [x] Add Demo Balance
+- [x] Save balance with SharedPreferences
+- [x] Tambahkan reward setelah approval
+- [x] Prevent duplicate reward
+- [x] Show reward result
 
 Target:
 
 ```text
 Approve challenge → Demo Balance hunter bertambah.
 ```
+
+Verified M9: canonical `assembleDebug`, `assembleDebugAndroidTest`, and
+`lintDebug` passed with 0 errors and 4 existing warnings. All ten instrumentation
+tests passed on Pixel_7 API 37. A focused final MockRewardTest rerun also passed
+with strengthened concurrent settlement and asynchronous balance rendering checks.
+
+Home/Profile share a Demo Balance card and rupiah formatter. Successful approval
+credits the registered hunter, preserves the creator balance, and shows a result
+in COMPLETED detail. Reject and stale/repeated approvals cannot pay a reward.
+SessionManager saves the updated account and one receipt per challenge together
+in bounty_accounts SharedPreferences, with synchronous disk commit off the main
+thread and a process-local lock across manager instances. Paid balances survive
+logout, recreation, restart, and challenge deletion. No Room schema change.
+
+Room approval and preferences cannot share a transaction. If approval commits
+before reward persistence, Home/Profile recover approved/completed unpaid records
+for the signed-in hunter. This also credits pre-M9 approvals once. Failed reward
+persistence reports approval success with reward pending, rather than claiming
+review failure; recovery retries disk persistence even if the snapshot is already
+visible in memory. The approach remains a single-process local mock, not payment.
+
+Tests cover Approve through the real review screen, duplicate clicks, creator/
+hunter separation, Reject and stale-proof guards, 50000-to-70000 reward, interrupted
+approval recovery, Home/Profile rendering, recreation, logout/login persistence,
+concurrent settlement from separate managers, and retained earnings after deletion.
+Manual checks confirmed light Home/completed result and dark Home/Profile at 1.3x
+font scale. An XML encoding issue caught during QA was corrected before delivery.
+
+Checks used an isolated app ID; its helper/data were removed, emulator settings
+restored, and the canonical APK installed without clearing existing Bounty data.
+Changed: SessionManager, ChallengeDao, ChallengeDisplay, MainActivity,
+ReviewProofActivity, ChallengeDetailActivity, shared balance/Home/Profile/detail
+XML, strings, MockRewardTest, README, and this ledger. Remaining: the four existing
+lint warnings; local mock balances are reset by clearing app data. M10 not started.
 
 ---
 

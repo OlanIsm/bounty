@@ -225,7 +225,8 @@ Challenges, and choose Review proof. The screen shows the latest hunter, photo,
 description, and PENDING status. Approve changes the proof to APPROVED and the
 challenge to COMPLETED. Reject changes the proof to REJECTED and the challenge
 back to ACCEPTED, preserving its hunter so another proof can be submitted.
-Success returns to refreshed detail. Balances remain unchanged until M9.
+Success returns to refreshed detail. At M8 completion, balances remained unchanged;
+M9 adds the hunter reward below.
 
 `AppDatabase.reviewProof` checks the creator, submitted challenge, latest proof
 ID, PENDING status, and matching participant inside a Room transaction. It updates
@@ -237,7 +238,7 @@ Controls disable while saving. Approve enables after the image loads. If its loc
 URI no longer works, the screen displays an error and retry; Reject remains
 available after reading the description. Missing records, unauthorized access,
 stale states, and database failures show explanatory states or a Snackbar.
-No schema change, new dependency, review confirmation dialog (M11), or reward logic.
+M8 introduced no schema change, new dependency, or review confirmation dialog (M11).
 
 `ReviewProofTest` checks Reject with held-write rotation and duplicate protection,
 resubmission, stale/unauthorized/repeated review rejection, photo failure/recovery,
@@ -249,3 +250,37 @@ and lint pass with 0 errors and 4 existing warnings. Manual screenshots confirme
 light/dark review, 1.3x fonts, photo/description/action layout, and detail refresh to
 COMPLETED. Testing used an isolated installation; the main APK was updated without
 clearing data, and emulator settings and temporary installations were restored.
+
+
+## M9 mock reward
+
+Home and Profile display the current account's Demo Balance (initially Rp50.000).
+Approve credits the challenge reward to the registered hunter, without reducing
+the creator balance. Reject pays nothing. COMPLETED detail displays the amount
+and hunter after payment; this is local simulation, not real money.
+
+`SessionManager.creditCompletedRewards` runs off the main thread. It finds Room
+COMPLETED challenges with APPROVED proofs and saves the updated account plus a
+per-challenge receipt in one `bounty_accounts` SharedPreferences commit. A local
+lock serializes manager instances. Receipts prevent duplicate credits, including
+after rotation, reopening, or repeated review. Earned balance is persisted rather
+than recomputed from remaining challenges, so deletion cannot remove old earnings.
+
+Approval stays atomic within Room; preferences are a separate store. If the app
+stops after approval and before reward persistence, the hunter's next Home/Profile
+visit settles completed unpaid challenges. Existing M8 approvals are also credited
+once. The review result distinguishes approval with reward pending from review
+failure. A later refresh retries failed preferences disk commits. This mechanism
+is for the single-process coursework app; no backend ledger, Room migration, new
+dependency, real payment, or M10 external API is introduced. Clearing app data
+resets local mock accounts, receipts, and balances.
+
+`MockRewardTest` covers real Approve UI, duplicate clicks, unchanged creator balance,
+Reject/stale guards, Rp50.000 + Rp20.000 = Rp70.000, recovery after an interrupted
+approval, Home/Profile refresh, recreation, logout/login persistence, concurrent
+payments from separate SessionManager instances, and retained balance after deletion.
+All ten tests passed on Pixel_7 API 37; the strengthened final reward test also
+passed separately. Canonical app/test builds and lint pass with 0 errors and 4
+existing warnings. Light/dark screenshots and 1.3x font scale were checked in an
+isolated installation; temporary QA artifacts/settings were cleaned up, and the
+canonical app was updated without clearing existing data. M10 has not started.
