@@ -18,6 +18,16 @@
     <string name="home_description">Temukan challenge dan selesaikan untuk mendapatkan reward demo.</string>
     <string name="available_challenges">Challenge tersedia</string>
     <string name="no_available_challenges">Belum ada challenge untuk ditampilkan.</string>
+    <string name="loading_challenges">Memuat challenge</string>
+    <string name="challenge_load_error">Challenge gagal dimuat. Coba lagi.</string>
+    <string name="retry_action">Coba lagi</string>
+    <string name="challenge_detail_title">Detail challenge</string>
+    <string name="view_challenge">Lihat challenge</string>
+    <string name="demo_reward">Reward demo · bukan uang asli</string>
+    <string name="rupiah_amount">Rp%1$s</string>
+    <string name="challenge_deadline">Batas waktu: %1$s</string>
+    <string name="challenge_not_found">Challenge tidak ditemukan atau sudah dihapus.</string>
+    <string name="back_action">Kembali</string>
     <string name="no_my_challenges">Belum ada challenge kamu</string>
     <string name="my_challenges_description">Challenge yang kamu buat atau terima akan tampil di sini.</string>
     <string name="create_challenge_title">Buat challenge baru</string>

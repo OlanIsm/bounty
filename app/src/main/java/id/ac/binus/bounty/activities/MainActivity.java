@@ -4,22 +4,33 @@ import android.os.Bundle;
 import android.content.Intent;
 import android.widget.TextView;
 import android.widget.FrameLayout;
+import android.view.View;
+import android.util.Log;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.Lifecycle;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.appbar.MaterialToolbar;
+import com.google.android.material.snackbar.Snackbar;
 
 import id.ac.binus.bounty.R;
+import id.ac.binus.bounty.adapters.ChallengeAdapter;
+import id.ac.binus.bounty.database.AppDatabase;
+import id.ac.binus.bounty.models.Challenge;
+import java.util.List;
 import id.ac.binus.bounty.models.User;
 import id.ac.binus.bounty.utils.ScreenInsets;
 import id.ac.binus.bounty.utils.SessionManager;
 
-/** Four top-level M2 destinations; challenge features are added in later milestones. */
+/** Four top-level destinations with a local Room challenge feed. */
 public class MainActivity extends AppCompatActivity {
     private BottomNavigationView navigation;
     private int selectedDestination = R.id.nav_home;
+    private int feedRequest;
     private final OnBackPressedCallback backToHome = new OnBackPressedCallback(false) {
         @Override
         public void handleOnBackPressed() {
@@ -63,6 +74,12 @@ public class MainActivity extends AppCompatActivity {
         super.onSaveInstanceState(outState);
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        if (navigation != null && selectedDestination == R.id.nav_home) loadFeed();
+    }
+
     private boolean showScreen(int destination) {
         int layout;
         int title;
@@ -82,7 +99,7 @@ public class MainActivity extends AppCompatActivity {
             return false;
         }
         FrameLayout content = findViewById(R.id.screen_content);
-        // ponytail: reinflate static M2 screens; retain form state when editable forms arrive in M5.
+        // ponytail: reinflate destination screens; retain editable form state when forms arrive in M5.
         content.removeAllViews();
         getLayoutInflater().inflate(layout, content, true);
         ((MaterialToolbar) findViewById(R.id.main_toolbar)).setTitle(title);
@@ -97,8 +114,53 @@ public class MainActivity extends AppCompatActivity {
                 new SessionManager(this).logout();
                 openLogin();
             });
+        } else if (destination == R.id.nav_home) {
+            RecyclerView list = findViewById(R.id.challenge_list);
+            list.setLayoutManager(new LinearLayoutManager(this));
+            list.setAdapter(new ChallengeAdapter(challenge -> startActivity(
+                    new Intent(this, ChallengeDetailActivity.class)
+                            .putExtra(ChallengeDetailActivity.EXTRA_CHALLENGE_ID, challenge.id))));
+            findViewById(R.id.feed_retry).setOnClickListener(view -> loadFeed());
+            if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) loadFeed();
         }
         return true;
+    }
+
+    private void loadFeed() {
+        View home = findViewById(R.id.home_screen);
+        if (home == null) return;
+        int request = ++feedRequest;
+        home.findViewById(R.id.feed_loading).setVisibility(View.VISIBLE);
+        home.findViewById(R.id.feed_message).setVisibility(View.GONE);
+        home.findViewById(R.id.feed_retry).setVisibility(View.GONE);
+        AppDatabase db = AppDatabase.getInstance(this);
+        db.getQueryExecutor().execute(() -> {
+            try {
+                List<Challenge> challenges = db.challengeDao().getAllChallenges();
+                runOnUiThread(() -> {
+                    if (isDestroyed() || isFinishing() || request != feedRequest || findViewById(R.id.home_screen) != home) return;
+                    RecyclerView list = home.findViewById(R.id.challenge_list);
+                    ((ChallengeAdapter) list.getAdapter()).submitList(challenges);
+                    home.findViewById(R.id.feed_loading).setVisibility(View.GONE);
+                    list.setVisibility(challenges.isEmpty() ? View.GONE : View.VISIBLE);
+                    TextView message = home.findViewById(R.id.feed_message);
+                    message.setText(R.string.no_available_challenges);
+                    message.setVisibility(challenges.isEmpty() ? View.VISIBLE : View.GONE);
+                });
+            } catch (RuntimeException error) {
+                Log.e("BountyFeed", "Unable to load challenges", error);
+                runOnUiThread(() -> {
+                    if (isDestroyed() || isFinishing() || request != feedRequest || findViewById(R.id.home_screen) != home) return;
+                    home.findViewById(R.id.feed_loading).setVisibility(View.GONE);
+                    home.findViewById(R.id.challenge_list).setVisibility(View.GONE);
+                    TextView message = home.findViewById(R.id.feed_message);
+                    message.setText(R.string.challenge_load_error);
+                    message.setVisibility(View.VISIBLE);
+                    home.findViewById(R.id.feed_retry).setVisibility(View.VISIBLE);
+                    Snackbar.make(home, R.string.challenge_load_error, Snackbar.LENGTH_LONG).show();
+                });
+            }
+        });
     }
 
     private void bindUser(User user) {
