@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/create_screen" style="@style/BountyScreen">
     <LinearLayout style="@style/BountyScreenContent">
         <com.google.android.material.textview.MaterialTextView
@@ -7,8 +8,52 @@
         <com.google.android.material.textview.MaterialTextView
             style="@style/BountyBody" android:layout_marginTop="16dp"
             android:text="@string/create_description" />
-        <com.google.android.material.textview.MaterialTextView
-            style="@style/BountyBody" android:layout_marginTop="24dp"
-            android:text="@string/create_unavailable" />
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/create_title_layout" style="@style/BountyTextInput"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="24dp" android:hint="@string/challenge_title_label">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/create_title_input" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:inputType="textCapSentences"
+                android:singleLine="true" android:maxLength="100" android:imeOptions="actionNext" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/create_description_layout" style="@style/BountyTextInput"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" android:hint="@string/challenge_description_label">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/create_description_input" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:inputType="textMultiLine|textCapSentences"
+                android:minLines="3" android:maxLength="2000" android:gravity="top|start" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/create_reward_layout" style="@style/BountyTextInput"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" android:hint="@string/challenge_reward_label"
+            app:helperText="@string/reward_input_hint">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/create_reward_input" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:inputType="number" android:maxLength="20"
+                android:singleLine="true" android:imeOptions="actionNext" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/create_deadline_layout" style="@style/BountyTextInput"
+            android:layout_width="match_parent" android:layout_height="wrap_content"
+            android:layout_marginTop="16dp" android:hint="@string/challenge_deadline_label"
+            app:helperText="@string/deadline_input_hint" app:endIconMode="custom"
+            app:endIconDrawable="@drawable/ic_calendar" app:endIconContentDescription="@string/choose_deadline">
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/create_deadline_input" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:inputType="date" android:maxLength="10"
+                android:singleLine="true" android:imeOptions="actionDone" />
+        </com.google.android.material.textfield.TextInputLayout>
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/publish_loading" android:layout_width="match_parent"
+            android:layout_height="wrap_content" android:layout_marginTop="24dp"
+            android:indeterminate="true" android:visibility="gone"
+            android:contentDescription="@string/publishing_challenge" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/publish_button" style="@style/BountyButton"
+            android:layout_marginTop="24dp" android:text="@string/publish_action" />
     </LinearLayout>
 </ScrollView>
