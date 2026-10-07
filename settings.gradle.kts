@@ -22,5 +22,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "Bounty"
+rootProject.name = "bounty"
 include(":app")
