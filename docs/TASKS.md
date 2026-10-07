@@ -323,11 +323,11 @@ M8 has not started.
 
 # M8 — Review Proof
 
-- [ ] Create ReviewProofActivity
-- [ ] Display proof image
-- [ ] Display proof description
-- [ ] Add Approve button
-- [ ] Add Reject button
+- [x] Create ReviewProofActivity
+- [x] Display proof image
+- [x] Display proof description
+- [x] Add Approve button
+- [x] Add Reject button
 
 Approve:
 
@@ -348,6 +348,33 @@ Target:
 ```text
 Creator dapat approve atau reject proof.
 ```
+
+Verified M8: canonical `assembleDebug`, `assembleDebugAndroidTest`, and
+`lintDebug` passed with 0 errors and 4 existing warnings. Eight existing tests
+passed in the full emulator suite. The focused `ReviewProofTest` passed after
+narrowing UI setup to ReviewProofActivity and waiting for Room status changes;
+feed ordering and cross-activity waits no longer obscure the review checks.
+
+Tests cover Reject, resubmission, Approve, latest-proof/creator/participant guards,
+invalid IDs, repeated/opposing decisions, rotation during a held review, duplicate
+clicks, photo error/retry, recreation, unavailable/missing records, unchanged
+balance, and rollback when the challenge update fails after the proof update.
+
+ReviewProofActivity is private and opens from SUBMITTED detail for the creator.
+It displays hunter, photo, description, and PENDING status using existing Material
+styles and Glide. Approve requires a loaded photo; a missing local image offers
+retry and still permits Reject. Controls disable during retained saving.
+The Room transaction checks current records and updates both statuses together:
+APPROVED/COMPLETED or REJECTED/ACCEPTED. Reject retains the hunter for resubmission.
+
+Manual checks confirmed feed/detail/review navigation, light mode, dark mode at
+1.3x font scale, complete action labels, readable proof content, and return to
+COMPLETED detail. Tests and visual checks used an isolated application ID;
+temporary QA data/helper were removed, settings restored, and canonical APK
+installed without clearing existing data. Changed: ReviewProofActivity,
+ChallengeDetailActivity, AppDatabase, manifest, review/detail XML, strings,
+ReviewProofTest, README, and this ledger. Remaining: deleted/moved local photos
+can become unavailable; retry/error handling is present. M9 has not started.
 
 ---
 

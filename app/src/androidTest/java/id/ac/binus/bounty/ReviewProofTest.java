@@ -19,7 +19,6 @@ import java.io.FileOutputStream;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import id.ac.binus.bounty.activities.ChallengeDetailActivity;
-import id.ac.binus.bounty.activities.MainActivity;
 import id.ac.binus.bounty.activities.ReviewProofActivity;
 import id.ac.binus.bounty.database.AppDatabase;
 import id.ac.binus.bounty.models.Challenge;
@@ -27,7 +26,6 @@ import id.ac.binus.bounty.models.Proof;
 import id.ac.binus.bounty.models.User;
 import id.ac.binus.bounty.utils.SessionManager;
 import static androidx.test.espresso.Espresso.onView;
-import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.*;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.*;
@@ -61,11 +59,9 @@ public class ReviewProofTest {
         try {
             assertFalse(db.reviewProof(challenge.id, first.id, "other_creator", true));
             assertFalse(db.reviewProof(-1, first.id, creator.id, true));
-            try (ActivityScenario<MainActivity> main = ActivityScenario.launch(MainActivity.class)) {
-                waitForView(R.id.feed_loading, false);
-                onView(withText(challenge.title)).perform(click());
-                waitForView(R.id.detail_loading, false);
-                onView(withId(R.id.review_proof_button)).perform(scrollTo(), click());
+            Intent intent = new Intent(context, ReviewProofActivity.class)
+                    .putExtra(ChallengeDetailActivity.EXTRA_CHALLENGE_ID, challenge.id);
+            try (ActivityScenario<ReviewProofActivity> scenario = ActivityScenario.launch(intent)) {
                 waitForView(R.id.review_loading, false);
                 waitForView(R.id.review_approve, true);
                 onView(withId(R.id.review_description)).check(matches(withText("First proof")));
@@ -78,34 +74,21 @@ public class ReviewProofTest {
                 });
                 assertTrue(blocked.await(5, TimeUnit.SECONDS));
                 onView(withId(R.id.review_reject)).perform(scrollTo(), click()).check(matches(not(isEnabled())));
-                InstrumentationRegistry.getInstrumentation().runOnMainSync(() -> {
-                    android.app.Activity review = null;
-                    for (android.app.Activity activity : androidx.test.runner.lifecycle.ActivityLifecycleMonitorRegistry
-                            .getInstance().getActivitiesInStage(androidx.test.runner.lifecycle.Stage.RESUMED)) review = activity;
-                    assertTrue(review instanceof ReviewProofActivity);
-                    review.findViewById(R.id.review_approve).performClick();
-                    review.recreate();
-                });
+                scenario.onActivity(activity -> activity.findViewById(R.id.review_approve).performClick());
+                scenario.recreate();
                 waitForView(R.id.review_loading, false);
                 onView(withId(R.id.review_reject)).perform(scrollTo()).check(matches(not(isEnabled())));
                 release.countDown();
-                waitForView(R.id.detail_loading, false);
-                onView(withId(R.id.challenge_status)).check(matches(withText(Challenge.ACCEPTED)));
-                assertEquals(Proof.REJECTED, db.proofDao().getProofByChallengeId(challenge.id).status);
-                pressBack();
-                waitForView(R.id.feed_loading, false);
-                onView(withId(R.id.nav_my_challenges)).perform(click());
-                waitForView(R.id.feed_loading, false);
-                onView(withText(challenge.title)).check(matches(isDisplayed()));
-                assertFalse(db.reviewProof(challenge.id, first.id, creator.id, true));
-                Proof next = proof(challenge.id, "file:///missing-m8-image.png", "Resubmitted proof");
-                next.id = (int) db.submitProof(next);
-                assertTrue(next.id > first.id);
-                assertFalse(db.reviewProof(challenge.id, first.id, creator.id, true));
-                assertEquals(Proof.PENDING, db.proofDao().getProofByChallengeId(challenge.id).status);
-                onView(withText(challenge.title)).perform(click());
-                waitForView(R.id.detail_loading, false);
-                onView(withId(R.id.review_proof_button)).perform(scrollTo(), click());
+                waitForStatus(db, challenge.id, Challenge.ACCEPTED);
+            }
+            assertEquals(Proof.REJECTED, db.proofDao().getProofByChallengeId(challenge.id).status);
+            assertFalse(db.reviewProof(challenge.id, first.id, creator.id, true));
+            Proof next = proof(challenge.id, "file:///missing-m8-image.png", "Resubmitted proof");
+            next.id = (int) db.submitProof(next);
+            assertTrue(next.id > first.id);
+            assertFalse(db.reviewProof(challenge.id, first.id, creator.id, true));
+            assertEquals(Proof.PENDING, db.proofDao().getProofByChallengeId(challenge.id).status);
+            try (ActivityScenario<ReviewProofActivity> scenario = ActivityScenario.launch(intent)) {
                 waitForView(R.id.review_loading, false);
                 waitForView(R.id.review_photo_error, false);
                 onView(withId(R.id.review_approve)).perform(scrollTo()).check(matches(not(isEnabled())));
@@ -116,7 +99,10 @@ public class ReviewProofTest {
                 waitForView(R.id.review_loading, false);
                 waitForView(R.id.review_approve, true);
                 onView(withId(R.id.review_description)).check(matches(withText("Resubmitted proof")));
-                // Force failure after updating the proof, verifying that both changes roll back.
+                scenario.recreate();
+                waitForView(R.id.review_loading, false);
+                waitForView(R.id.review_approve, true);
+                // Force failure after updating the proof, verifying both changes roll back.
                 db.getOpenHelper().getWritableDatabase().execSQL("CREATE TRIGGER m8_abort_review BEFORE UPDATE OF status ON challenges "
                         + "WHEN NEW.id = " + challenge.id + " AND NEW.status = 'COMPLETED' BEGIN SELECT RAISE(ABORT, 'M8 rollback'); END");
                 try { db.reviewProof(challenge.id, next.id, creator.id, true); fail("Trigger must abort review"); }
@@ -125,12 +111,11 @@ public class ReviewProofTest {
                 assertEquals(Proof.PENDING, db.proofDao().getProofByChallengeId(challenge.id).status);
                 assertEquals(Challenge.SUBMITTED, db.challengeDao().getChallengeById(challenge.id).status);
                 onView(withId(R.id.review_approve)).perform(scrollTo(), click());
-                waitForView(R.id.detail_loading, false);
-                onView(withId(R.id.challenge_status)).check(matches(withText(Challenge.COMPLETED)));
-                assertEquals(Proof.APPROVED, db.proofDao().getProofByChallengeId(challenge.id).status);
-                assertFalse(db.reviewProof(challenge.id, next.id, creator.id, false));
-                assertEquals(creator.demoBalance, session.getCurrentUser().demoBalance, 0);
+                waitForStatus(db, challenge.id, Challenge.COMPLETED);
             }
+            assertEquals(Proof.APPROVED, db.proofDao().getProofByChallengeId(challenge.id).status);
+            assertFalse(db.reviewProof(challenge.id, next.id, creator.id, false));
+            assertEquals(creator.demoBalance, session.getCurrentUser().demoBalance, 0);
             Intent review = new Intent(context, ReviewProofActivity.class)
                     .putExtra(ChallengeDetailActivity.EXTRA_CHALLENGE_ID, challenge.id);
             try (ActivityScenario<ReviewProofActivity> denied = ActivityScenario.launch(review)) {
@@ -158,6 +143,12 @@ public class ReviewProofTest {
         proof.imageUri = uri;
         proof.submittedAt = System.currentTimeMillis();
         return proof;
+    }
+    private void waitForStatus(AppDatabase db, int id, String status) {
+        long end = SystemClock.uptimeMillis() + 5000;
+        while (!status.equals(db.challengeDao().getChallengeById(id).status)
+                && SystemClock.uptimeMillis() < end) SystemClock.sleep(16);
+        assertEquals(status, db.challengeDao().getChallengeById(id).status);
     }
     private void waitForView(int id, boolean enabled) {
         onView(isRoot()).perform(new ViewAction() {

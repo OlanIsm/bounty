@@ -2,8 +2,8 @@
 
 Android coursework MVP using Java and XML. M0 project setup, M1 mock
 authentication, M2 main navigation, M3 local database, M4 challenge feed,
-M5 challenge publishing, M6 challenge acceptance, and M7 proof submission
-are implemented. M8 and later features are not implemented.
+M5 challenge publishing, M6 challenge acceptance, M7 proof submission, and
+M8 proof review are implemented. M9 and later features are not implemented.
 
 ## Requirements
 
@@ -28,7 +28,7 @@ Back behavior, logout, the signed-in screen guard, Room seed/CRUD/persistence,
 feed/detail navigation, recreation, refresh, empty states, missing IDs,
 Create validation, draft restoration, single-insert publishing, and acceptance
 with rotation, duplicate protection, persistence, and current-user filtering,
-plus native image picking and transactional proof submission.
+plus native image picking, transactional proof submission, and creator review.
 Run the suite on a disposable test installation: authentication resets local
 mock accounts, and the feed test temporarily deletes challenges (including
 related proofs) before restoring the original challenge records.
@@ -204,7 +204,7 @@ challenge to SUBMITTED and inserts its PENDING proof within one Room transaction
 Stale/duplicate submissions and other hunters are rejected; insertion failure
 rolls back the status. A ViewModel retains in-flight saving across rotation.
 Success returns to the refreshed detail; mock balance stays unchanged.
-Review, approval/rejection, and rewards remain M8/M9.
+Review and approval/rejection are added in M8; rewards remain M9.
 
 `SubmitProofTest` exercises required description/photo, cancellation and selection
 through the native picker, draft recreation, duplicate clicks and rotation during
@@ -217,3 +217,35 @@ the focused SubmitProofTest rerun passed after fixing native picker automation.
 Manual checks confirmed light/keyboard layouts, retained photo/text in dark mode
 at 1.3x font scale, and return to detail with SUBMITTED status. Tests and QA used
 an isolated application ID; the canonical APK was installed without clearing data.
+
+## M8 review proof
+
+Sign in as a challenge's creator, open its SUBMITTED detail from Home or My
+Challenges, and choose Review proof. The screen shows the latest hunter, photo,
+description, and PENDING status. Approve changes the proof to APPROVED and the
+challenge to COMPLETED. Reject changes the proof to REJECTED and the challenge
+back to ACCEPTED, preserving its hunter so another proof can be submitted.
+Success returns to refreshed detail. Balances remain unchanged until M9.
+
+`AppDatabase.reviewProof` checks the creator, submitted challenge, latest proof
+ID, PENDING status, and matching participant inside a Room transaction. It updates
+both records together and rolls back on failure. A stale proof cannot approve a
+new submission; repeated/opposing decisions cannot change a reviewed challenge.
+The native ViewModel retains an in-flight review across rotation.
+
+Controls disable while saving. Approve enables after the image loads. If its local
+URI no longer works, the screen displays an error and retry; Reject remains
+available after reading the description. Missing records, unauthorized access,
+stale states, and database failures show explanatory states or a Snackbar.
+No schema change, new dependency, review confirmation dialog (M11), or reward logic.
+
+`ReviewProofTest` checks Reject with held-write rotation and duplicate protection,
+resubmission, stale/unauthorized/repeated review rejection, photo failure/recovery,
+recreation, Approve, rollback after a forced second-record write failure, unavailable
+and missing records, and unchanged balance. Eight regression tests passed in the
+full Pixel_7 API 37 suite; the focused M8 test passed after narrowing its UI setup
+to the review screen and waiting for Room results. Canonical app/test APK builds
+and lint pass with 0 errors and 4 existing warnings. Manual screenshots confirmed
+light/dark review, 1.3x fonts, photo/description/action layout, and detail refresh to
+COMPLETED. Testing used an isolated installation; the main APK was updated without
+clearing data, and emulator settings and temporary installations were restored.
