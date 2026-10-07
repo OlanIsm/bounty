@@ -62,8 +62,8 @@ login/Home/register layouts, dark mode, 1.3x font scale, and keyboard insets.
 
 Demo login: `demo@bounty.local` (Insan), no password. Registration stores local
 mock accounts and returns to login with the registered email filled in.
-Logout clears the session but retains accounts. MainActivity is only a signed-in
-name/email/logout placeholder for the M1 target; M2 has not been started.
+Logout clears the session but retains accounts. At M1 completion, MainActivity
+was only a signed-in name/email/logout placeholder; navigation is tracked in M2.
 
 Remaining: lint has 0 errors and 4 non-blocking warnings (target SDK 36,
 available AGP update, the required SplashActivity name triggering the custom
@@ -74,12 +74,12 @@ immediately without a custom splash layout or artificial delay.
 
 # M2 — Main Navigation
 
-- [ ] Create MainActivity
-- [ ] Setup bottom navigation
-- [ ] Create Home screen
-- [ ] Create My Challenges screen
-- [ ] Create Create Challenge screen
-- [ ] Create Profile screen
+- [x] Create MainActivity
+- [x] Setup bottom navigation
+- [x] Create Home screen
+- [x] Create My Challenges screen
+- [x] Create Create Challenge screen
+- [x] Create Profile screen
 
 Navigation:
 
@@ -95,6 +95,22 @@ Target:
 ```text
 Semua main screen dapat dibuka.
 ```
+
+Verified: `assembleDebug`, `assembleDebugAndroidTest`, `lintDebug`, and
+`connectedDebugAndroidTest` passed on Pixel_7 (API 37). All three instrumentation
+tests passed, including authentication regression and navigation through all
+four destinations, activity recreation, tab selection, Back to Home, and
+logout from Profile. Emulator checks used a temporary application ID to keep
+the existing Bounty installation's mock accounts intact; the original
+`id.ac.binus.bounty` application ID was restored and the deliverable APK rebuilt.
+
+Manual screenshots confirmed Home, My Challenges, Create, and Profile, plus
+dark mode and 1.3x font scaling with complete navigation labels and safe insets.
+Lint remains at 0 errors and 4 existing non-blocking warnings listed under M1.
+
+Home and My Challenges show empty states. Create is a screen shell without
+the M5 form or publish action. Profile shows the current mock user and logout.
+Database, feed, and reward behavior remain later milestones. M3 has not started.
 
 ---
 

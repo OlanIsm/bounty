@@ -1,7 +1,8 @@
 # Bounty
 
-Android coursework MVP using Java and XML. M0 project setup and M1 mock
-authentication are implemented. M2 navigation and later features are not implemented.
+Android coursework MVP using Java and XML. M0 project setup, M1 mock
+authentication, and M2 main navigation are implemented. M3 and later features
+are not implemented.
 
 ## Requirements
 
@@ -21,7 +22,8 @@ to your JDK installation.
 
 The second command needs a running device or emulator. Tests check the launcher,
 INTERNET permission, registration validation, duplicate email handling, login,
-session persistence, logout, and the signed-in screen guard. The authentication
+session persistence, all four navigation destinations, restored tab selection,
+Back behavior, logout, and the signed-in screen guard. The authentication
 test resets local mock accounts on the test device.
 The debug APK is written to `app/build/outputs/apk/debug/app-debug.apk`.
 
@@ -41,7 +43,7 @@ Project requirements and milestone order are in `docs/` and `AGENTS.md`.
 
 ## M1 mock authentication
 
-Launch the app to enter login, or resume the signed-in placeholder if a session
+Launch the app to enter login, or resume Home if a session
 already exists. Use `demo@bounty.local` (name: Insan), or register a name and
 email, then log in with that email. There is no password or authentication
 server: any person using this installation can select a registered mock account.
@@ -55,11 +57,29 @@ and reward updates remain M9 work. Logout clears only the session, preserving
 accounts for later login. Session preferences are excluded from backups and
 device transfer.
 
-The signed-in screen shows the current name/email and a logout button.
+Profile shows the current name/email and a logout button.
 Authentication transitions clear the activity task so Back cannot return to
-the signed-in screen after logout. No bottom navigation or challenge screens
-are included in M1.
+the signed-in screen after logout. M1 provides authentication; navigation was
+added in M2.
 
 Auth forms use Material controls, the documented orange/yellow palette,
 16dp screen padding, scrollable layouts, and keyboard/system-bar insets.
 Button labels use dark text on orange to maintain readable contrast.
+
+## M2 main navigation
+
+MainActivity hosts four XML screens through Material BottomNavigationView:
+Home, My Challenges, Create, and Profile. Switching tabs replaces the content
+inside the activity; selecting the current tab keeps it in place. The selected
+destination survives activity recreation. Back returns to Home from other tabs;
+Back on Home follows the default Android behavior.
+
+Home greets the current user and shows an empty challenge section.
+My Challenges shows an empty state. Create explains that the form is not yet
+available. Profile displays the local user's name/email and supports logout.
+These are navigation screens only: Room entities remain M3, the challenge feed
+M4, publishing M5, and balances/rewards M9.
+
+Screens reuse the existing colors, typography, and spacing, and scroll when
+content or font sizes need more space. The root handles system-bar, cutout,
+and keyboard insets so the bottom navigation does not apply them twice.
