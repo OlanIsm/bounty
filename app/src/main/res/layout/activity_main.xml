@@ -1,22 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".activities.MainActivity">
+    android:fillViewport="true"
+    android:padding="16dp">
 
+    <LinearLayout android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:orientation="vertical"
+        android:paddingTop="32dp" android:paddingBottom="24dp">
     <com.google.android.material.textview.MaterialTextView
         android:id="@+id/app_title"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/app_name"
-        android:textSize="28sp"
-        android:textStyle="bold"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+        style="@style/BountyHeading"
+        android:text="@string/home_title" />
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/welcome_text" style="@style/BountyBody"
+        android:layout_marginTop="24dp" android:textSize="22sp" android:textStyle="bold" />
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/user_email" style="@style/BountyBody" android:layout_marginTop="8dp" />
+    <com.google.android.material.textview.MaterialTextView
+        style="@style/BountyBody" android:layout_marginTop="24dp"
+        android:text="@string/signed_in_note" />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/logout_button" style="@style/BountyButton"
+        android:layout_marginTop="32dp" android:text="@string/logout_action" />
+    </LinearLayout>
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>

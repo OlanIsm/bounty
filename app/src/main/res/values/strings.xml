@@ -1,3 +1,21 @@
 <resources>
     <string name="app_name">Bounty</string>
+    <string name="login_title">Masuk ke Bounty</string>
+    <string name="register_title">Buat akun demo</string>
+    <string name="mock_auth_note">Akun demo lokal. Tidak perlu password; jangan gunakan data sensitif.</string>
+    <string name="demo_account_hint">Coba akun demo: demo@bounty.local</string>
+    <string name="email_label">Email</string>
+    <string name="name_label">Nama</string>
+    <string name="login_action">Masuk</string>
+    <string name="register_action">Daftar</string>
+    <string name="register_link">Belum punya akun? Daftar</string>
+    <string name="login_link">Kembali ke login</string>
+    <string name="logout_action">Keluar</string>
+    <string name="home_title">Home</string>
+    <string name="welcome_user">Halo, %1$s!</string>
+    <string name="signed_in_note">Kamu sudah masuk ke akun demo.</string>
+    <string name="invalid_email">Masukkan alamat email yang valid.</string>
+    <string name="required_name">Nama wajib diisi.</string>
+    <string name="duplicate_email">Email sudah terdaftar. Kembali ke login untuk masuk.</string>
+    <string name="unknown_account">Email belum terdaftar. Gunakan akun demo atau daftar dahulu.</string>
 </resources>

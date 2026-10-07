@@ -1,26 +1,44 @@
 package id.ac.binus.bounty.activities;
 
 import android.os.Bundle;
+import android.content.Intent;
+import android.widget.TextView;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 
 import id.ac.binus.bounty.R;
+import id.ac.binus.bounty.models.User;
+import id.ac.binus.bounty.utils.ScreenInsets;
+import id.ac.binus.bounty.utils.SessionManager;
 
-/** Minimal launcher for M0; navigation is implemented in M2. */
+/** M1 signed-in placeholder; the full Home and navigation belong to M2. */
 public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
         setContentView(R.layout.activity_main);
-        ViewCompat.setOnApplyWindowInsetsListener(findViewById(R.id.main), (view, insets) -> {
-            Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
-            view.setPadding(systemBars.left, systemBars.top, systemBars.right, systemBars.bottom);
-            return insets;
+        ScreenInsets.apply(this);
+        findViewById(R.id.logout_button).setOnClickListener(view -> {
+            new SessionManager(this).logout();
+            openLogin();
         });
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        User user = new SessionManager(this).getCurrentUser();
+        if (user == null) {
+            openLogin();
+            return;
+        }
+        ((TextView) findViewById(R.id.welcome_text)).setText(getString(R.string.welcome_user, user.name));
+        ((TextView) findViewById(R.id.user_email)).setText(user.email);
+    }
+
+    private void openLogin() {
+        startActivity(new Intent(this, LoginActivity.class)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
+        finish();
     }
 }

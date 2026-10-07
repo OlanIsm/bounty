@@ -1,0 +1,5 @@
+<resources>
+    <color name="bounty_background">#181818</color>
+    <color name="bounty_surface">#202020</color>
+    <color name="bounty_text">#F7F7F7</color>
+</resources>
