@@ -29,6 +29,7 @@ import id.ac.binus.bounty.models.User;
 import id.ac.binus.bounty.utils.SessionManager;
 
 import static androidx.test.espresso.Espresso.onView;
+import static androidx.test.espresso.Espresso.pressBack;
 import static androidx.test.espresso.action.ViewActions.*;
 import static androidx.test.espresso.assertion.ViewAssertions.matches;
 import static androidx.test.espresso.matcher.ViewMatchers.*;
@@ -118,11 +119,13 @@ public class CreateChallengeTest {
             assertNull(saved.participantId);
             assertTrue(saved.createdAt > 0);
             assertEquals(creator.demoBalance, session.getCurrentUser().demoBalance, 0);
-            onView(withText(saved.title)).check(matches(isDisplayed())).perform(click());
-            onView(withId(R.id.detail_toolbar)).check(matches(isDisplayed()));
-            onView(withContentDescription(R.string.back_action)).perform(click());
             onView(withId(R.id.nav_create)).perform(click());
             onView(withId(R.id.create_title_input)).check(matches(withText("")));
+            onView(withId(R.id.nav_home)).perform(click());
+            waitForPublishedFeed();
+            onView(withText(saved.title)).check(matches(isDisplayed())).perform(click());
+            onView(withId(R.id.detail_toolbar)).check(matches(isDisplayed()));
+            pressBack();
         } finally {
             release.countDown();
             for (Challenge row : db.challengeDao().getChallengesByCreator(creator.id)) {

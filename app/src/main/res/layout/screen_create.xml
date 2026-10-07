@@ -41,6 +41,7 @@
             android:layout_width="match_parent" android:layout_height="wrap_content"
             android:layout_marginTop="16dp" android:hint="@string/challenge_deadline_label"
             app:helperText="@string/deadline_input_hint" app:endIconMode="custom"
+            app:errorIconDrawable="@null"
             app:endIconDrawable="@drawable/ic_calendar" app:endIconContentDescription="@string/choose_deadline">
             <com.google.android.material.textfield.TextInputEditText
                 android:id="@+id/create_deadline_input" android:layout_width="match_parent"

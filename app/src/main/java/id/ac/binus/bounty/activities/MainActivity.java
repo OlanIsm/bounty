@@ -93,9 +93,9 @@ public class MainActivity extends AppCompatActivity {
                 navigation.setSelectedItemId(R.id.nav_home);
                 // If already on Home, refresh the existing adapter after a background publish.
                 if (alreadyHome) loadFeed();
-                Snackbar.make(findViewById(R.id.main), R.string.challenge_published, Snackbar.LENGTH_LONG).show();
+                showSnackbar(R.string.challenge_published);
             } else if (state == PublishModel.ERROR) {
-                Snackbar.make(findViewById(R.id.main), R.string.challenge_publish_error, Snackbar.LENGTH_LONG).show();
+                showSnackbar(R.string.challenge_publish_error);
                 publishModel.state.setValue(PublishModel.IDLE);
             }
         });
@@ -310,7 +310,7 @@ public class MainActivity extends AppCompatActivity {
                     message.setText(R.string.challenge_load_error);
                     message.setVisibility(View.VISIBLE);
                     home.findViewById(R.id.feed_retry).setVisibility(View.VISIBLE);
-                    Snackbar.make(home, R.string.challenge_load_error, Snackbar.LENGTH_LONG).show();
+                    showSnackbar(R.string.challenge_load_error);
                 });
             }
         });
@@ -330,5 +330,10 @@ public class MainActivity extends AppCompatActivity {
         startActivity(new Intent(this, LoginActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
         finish();
+    }
+
+    private void showSnackbar(int message) {
+        Snackbar.make(findViewById(R.id.main), message, Snackbar.LENGTH_LONG)
+                .setAnchorView(navigation).show();
     }
 }

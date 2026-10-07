@@ -176,7 +176,7 @@ and database error/retry states are handled; stale screen results are ignored.
 `ChallengeDetailActivity` checks the session and reads the latest record by ID.
 It displays full fields, supports Back and recreation, and handles missing,
 deleted, and invalid IDs. Detail remains read-only; Accept belongs to M6.
-Create remains the M2 shell; M5 has not started.
+At M4 completion, Create remained the M2 shell and M5 had not started.
 
 Verified: `assembleDebug`, `assembleDebugAndroidTest`, `lintDebug`, and
 `connectedDebugAndroidTest` passed on Pixel_7 (API 37). All five instrumentation
@@ -198,20 +198,43 @@ the same four existing non-blocking warnings.
 
 # M5 — Create Challenge
 
-- [ ] Create form
-- [ ] Title input
-- [ ] Description input
-- [ ] Reward input
-- [ ] Deadline input
-- [ ] Form validation
-- [ ] Insert challenge ke Room
-- [ ] Refresh Home setelah publish
+- [x] Create form
+- [x] Title input
+- [x] Description input
+- [x] Reward input
+- [x] Deadline input
+- [x] Form validation
+- [x] Insert challenge ke Room
+- [x] Refresh Home setelah publish
 
 Target:
 
 ```text
 User membuat challenge → challenge muncul di Home.
 ```
+
+Verified M5: `assembleDebug`, `assembleDebugAndroidTest`, and `lintDebug` pass
+with the canonical application ID. Five existing regression tests passed in
+the full emulator suite. The focused `CreateChallengeTest` rerun also passed
+after fixing the calendar icon hidden by validation errors and anchoring
+Snackbars above bottom navigation. Checks cover required fields, zero reward,
+invalid/past dates, calendar access, draft restoration across tabs/recreation,
+rotation during a held Room insert, duplicate-click protection, saved creator
+and OPEN status, Home refresh, detail access, draft reset, and unchanged balance.
+
+Create uses Material text inputs and Android's date picker. Draft state is
+retained between tabs and saved even when Create is detached. A small nested
+ViewModel holds in-flight write state across rotation; writes use Room's
+transaction executor. Failed writes retain the draft for retry. Rewards are
+positive whole rupiah, titles have a 100-character limit, descriptions a
+2000-character limit, and deadlines must be valid ISO dates from today onward.
+
+Manual screenshots confirmed light mode, keyboard insets, dark mode at 1.3x
+font scaling, retained draft text, scrolling, and a reachable Publish action.
+Tests/QA used a temporary application ID to preserve existing app data;
+emulator animation, keyboard, font, and night settings were restored. The
+canonical APK was rebuilt and installed without clearing data. Lint remains
+at 0 errors and 4 existing warnings. M6 has not started.
 
 ---
 

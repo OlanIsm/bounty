@@ -1,8 +1,8 @@
 # Bounty
 
 Android coursework MVP using Java and XML. M0 project setup, M1 mock
-authentication, M2 main navigation, M3 local database, and M4 challenge feed
-are implemented. M5 and later features are not implemented.
+authentication, M2 main navigation, M3 local database, M4 challenge feed,
+and M5 challenge publishing are implemented. M6 and later features are not implemented.
 
 ## Requirements
 
@@ -24,7 +24,8 @@ The second command needs a running device or emulator. Tests check the launcher,
 INTERNET permission, registration validation, duplicate email handling, login,
 session persistence, all four navigation destinations, restored tab selection,
 Back behavior, logout, the signed-in screen guard, Room seed/CRUD/persistence,
-and feed/detail navigation, recreation, refresh, empty states, and missing IDs.
+feed/detail navigation, recreation, refresh, empty states, missing IDs,
+and Create validation, draft restoration, and single-insert publishing.
 Run the suite on a disposable test installation: authentication resets local
 mock accounts, and the feed test temporarily deletes challenges (including
 related proofs) before restoring the original challenge records.
@@ -78,10 +79,10 @@ destination survives activity recreation. Back returns to Home from other tabs;
 Back on Home follows the default Android behavior.
 
 At M2 completion, Home greeted the current user and showed an empty challenge section.
-My Challenges shows an empty state. Create explains that the form is not yet
-available. Profile displays the local user's name/email and supports logout.
+My Challenges shows an empty state. At M2 completion, Create was a screen shell;
+M5 adds the publishing form. Profile displays the local user's name/email and supports logout.
 These were navigation screens only at M2 completion: the feed was added in M4,
-publishing M5, and balances/rewards M9.
+publishing was added in M5, and balances/rewards remain M9.
 
 Screens reuse the existing colors, typography, and spacing, and scroll when
 content or font sizes need more space. The root handles system-bar, cutout,
@@ -127,9 +128,36 @@ rows without replacing the entire list.
 and reads the latest Room record. It shows the full description and all card
 fields in a scrollable layout. Back returns to the feed; activity recreation
 retains the ID. Missing, invalid, and deleted IDs show an explanatory state.
-This detail screen is read-only: publishing remains M5 and Accept remains M6.
+This detail screen is read-only: publishing is available in Create; Accept remains M6.
 
 `ChallengeFeedTest` verifies the Room-backed feed/detail flow, fields and
 formatting, activity recreation, refreshed status, legacy dates, empty feed,
 and missing/invalid detail records. It inserts a test challenge directly
 through the DAO, then restores the original challenge data during cleanup.
+
+## M5 create and publish
+
+Open the Create tab, enter a title, description, positive whole-rupiah demo
+reward (no separators), and deadline in `YYYY-MM-DD` format, then choose
+Publish challenge. The calendar icon also opens Android's date picker and
+remains available when a date has a validation error. Titles are limited to
+100 characters and descriptions to 2000; whitespace-only text, zero/invalid
+rewards, invalid dates, and past dates are rejected with field errors.
+
+Publishing creates an OPEN Room challenge with the current user's ID,
+name/avatar, and a creation timestamp. It runs on Room's transaction executor,
+disables the form while saving, then clears the completed draft and returns
+to Home with a refreshed feed and success message. Errors preserve the input
+and let the user retry Publish. The operation does not modify demo balances.
+
+MainActivity retains the Create view between tabs and saves its hierarchy
+even when another destination is active. Drafts survive activity recreation.
+A small nested Android ViewModel/LiveData holds in-flight publish state across
+rotation, without retaining an Activity, and rejects duplicate submissions.
+Results are consumed after Android restores the navigation/view state.
+
+`CreateChallengeTest` verifies required-field, zero-reward, invalid/past-date
+validation, native calendar access, draft restoration across tabs/rotation,
+duplicate-click protection during a held Room insert, rotation during saving,
+persisted creator/status/reward fields, refreshed Home, detail access, draft
+reset, and unchanged mock balance. M6 acceptance is not implemented.
