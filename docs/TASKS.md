@@ -110,24 +110,43 @@ Lint remains at 0 errors and 4 existing non-blocking warnings listed under M1.
 
 Home and My Challenges show empty states. Create is a screen shell without
 the M5 form or publish action. Profile shows the current mock user and logout.
-Database, feed, and reward behavior remain later milestones. M3 has not started.
+At M2 completion, database, feed, and reward behavior remained later milestones.
 
 ---
 
 # M3 — Local Database
 
-- [ ] Create Challenge entity
-- [ ] Create Proof entity
-- [ ] Create ChallengeDao
-- [ ] Create ProofDao
-- [ ] Create AppDatabase
-- [ ] Add initial mock challenges
+- [x] Create Challenge entity
+- [x] Create Proof entity
+- [x] Create ChallengeDao
+- [x] Create ProofDao
+- [x] Create AppDatabase
+- [x] Add initial mock challenges
 
 Target:
 
 ```text
 Challenge mock dapat dibaca dari Room.
 ```
+
+Verified: `assembleDebug`, `assembleDebugAndroidTest`, `lintDebug`, and
+`connectedDebugAndroidTest` passed on Pixel_7 (API 37). All four instrumentation
+tests passed on the final emulator run. The first run passed the Room test
+but failed an existing authentication UI assertion; a full rerun passed
+without changes to authentication code or tests.
+
+The Room check covers the three documented seed titles/rewards/OPEN states,
+generated IDs, CRUD, creator/participant queries, latest proof selection,
+updates, persistence across reopening, no reseeding after deletion, and
+foreign-key rejection/cascade deletion. The test uses a separate database.
+The suite ran with a temporary application ID to preserve existing Bounty
+accounts; the original application ID was restored for the deliverable APK.
+
+Schema v1 is exported under `app/schemas/`. `AppDatabase.getInstance(context)`
+opens `bounty_database` lazily on the first DAO operation and seeds inside the
+creation transaction. DAO calls must run off the main thread. Mock deadlines
+are seven days after creation. M3 adds no UI changes; Home's Room feed remains
+M4, which has not started. Lint has 0 errors and the same 4 existing warnings.
 
 ---
 

@@ -1,8 +1,8 @@
 # Bounty
 
 Android coursework MVP using Java and XML. M0 project setup, M1 mock
-authentication, and M2 main navigation are implemented. M3 and later features
-are not implemented.
+authentication, M2 main navigation, and M3 local database are implemented.
+M4 and later features are not implemented.
 
 ## Requirements
 
@@ -23,8 +23,8 @@ to your JDK installation.
 The second command needs a running device or emulator. Tests check the launcher,
 INTERNET permission, registration validation, duplicate email handling, login,
 session persistence, all four navigation destinations, restored tab selection,
-Back behavior, logout, and the signed-in screen guard. The authentication
-test resets local mock accounts on the test device.
+Back behavior, logout, the signed-in screen guard, and Room seed/CRUD/persistence.
+The authentication test resets local mock accounts on the test device.
 The debug APK is written to `app/build/outputs/apk/debug/app-debug.apk`.
 
 ## M0 setup
@@ -77,9 +77,31 @@ Back on Home follows the default Android behavior.
 Home greets the current user and shows an empty challenge section.
 My Challenges shows an empty state. Create explains that the form is not yet
 available. Profile displays the local user's name/email and supports logout.
-These are navigation screens only: Room entities remain M3, the challenge feed
-M4, publishing M5, and balances/rewards M9.
+These are navigation screens only: the challenge feed remains M4,
+publishing M5, and balances/rewards M9.
 
 Screens reuse the existing colors, typography, and spacing, and scroll when
 content or font sizes need more space. The root handles system-bar, cutout,
 and keyboard insets so the bottom navigation does not apply them twice.
+
+## M3 local database
+
+`models/Challenge.java` and `models/Proof.java` implement the Room tables from
+`docs/DATABASE.md`. `database/ChallengeDao.java` provides insert, list, lookup,
+creator/participant filtering, update, and delete operations. `ProofDao.java`
+inserts/updates proofs and returns the latest submission for a challenge,
+ordered by submission time and then ID. Deleting a challenge also deletes its
+proofs; SQLite rejects proofs referencing a missing challenge.
+
+Use `AppDatabase.getInstance(context)` to obtain the application-context
+singleton named `bounty_database`. DAO operations are synchronous and must run
+off the main thread. Room opens the database lazily on the first operation;
+its creation callback inserts the three documented OPEN mock challenges in
+the creation transaction. Their creator is Bounty Demo and their deadlines
+are seven days after database creation. Reopening does not seed again, even
+after a demo challenge is deleted. Schema v1 is exported under `app/schemas/`.
+
+`AppDatabaseTest` checks seed values, CRUD/filtering, latest proof selection,
+reopening/persistence, absence of reseeding, and foreign-key enforcement using
+a separate test database. M3 adds the data layer only; Home remains empty
+until M4 connects the feed to Room.
