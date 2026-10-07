@@ -483,27 +483,69 @@ clearing existing Bounty data. Changed: MainActivity, User documentation, ApiCli
 RandomUserApi, RandomUserResponse, Profile/user-row XML, strings, ExternalApiTest,
 SubmitProofTest synchronization, README, and this ledger. Remaining: four existing
 lint warnings; public service/photo availability uses the documented fallback.
-M11 has not started.
+M11 remained pending at M10 completion.
 
 ---
 
 # M11 — UI Polish
 
-- [ ] Apply design system
-- [ ] Consistent spacing
-- [ ] Status badges
-- [ ] Reward styling
-- [ ] Empty state
-- [ ] Loading indicator
-- [ ] Error messages
-- [ ] Confirm dialog untuk Accept
-- [ ] Confirm dialog untuk Approve
+- [x] Apply design system
+- [x] Consistent spacing
+- [x] Status badges
+- [x] Reward styling
+- [x] Empty state
+- [x] Loading indicator
+- [x] Error messages
+- [x] Confirm dialog untuk Accept
+- [x] Confirm dialog untuk Approve
 
 Target:
 
 ```text
 App siap dipresentasikan.
 ```
+
+Implementation and verification (2026-10-08):
+
+Shared Java/XML presentation now applies labeled status badges to cards/detail
+and proof review, rounded orange demo reward highlights, consistent spacing,
+secondary button styling, and native 20dp confirmation dialogs. Light/dark badge
+pairs all exceed 4.5:1. Dialog action text uses themed readable colors after visual
+QA identified insufficient contrast in the stock orange text buttons. Existing
+empty/loading/error/retry states are retained, with polite live regions for
+asynchronous messages and descriptive loading labels.
+
+Home uses the existing RecyclerView with a native ConcatAdapter welcome/balance
+header so the feed remains scrollable in short landscape windows and larger
+fonts. No new dependency, custom animation, payment feature, or Room migration.
+
+Accept and Approve now show Batal/action confirmations describing the challenge
+and demo reward; Approve also identifies the recipient and says it is not real
+money. A native DialogFragment retains the captured actor/challenge/proof payload
+through recreation, prevents duplicate dialogs, and routes confirmed actions
+through the existing retained models and atomic Room authorization/state checks.
+Cancel changes neither status nor balance.
+
+Validation: assembleDebug, assembleDebugAndroidTest, and lintDebug pass; lint has
+0 errors and the same four pre-existing warnings. All 11 existing instrumentation
+tests pass on Pixel_7/API 37 using an isolated app ID. Updated acceptance/review
+checks cover cancellation and pending-dialog recreation; mock reward checks cover
+duplicate clicks and unchanged exactly-once crediting. Feed checks account for the
+scrolling header and still cover empty state, refresh, recreation, and missing IDs.
+
+Manual isolated-install QA checked Home/status/reward presentation, Accept and
+Approve dialogs, native Back cancellation, light/dark modes, 1.3x font scale, and
+landscape feed scrolling. A final visual confirmation checked readable dialog
+button text in both themes. Temporary fixtures/installations were removed and
+font/night/rotation/animation settings restored. The canonical APK was rebuilt
+and installed without clearing existing Bounty data.
+
+Changed: ChallengeDetailActivity, ReviewProofActivity, MainActivity,
+ActionConfirmation, ChallengeDisplay, shared theme/colors/strings/reward drawable,
+Home header XML, async-message layouts, four existing instrumentation tests,
+README, DESIGN_SYSTEM, and this ledger. Remaining: four existing lint warnings;
+QA used the current phone emulator rather than a separate tablet device. M12
+has not started; its scenario campaign remains unchecked.
 
 ---
 

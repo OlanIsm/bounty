@@ -40,6 +40,12 @@
     </style>
     <style name="BountyDialog" parent="ThemeOverlay.Material3.MaterialAlertDialog">
         <item name="shapeAppearanceOverlay">@style/BountyDialogShape</item>
+        <item name="colorSurface">@color/bounty_surface</item>
+        <item name="buttonBarPositiveButtonStyle">@style/BountyDialogButton</item>
+        <item name="buttonBarNegativeButtonStyle">@style/BountyDialogButton</item>
+    </style>
+    <style name="BountyDialogButton" parent="Widget.Material3.Button.TextButton.Dialog">
+        <item name="android:textColor">@color/status_open_fg</item>
     </style>
     <style name="BountyDialogShape">
         <item name="cornerFamily">rounded</item><item name="cornerSize">20dp</item>

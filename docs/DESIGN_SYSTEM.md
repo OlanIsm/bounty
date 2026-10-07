@@ -355,3 +355,27 @@ Jangan menggunakan terlalu banyak:
 - Complex layout
 
 Karena tujuan utama project adalah aplikasi Android yang functional dan mudah didemonstrasikan.
+
+
+## 16. Native implementation notes (M11)
+
+Primary buttons and reward labels use dark text on #FF7A00 for readable contrast;
+white text on this orange does not meet 4.5:1. Status badges retain their text
+labels alongside semantic colors: OPEN orange/yellow, ACCEPTED blue, SUBMITTED
+and PENDING purple, COMPLETED and APPROVED green, REJECTED red, and unknown or
+EXPIRED neutral. Foreground/background pairs have separate light/dark resources
+and all meet 4.5:1. Status is never communicated through color alone.
+
+Use shared native typography, 16dp screen/card padding, spacing in multiples of
+4dp, 16dp card corners, 12dp button corners, and 20dp Material dialog corners.
+Home's welcome and demo balance scroll with the challenge list so landscape
+and larger fonts leave the feed reachable. Existing forms/detail/review/Profile
+remain scrollable. Asynchronous empty/error messages use polite live regions;
+loading indicators retain descriptive accessibility labels.
+
+Accept and Approve require a native confirmation with Batal and the action
+label. Accept identifies the challenge and explains when demo reward is granted.
+Approve identifies the challenge, recipient, and demo amount and explicitly
+states that it is not real money. Cancelling leaves local state unchanged;
+pending dialogs restore across activity recreation and recheck permissions and
+current Room status when confirmed.

@@ -3,8 +3,8 @@
 Android coursework MVP using Java and XML. M0 project setup, M1 mock
 authentication, M2 main navigation, M3 local database, M4 challenge feed,
 M5 challenge publishing, M6 challenge acceptance, M7 proof submission,
-M8 proof review, M9 mock reward, and M10 external demo profiles are implemented.
-M11 and later features are not implemented.
+M8 proof review, M9 mock reward, M10 external demo profiles, and M11 UI polish
+are implemented. M12 and later milestones have not started.
 
 ## Requirements
 
@@ -30,7 +30,8 @@ feed/detail navigation, recreation, refresh, empty states, missing IDs,
 Create validation, draft restoration, single-insert publishing, and acceptance
 with rotation, duplicate protection, persistence, and current-user filtering,
 plus native image picking, transactional proof submission, creator review,
-mock reward/recovery, and external API parsing/loading/fallback behavior.
+mock reward/recovery, external API parsing/loading/fallback behavior, and
+confirmation cancellation/recreation before accepting or approving.
 Run the suite on a disposable test installation: authentication resets local
 mock accounts, and the feed test temporarily deletes challenges (including
 related proofs) before restoring the original challenge records.
@@ -329,3 +330,22 @@ at 1.3x font scale, offline fallback, local Home while offline, and the actual r
 button loading profiles after connectivity returned. Emulator network/appearance/
 animation settings were restored and the isolated app removed. The canonical APK
 was installed without clearing existing Bounty data. M11 has not started.
+
+
+## M11 UI polish
+
+Challenge cards/detail and proof review show labeled status badges with semantic
+light/dark colors. Rounded orange reward labels keep the demo amount prominent.
+Native shared styles preserve the documented typography, padding, spacing,
+button/card/dialog corners, and readable contrast. Home's welcome and balance
+scroll with the feed to keep challenges reachable in landscape and larger fonts.
+Existing empty/loading/error/retry states remain available; asynchronous messages
+are announced through polite accessibility live regions.
+
+Accept Challenge now asks for confirmation before assigning the hunter. Approve
+Proof asks for confirmation with the challenge, reward amount, and recipient,
+explicitly identifying the reward as demo money. Batal dismisses without changing
+status or balance. Pending confirmations restore after activity recreation;
+confirmation still checks the current actor, Room permissions, latest proof,
+and current challenge state. Existing duplicate/busy guards and exactly-once
+mock reward crediting remain in place. No new dependency or database migration.
