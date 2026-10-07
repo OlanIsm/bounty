@@ -89,7 +89,7 @@ public class SubmitProofTest {
                 waitForLoad();
                 onView(withId(R.id.proof_description_input)).check(matches(withText(" Completed challenge with photo. ")));
                 onView(withId(R.id.choose_proof_photo)).perform(scrollTo(), click());
-                chooseNativeImage(instrumentation);
+                chooseNativeImage(instrumentation, "M7-proof");
                 waitForLoad();
                 onView(withId(R.id.proof_photo)).perform(scrollTo()).check(matches(isDisplayed()));
                 scenario.recreate();
@@ -148,7 +148,7 @@ public class SubmitProofTest {
         proof.submittedAt = System.currentTimeMillis();
         return proof;
     }
-    private void waitForPackage(Instrumentation instrumentation, String packageName) {
+    private static void waitForPackage(Instrumentation instrumentation, String packageName) {
         long end = SystemClock.uptimeMillis() + 10000;
         do {
             AccessibilityNodeInfo root = instrumentation.getUiAutomation().getRootInActiveWindow();
@@ -159,14 +159,22 @@ public class SubmitProofTest {
         } while (SystemClock.uptimeMillis() < end);
         throw new AssertionError("Native window did not become ready: " + packageName);
     }
-    private void chooseNativeImage(Instrumentation instrumentation) {
+    static void chooseNativeImage(Instrumentation instrumentation, String filename) {
         long end = SystemClock.uptimeMillis() + 10000;
         do {
             AccessibilityNodeInfo root = instrumentation.getUiAutomation().getRootInActiveWindow();
-            AccessibilityNodeInfo node = findImage(root);
+            AccessibilityNodeInfo node = findImage(root, filename);
             if (node != null) {
                 android.graphics.Rect bounds = new android.graphics.Rect();
                 node.getBoundsInScreen(bounds);
+                AccessibilityNodeInfo clickable = node;
+                while (clickable != null && !clickable.isClickable()) clickable = clickable.getParent();
+                // Prefer the native item action: grid bounds can move while DocumentsUI refreshes.
+                if (clickable != null && clickable.performAction(AccessibilityNodeInfo.ACTION_CLICK)) {
+                    waitForPackage(instrumentation, instrumentation.getTargetContext().getPackageName());
+                    instrumentation.waitForIdleSync();
+                    return;
+                }
                 try (android.os.ParcelFileDescriptor command = instrumentation.getUiAutomation()
                         .executeShellCommand("input tap " + bounds.centerX() + " " + bounds.centerY());
                      java.io.InputStream output = new java.io.FileInputStream(command.getFileDescriptor())) {
@@ -181,19 +189,21 @@ public class SubmitProofTest {
                     }
                     SystemClock.sleep(100);
                 } while (SystemClock.uptimeMillis() < returned);
-                throw new AssertionError("Picker did not return after tapping " + bounds);
+                AccessibilityNodeInfo active = instrumentation.getUiAutomation().getRootInActiveWindow();
+                throw new AssertionError("Picker did not return after tapping " + bounds + "; active package: "
+                        + (active == null ? "none" : active.getPackageName()));
 
             }
             SystemClock.sleep(100);
         } while (SystemClock.uptimeMillis() < end);
-        throw new AssertionError("Native picker did not show M7-proof.png");
+        throw new AssertionError("Native picker did not show " + filename);
     }
-    private AccessibilityNodeInfo findImage(AccessibilityNodeInfo node) {
+    private static AccessibilityNodeInfo findImage(AccessibilityNodeInfo node, String filename) {
         if (node == null) return null;
-        if ((node.getText() != null && node.getText().toString().contains("M7-proof"))
-                || (node.getContentDescription() != null && node.getContentDescription().toString().startsWith("M7-proof"))) return node;
+        if ((node.getText() != null && node.getText().toString().contains(filename))
+                || (node.getContentDescription() != null && node.getContentDescription().toString().startsWith(filename))) return node;
         for (int i = 0; i < node.getChildCount(); i++) {
-            AccessibilityNodeInfo found = findImage(node.getChild(i));
+            AccessibilityNodeInfo found = findImage(node.getChild(i), filename);
             if (found != null) return found;
         }
         return null;

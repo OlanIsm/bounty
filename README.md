@@ -4,7 +4,7 @@ Android coursework MVP using Java and XML. M0 project setup, M1 mock
 authentication, M2 main navigation, M3 local database, M4 challenge feed,
 M5 challenge publishing, M6 challenge acceptance, M7 proof submission,
 M8 proof review, M9 mock reward, M10 external demo profiles, and M11 UI polish
-are implemented. M12 and later milestones have not started.
+are implemented. M12 testing is in progress; M13 has not started.
 
 ## Requirements
 
@@ -19,10 +19,12 @@ to your JDK installation.
 
 ```powershell
 ./gradlew.bat assembleDebug lintDebug
-./gradlew.bat connectedDebugAndroidTest
+./scripts/Test-Android.ps1
 ```
 
-The second command needs a running device or emulator. Tests check the launcher,
+The second command needs a running device or emulator and uses a separate
+`id.ac.binus.bounty.testing` installation. Pass `-Adb` for a custom SDK location
+and `-Serial` when multiple devices are connected. Tests check the launcher,
 INTERNET permission, registration validation, duplicate email handling, login,
 session persistence, all four navigation destinations, restored tab selection,
 Back behavior, logout, the signed-in screen guard, Room seed/CRUD/persistence,
@@ -32,9 +34,15 @@ with rotation, duplicate protection, persistence, and current-user filtering,
 plus native image picking, transactional proof submission, creator review,
 mock reward/recovery, external API parsing/loading/fallback behavior, and
 confirmation cancellation/recreation before accepting or approving.
-Run the suite on a disposable test installation: authentication resets local
-mock accounts, and the feed test temporarily deletes challenges (including
-related proofs) before restoring the original challenge records.
+The script checks fresh Login, runs the feature tests and a continuous
+creator/hunter flow, then checks the paid hunter after two actual process
+restarts. It removes only the temporary app/test packages and restores emulator
+animation settings in `finally`. Reports are written under
+`app/build/reports/m12/`. Raw instrumentation resets local mock accounts and
+temporarily deletes challenges/proofs, so use the isolated script rather than
+`connectedDebugAndroidTest` against your normal installation.
+The script builds isolated APKs; run `assembleDebug` again to produce the
+canonical `id.ac.binus.bounty` APK for normal use.
 The debug APK is written to `app/build/outputs/apk/debug/app-debug.apk`.
 
 ## M0 setup

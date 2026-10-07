@@ -24,6 +24,12 @@ android {
     }
 
     buildTypes {
+        debug {
+            // Disposable installation for instrumentation and the M12 restart check.
+            if (providers.gradleProperty("bountyIsolatedTest").orNull == "true") {
+                applicationIdSuffix = ".testing"
+            }
+        }
         release {
             isMinifyEnabled = false
             proguardFiles(
