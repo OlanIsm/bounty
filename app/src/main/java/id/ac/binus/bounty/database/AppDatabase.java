@@ -63,6 +63,24 @@ public abstract class AppDatabase extends RoomDatabase {
         });
     }
 
+    /** Reviews only the current pending submission, keeping both status changes atomic. */
+    public boolean reviewProof(int challengeId, int proofId, String creatorId, boolean approve) {
+        if (challengeId <= 0 || proofId <= 0 || creatorId == null || creatorId.trim().isEmpty()) return false;
+        return runInTransaction(() -> {
+            Challenge challenge = challengeDao().getChallengeById(challengeId);
+            Proof proof = proofDao().getProofByChallengeId(challengeId);
+            if (challenge == null || proof == null || proof.id != proofId
+                    || !creatorId.equals(challenge.creatorId) || !Challenge.SUBMITTED.equals(challenge.status)
+                    || !Proof.PENDING.equals(proof.status) || !proof.hunterId.equals(challenge.participantId)) return false;
+            proof.status = approve ? Proof.APPROVED : Proof.REJECTED;
+            challenge.status = approve ? Challenge.COMPLETED : Challenge.ACCEPTED;
+            if (proofDao().updateProof(proof) != 1 || challengeDao().updateChallenge(challenge) != 1) {
+                throw new IllegalStateException("Review records changed during transaction");
+            }
+            return true;
+        });
+    }
+
     public abstract ChallengeDao challengeDao();
     public abstract ProofDao proofDao();
 }

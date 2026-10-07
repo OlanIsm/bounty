@@ -39,6 +39,8 @@ public class ChallengeDetailActivity extends AppCompatActivity {
         });
         findViewById(R.id.submit_proof_button).setOnClickListener(view -> startActivity(
                 new Intent(this, SubmitProofActivity.class).putExtra(EXTRA_CHALLENGE_ID, currentChallenge.id)));
+        findViewById(R.id.review_proof_button).setOnClickListener(view -> startActivity(
+                new Intent(this, ReviewProofActivity.class).putExtra(EXTRA_CHALLENGE_ID, currentChallenge.id)));
         acceptModel.state.observe(this, state -> {
             bindAccept();
             if (state != AcceptModel.IDLE && state != AcceptModel.SAVING) {
@@ -114,6 +116,8 @@ public class ChallengeDetailActivity extends AppCompatActivity {
         button.setText(saving ? R.string.accepting_challenge : R.string.accept_action);
         findViewById(R.id.submit_proof_button).setVisibility(challenge != null && user != null
                 && Challenge.ACCEPTED.equals(challenge.status) && user.id.equals(challenge.participantId)
+                ? View.VISIBLE : View.GONE);
+        findViewById(R.id.review_proof_button).setVisibility(own && Challenge.SUBMITTED.equals(challenge.status)
                 ? View.VISIBLE : View.GONE);
         TextView message = findViewById(R.id.accept_message);
         if (challenge != null && challenge.participantId != null) {

@@ -47,6 +47,9 @@
                 <com.google.android.material.button.MaterialButton android:id="@+id/submit_proof_button"
                     style="@style/BountyButton" android:layout_marginTop="16dp"
                     android:text="@string/submit_proof_action" android:visibility="gone" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/review_proof_button"
+                    style="@style/BountyButton" android:layout_marginTop="16dp"
+                    android:text="@string/review_proof_action" android:visibility="gone" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

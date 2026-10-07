@@ -72,4 +72,14 @@
     <string name="proof_submitting">Menyimpan bukti&#8230;</string>
     <string name="proof_saved">Bukti tersimpan. Status challenge: SUBMITTED.</string>
     <string name="proof_save_error">Gagal menyimpan bukti. Coba lagi.</string>
+    <string name="review_proof_action">Review proof</string>
+    <string name="approve_proof_action">Approve</string>
+    <string name="reject_proof_action">Reject</string>
+    <string name="review_saving">Menyimpan review&#8230;</string>
+    <string name="review_approved">Bukti disetujui. Challenge COMPLETED.</string>
+    <string name="review_rejected">Bukti ditolak. Hunter dapat submit ulang.</string>
+    <string name="review_unavailable">Review hanya untuk creator dan bukti terbaru yang masih PENDING pada challenge SUBMITTED.</string>
+    <string name="review_missing_proof">Bukti challenge belum ditemukan.</string>
+    <string name="review_save_error">Gagal menyimpan review. Coba lagi.</string>
+    <string name="review_image_error">Foto tidak tersedia. Coba muat ulang atau periksa deskripsi sebelum Reject.</string>
 </resources>

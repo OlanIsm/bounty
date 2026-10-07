@@ -12,6 +12,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/Theme.Bounty">
+        <activity android:name=".activities.ReviewProofActivity" android:exported="false" />
         <activity android:name=".activities.SubmitProofActivity" android:exported="false"
             android:windowSoftInputMode="adjustResize" />
         <activity android:name=".activities.ChallengeDetailActivity" android:exported="false" />

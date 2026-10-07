@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:orientation="vertical">
+    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/review_toolbar"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:minHeight="?attr/actionBarSize" app:title="@string/review_proof_action"
+        app:navigationIcon="@drawable/ic_back" app:navigationContentDescription="@string/back_action" />
+    <com.google.android.material.progressindicator.LinearProgressIndicator android:id="@+id/review_loading"
+        android:layout_width="match_parent" android:layout_height="wrap_content"
+        android:indeterminate="true" android:contentDescription="@string/loading_challenges" />
+    <ScrollView android:layout_width="match_parent" android:layout_height="0dp"
+        android:layout_weight="1" android:fillViewport="true" android:padding="16dp">
+        <LinearLayout style="@style/BountyScreenContent">
+            <com.google.android.material.textview.MaterialTextView android:id="@+id/review_message"
+                style="@style/BountyBody" android:visibility="gone" />
+            <com.google.android.material.button.MaterialButton android:id="@+id/review_retry"
+                style="@style/BountyButton" android:text="@string/retry_action" android:visibility="gone" />
+            <LinearLayout android:id="@+id/review_content" android:layout_width="match_parent"
+                android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone">
+                <com.google.android.material.textview.MaterialTextView android:id="@+id/review_title" style="@style/BountyHeading" />
+                <com.google.android.material.textview.MaterialTextView android:id="@+id/review_hunter"
+                    style="@style/BountyBody" android:layout_marginTop="16dp" />
+                <ImageView android:id="@+id/review_photo" android:layout_width="match_parent"
+                    android:layout_height="240dp" android:layout_marginTop="24dp"
+                    android:scaleType="fitCenter" android:contentDescription="@string/proof_photo_preview" />
+                <com.google.android.material.textview.MaterialTextView android:id="@+id/review_photo_error"
+                    style="@style/BountyBody" android:layout_marginTop="16dp" android:visibility="gone"
+                    android:text="@string/review_image_error" android:accessibilityLiveRegion="polite" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/review_photo_retry"
+                    style="@style/BountyButton" android:text="@string/retry_action" android:visibility="gone" />
+                <com.google.android.material.textview.MaterialTextView style="@style/BountySection"
+                    android:text="@string/proof_description_label" android:layout_marginTop="24dp" />
+                <com.google.android.material.textview.MaterialTextView android:id="@+id/review_description"
+                    style="@style/BountyBody" android:layout_marginTop="8dp" />
+                <com.google.android.material.textview.MaterialTextView android:id="@+id/review_status"
+                    style="@style/BountyStatus" android:layout_marginTop="16dp" />
+                <com.google.android.material.progressindicator.LinearProgressIndicator android:id="@+id/review_saving"
+                    android:layout_width="match_parent" android:layout_height="wrap_content"
+                    android:layout_marginTop="24dp" android:indeterminate="true" android:visibility="gone"
+                    android:contentDescription="@string/review_saving" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/review_approve"
+                    style="@style/BountyButton" android:layout_marginTop="24dp"
+                    android:text="@string/approve_proof_action" android:enabled="false" />
+                <com.google.android.material.button.MaterialButton android:id="@+id/review_reject"
+                    style="@style/BountyButton" android:layout_marginTop="8dp"
+                    app:backgroundTint="?attr/colorSurface" android:textColor="?attr/colorOnSurface"
+                    app:strokeColor="?attr/colorOnSurface" app:strokeWidth="1dp"
+                    android:text="@string/reject_proof_action" android:enabled="false" />
+            </LinearLayout>
+        </LinearLayout>
+    </ScrollView>
+</LinearLayout>
