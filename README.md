@@ -2,7 +2,8 @@
 
 Android coursework MVP using Java and XML. M0 project setup, M1 mock
 authentication, M2 main navigation, M3 local database, M4 challenge feed,
-and M5 challenge publishing are implemented. M6 and later features are not implemented.
+M5 challenge publishing, and M6 challenge acceptance are implemented.
+M7 and later features are not implemented.
 
 ## Requirements
 
@@ -25,7 +26,8 @@ INTERNET permission, registration validation, duplicate email handling, login,
 session persistence, all four navigation destinations, restored tab selection,
 Back behavior, logout, the signed-in screen guard, Room seed/CRUD/persistence,
 feed/detail navigation, recreation, refresh, empty states, missing IDs,
-and Create validation, draft restoration, and single-insert publishing.
+Create validation, draft restoration, single-insert publishing, and acceptance
+with rotation, duplicate protection, persistence, and current-user filtering.
 Run the suite on a disposable test installation: authentication resets local
 mock accounts, and the feed test temporarily deletes challenges (including
 related proofs) before restoring the original challenge records.
@@ -79,7 +81,7 @@ destination survives activity recreation. Back returns to Home from other tabs;
 Back on Home follows the default Android behavior.
 
 At M2 completion, Home greeted the current user and showed an empty challenge section.
-My Challenges shows an empty state. At M2 completion, Create was a screen shell;
+At M2 completion, My Challenges showed an empty state and Create was a screen shell;
 M5 adds the publishing form. Profile displays the local user's name/email and supports logout.
 These were navigation screens only at M2 completion: the feed was added in M4,
 publishing was added in M5, and balances/rewards remain M9.
@@ -128,7 +130,7 @@ rows without replacing the entire list.
 and reads the latest Room record. It shows the full description and all card
 fields in a scrollable layout. Back returns to the feed; activity recreation
 retains the ID. Missing, invalid, and deleted IDs show an explanatory state.
-This detail screen is read-only: publishing is available in Create; Accept remains M6.
+At M4 completion, detail was read-only. M5 adds publishing and M6 adds acceptance.
 
 `ChallengeFeedTest` verifies the Room-backed feed/detail flow, fields and
 formatting, activity recreation, refreshed status, legacy dates, empty feed,
@@ -160,4 +162,24 @@ Results are consumed after Android restores the navigation/view state.
 validation, native calendar access, draft restoration across tabs/rotation,
 duplicate-click protection during a held Room insert, rotation during saving,
 persisted creator/status/reward fields, refreshed Home, detail access, draft
-reset, and unchanged mock balance. M6 acceptance is not implemented.
+reset, and unchanged mock balance.
+
+## M6 accept and My Challenges
+
+Open an OPEN challenge created by another account and choose Accept challenge.
+Room atomically changes it to ACCEPTED and stores the current hunter's ID/name.
+The conditional update rejects non-OPEN, already assigned, missing, and creator-owned
+records, so repeated or competing acceptance cannot overwrite the first hunter.
+The button disables while saving and after acceptance; detail displays the hunter.
+A nested ViewModel retains the write across recreation. Errors show a Snackbar
+and reload the latest record for retry. Acceptance leaves demo balances unchanged.
+
+My Challenges reuses the feed adapter, detail navigation, and loading/empty/retry
+states. It lists challenges created or accepted by the signed-in account, newest
+first, refreshing on tab entry and resume. No schema change or library was needed.
+
+`AcceptChallengeTest` checks creator rejection, disabled controls and duplicate
+clicks during a held write, rotation during/after saving, persisted hunter/status,
+rejection of a second hunter and invalid ID, creator/hunter filtering, My Challenges
+across recreation, and unchanged balance. All seven instrumentation tests pass
+on Pixel_7 API 37 using an isolated test application ID. Submit Proof remains M7.

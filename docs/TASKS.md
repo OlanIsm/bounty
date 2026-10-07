@@ -240,17 +240,38 @@ at 0 errors and 4 existing warnings. M6 has not started.
 
 # M6 — Accept Challenge
 
-- [ ] Add Accept button
-- [ ] Check challenge status
-- [ ] Save participant
-- [ ] Update status OPEN → ACCEPTED
-- [ ] Show accepted challenge di My Challenges
+- [x] Add Accept button
+- [x] Check challenge status
+- [x] Save participant
+- [x] Update status OPEN → ACCEPTED
+- [x] Show accepted challenge di My Challenges
 
 Target:
 
 ```text
 Hunter dapat menerima challenge.
 ```
+
+Verified M6: `assembleDebug`, `assembleDebugAndroidTest`, `lintDebug`, and
+`connectedDebugAndroidTest` passed on Pixel_7 API 37. All seven instrumentation
+tests passed, including held acceptance/rotation, duplicate-click protection,
+creator rejection, saved participant/status, second-hunter rejection, missing ID,
+current-user filtering, My Challenges recreation, and unchanged demo balance.
+
+A conditional Room UPDATE accepts only OPEN, unassigned challenges created by
+another user. Detail shows loading/disabled controls and the assigned hunter;
+a nested ViewModel retains the write across rotation. My Challenges shares the
+existing adapter and query flow, listing records created or accepted by the
+current account with loading, empty, retry, and resume refresh behavior.
+
+Manual emulator checks confirmed enabled OPEN acceptance, ACCEPTED/disabled
+controls and hunter name, and the accepted record in My Challenges. Screenshots
+confirmed light mode and My Challenges in dark mode at 1.3x font scale. Testing
+used a temporary application ID to preserve existing Bounty data. The canonical
+APK was rebuilt and installed without clearing data; temporary app and emulator
+settings were restored. Lint remains at 0 errors and 4 existing warnings.
+Changed: ChallengeDao, ChallengeDetailActivity, MainActivity, detail/My Challenges
+XML, strings, AcceptChallengeTest, README, and this task ledger. M7 has not started.
 
 ---
 
