@@ -146,26 +146,53 @@ Schema v1 is exported under `app/schemas/`. `AppDatabase.getInstance(context)`
 opens `bounty_database` lazily on the first DAO operation and seeds inside the
 creation transaction. DAO calls must run off the main thread. Mock deadlines
 are seven days after creation. M3 adds no UI changes; Home's Room feed remains
-M4, which has not started. Lint has 0 errors and the same 4 existing warnings.
+M4 at M3 completion. Lint has 0 errors and the same 4 existing warnings.
 
 ---
 
 # M4 — Challenge Feed
 
-- [ ] Create Challenge model
-- [ ] Create challenge card XML
-- [ ] Create RecyclerView
-- [ ] Create ChallengeAdapter
-- [ ] Load challenges from Room
-- [ ] Show reward
-- [ ] Show status
-- [ ] Open Challenge Detail
+- [x] Create Challenge model
+- [x] Create challenge card XML
+- [x] Create RecyclerView
+- [x] Create ChallengeAdapter
+- [x] Load challenges from Room
+- [x] Show reward
+- [x] Show status
+- [x] Open Challenge Detail
 
 Target:
 
 ```text
 Home menampilkan challenge feed.
 ```
+
+Reuses the M3 `Challenge` entity as the model. `MainActivity` loads the Room
+feed through its query executor into `ChallengeAdapter`/`item_challenge.xml`.
+Cards show creator/fallback avatar, title, description preview, rupiah reward
+labelled as a demo, deadline, status, and a detail action. Loading, empty,
+and database error/retry states are handled; stale screen results are ignored.
+
+`ChallengeDetailActivity` checks the session and reads the latest record by ID.
+It displays full fields, supports Back and recreation, and handles missing,
+deleted, and invalid IDs. Detail remains read-only; Accept belongs to M6.
+Create remains the M2 shell; M5 has not started.
+
+Verified: `assembleDebug`, `assembleDebugAndroidTest`, `lintDebug`, and
+`connectedDebugAndroidTest` passed on Pixel_7 (API 37). All five instrumentation
+tests passed, including the new feed/detail flow, fields/formatting, activity
+recreation, status refresh, non-ISO dates, empty feed, and missing/invalid IDs.
+The first run exposed a test-launcher task-clearing issue; the standalone
+detail scenarios now run after the Home checks. No production behavior was
+changed for this test fix.
+
+Manual screenshots confirmed feed/detail in light mode and dark mode with
+1.3x font scaling, readable rewards, complete action labels, and safe insets.
+Emulator tests and visual checks used a temporary application ID to preserve
+existing Bounty data. The original `id.ac.binus.bounty` ID was restored, final
+APKs rebuilt, and the app updated without clearing data. Font scale and night
+mode were restored; the temporary app was removed. Lint has 0 errors and
+the same four existing non-blocking warnings.
 
 ---
 

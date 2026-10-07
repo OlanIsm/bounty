@@ -64,12 +64,6 @@ public class ChallengeFeedTest {
 
             Intent detail = new Intent(context, ChallengeDetailActivity.class)
                     .putExtra(ChallengeDetailActivity.EXTRA_CHALLENGE_ID, challenge.id);
-            try (ActivityScenario<ChallengeDetailActivity> scenario = ActivityScenario.launch(detail)) {
-                waitForLoad(R.id.detail_loading, -1);
-                scenario.recreate();
-                waitForLoad(R.id.detail_loading, -1);
-                checkDetail(challenge);
-            }
             challenge.status = Challenge.ACCEPTED;
             challenge.deadline = "31 Dec";
             dao.updateChallenge(challenge);
@@ -87,6 +81,15 @@ public class ChallengeFeedTest {
             onView(withId(R.id.nav_home)).perform(click());
             waitForLoad(R.id.feed_loading, 0);
             onView(withId(R.id.feed_message)).check(matches(withText(R.string.no_available_challenges)));
+            // ActivityScenario's launcher clears the task; finish Home checks before standalone detail scenarios.
+            dao.insertChallenge(challenge);
+            try (ActivityScenario<ChallengeDetailActivity> scenario = ActivityScenario.launch(detail)) {
+                waitForLoad(R.id.detail_loading, -1);
+                scenario.recreate();
+                waitForLoad(R.id.detail_loading, -1);
+                checkDetail(challenge);
+            }
+            dao.deleteChallenge(challenge);
             try (ActivityScenario<ChallengeDetailActivity> missing = ActivityScenario.launch(detail)) {
                 waitForLoad(R.id.detail_loading, -1);
                 onView(withId(R.id.detail_message)).check(matches(withText(R.string.challenge_not_found)));

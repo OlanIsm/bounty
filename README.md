@@ -1,8 +1,8 @@
 # Bounty
 
 Android coursework MVP using Java and XML. M0 project setup, M1 mock
-authentication, M2 main navigation, and M3 local database are implemented.
-M4 and later features are not implemented.
+authentication, M2 main navigation, M3 local database, and M4 challenge feed
+are implemented. M5 and later features are not implemented.
 
 ## Requirements
 
@@ -23,8 +23,11 @@ to your JDK installation.
 The second command needs a running device or emulator. Tests check the launcher,
 INTERNET permission, registration validation, duplicate email handling, login,
 session persistence, all four navigation destinations, restored tab selection,
-Back behavior, logout, the signed-in screen guard, and Room seed/CRUD/persistence.
-The authentication test resets local mock accounts on the test device.
+Back behavior, logout, the signed-in screen guard, Room seed/CRUD/persistence,
+and feed/detail navigation, recreation, refresh, empty states, and missing IDs.
+Run the suite on a disposable test installation: authentication resets local
+mock accounts, and the feed test temporarily deletes challenges (including
+related proofs) before restoring the original challenge records.
 The debug APK is written to `app/build/outputs/apk/debug/app-debug.apk`.
 
 ## M0 setup
@@ -74,10 +77,10 @@ inside the activity; selecting the current tab keeps it in place. The selected
 destination survives activity recreation. Back returns to Home from other tabs;
 Back on Home follows the default Android behavior.
 
-Home greets the current user and shows an empty challenge section.
+At M2 completion, Home greeted the current user and showed an empty challenge section.
 My Challenges shows an empty state. Create explains that the form is not yet
 available. Profile displays the local user's name/email and supports logout.
-These are navigation screens only: the challenge feed remains M4,
+These were navigation screens only at M2 completion: the feed was added in M4,
 publishing M5, and balances/rewards M9.
 
 Screens reuse the existing colors, typography, and spacing, and scroll when
@@ -103,5 +106,30 @@ after a demo challenge is deleted. Schema v1 is exported under `app/schemas/`.
 
 `AppDatabaseTest` checks seed values, CRUD/filtering, latest proof selection,
 reopening/persistence, absence of reseeding, and foreign-key enforcement using
-a separate test database. M3 adds the data layer only; Home remains empty
-until M4 connects the feed to Room.
+a separate test database. M3 added the data layer only; M4 connects Home to Room.
+
+## M4 challenge feed and detail
+
+Home now reads Room challenges into a RecyclerView using `ChallengeAdapter`
+and `item_challenge.xml`. The M3 `Challenge` entity also serves as the model;
+there is no duplicate DTO. Cards display creator/avatar (with local fallback),
+title, a two-line description preview, reward labelled as a demo, deadline,
+status, and a detail button. Rupiah formatting and date presentation are
+shared with detail in `ChallengeDisplay`; non-ISO dates retain their stored text.
+
+Queries run on Room's query executor. Home refreshes on resume or after
+switching back to its tab. Loading, empty, and database error states are
+handled; errors offer retry and show a Snackbar. Results from destroyed
+activities or replaced Home views are ignored. ListAdapter applies changed
+rows without replacing the entire list.
+
+`ChallengeDetailActivity` opens by challenge ID, checks the local session,
+and reads the latest Room record. It shows the full description and all card
+fields in a scrollable layout. Back returns to the feed; activity recreation
+retains the ID. Missing, invalid, and deleted IDs show an explanatory state.
+This detail screen is read-only: publishing remains M5 and Accept remains M6.
+
+`ChallengeFeedTest` verifies the Room-backed feed/detail flow, fields and
+formatting, activity recreation, refreshed status, legacy dates, empty feed,
+and missing/invalid detail records. It inserts a test challenge directly
+through the DAO, then restores the original challenge data during cleanup.
