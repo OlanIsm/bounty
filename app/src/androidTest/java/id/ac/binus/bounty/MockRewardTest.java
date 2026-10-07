@@ -76,6 +76,16 @@ public class MockRewardTest {
                     SystemClock.sleep(16);
                 } while (SystemClock.uptimeMillis() < end);
                 assertTrue("Approve must become available", ready.get());
+                assertEquals(Challenge.SUBMITTED, db.challengeDao().getChallengeById(first.id).status);
+                review.recreate();
+                review.onActivity(activity -> {
+                    androidx.appcompat.app.AppCompatDialogFragment dialog =
+                            (androidx.appcompat.app.AppCompatDialogFragment) activity.getSupportFragmentManager()
+                                    .findFragmentByTag("confirm_approve");
+                    assertNotNull(dialog);
+                    ((androidx.appcompat.app.AlertDialog) dialog.requireDialog())
+                            .getButton(android.content.DialogInterface.BUTTON_POSITIVE).performClick();
+                });
                 waitForBalance(context, email, 70000);
             }
             assertEquals(Challenge.COMPLETED, db.challengeDao().getChallengeById(first.id).status);

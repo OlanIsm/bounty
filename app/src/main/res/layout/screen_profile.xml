@@ -23,7 +23,7 @@
             android:layout_height="wrap_content" android:layout_marginTop="16dp"
             android:indeterminate="true" android:contentDescription="@string/demo_users_loading" />
         <com.google.android.material.textview.MaterialTextView android:id="@+id/demo_users_error"
-            style="@style/BountyBody" android:layout_marginTop="16dp"
+            android:accessibilityLiveRegion="polite" style="@style/BountyBody" android:layout_marginTop="16dp"
             android:text="@string/demo_users_error" android:visibility="gone" />
         <com.google.android.material.button.MaterialButton android:id="@+id/demo_users_retry"
             style="@style/BountyButton" android:text="@string/retry_action" android:visibility="gone" />

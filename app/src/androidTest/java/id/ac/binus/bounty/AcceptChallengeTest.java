@@ -52,6 +52,13 @@ public class AcceptChallengeTest {
             try (ActivityScenario<ChallengeDetailActivity> scenario = ActivityScenario.launch(detail)) {
                 waitForLoad(R.id.detail_loading);
                 onView(withId(R.id.accept_button)).perform(scrollTo()).check(matches(isEnabled()));
+                onView(withId(R.id.accept_button)).perform(click());
+                assertEquals(Challenge.OPEN, db.challengeDao().getChallengeById(challenge.id).status);
+                onView(withId(android.R.id.button2)).perform(click());
+                assertEquals(Challenge.OPEN, db.challengeDao().getChallengeById(challenge.id).status);
+                onView(withId(R.id.accept_button)).perform(click());
+                scenario.recreate();
+                onView(withText(R.string.confirm_accept_title)).check(matches(isDisplayed()));
                 CountDownLatch blocked = new CountDownLatch(1);
                 db.getTransactionExecutor().execute(() -> {
                     blocked.countDown();
@@ -59,7 +66,8 @@ public class AcceptChallengeTest {
                     catch (InterruptedException error) { Thread.currentThread().interrupt(); }
                 });
                 assertTrue(blocked.await(5, TimeUnit.SECONDS));
-                onView(withId(R.id.accept_button)).perform(click()).check(matches(not(isEnabled())));
+                onView(withId(android.R.id.button1)).perform(click());
+                onView(withId(R.id.accept_button)).check(matches(not(isEnabled())));
                 scenario.onActivity(activity -> activity.findViewById(R.id.accept_button).performClick());
                 scenario.recreate();
                 waitForLoad(R.id.detail_loading);

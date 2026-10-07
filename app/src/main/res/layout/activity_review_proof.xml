@@ -14,7 +14,7 @@
         android:layout_weight="1" android:fillViewport="true" android:padding="16dp">
         <LinearLayout style="@style/BountyScreenContent">
             <com.google.android.material.textview.MaterialTextView android:id="@+id/review_message"
-                style="@style/BountyBody" android:visibility="gone" />
+                android:accessibilityLiveRegion="polite" style="@style/BountyBody" android:visibility="gone" />
             <com.google.android.material.button.MaterialButton android:id="@+id/review_retry"
                 style="@style/BountyButton" android:text="@string/retry_action" android:visibility="gone" />
             <LinearLayout android:id="@+id/review_content" android:layout_width="match_parent"
@@ -44,9 +44,7 @@
                     style="@style/BountyButton" android:layout_marginTop="24dp"
                     android:text="@string/approve_proof_action" android:enabled="false" />
                 <com.google.android.material.button.MaterialButton android:id="@+id/review_reject"
-                    style="@style/BountyButton" android:layout_marginTop="8dp"
-                    app:backgroundTint="?attr/colorSurface" android:textColor="?attr/colorOnSurface"
-                    app:strokeColor="?attr/colorOnSurface" app:strokeWidth="1dp"
+                    style="@style/BountySecondaryButton" android:layout_marginTop="8dp"
                     android:text="@string/reject_proof_action" android:enabled="false" />
             </LinearLayout>
         </LinearLayout>

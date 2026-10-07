@@ -2,4 +2,16 @@
     <color name="bounty_background">#181818</color>
     <color name="bounty_surface">#202020</color>
     <color name="bounty_text">#F7F7F7</color>
+    <color name="status_open_bg">#49321B</color>
+    <color name="status_open_fg">#FFD18A</color>
+    <color name="status_accepted_bg">#1C3252</color>
+    <color name="status_accepted_fg">#B3D1FF</color>
+    <color name="status_submitted_bg">#392344</color>
+    <color name="status_submitted_fg">#EDBFFF</color>
+    <color name="status_completed_bg">#1C3829</color>
+    <color name="status_completed_fg">#A6E9BD</color>
+    <color name="status_rejected_bg">#482525</color>
+    <color name="status_rejected_fg">#FFBABA</color>
+    <color name="status_neutral_bg">#32383B</color>
+    <color name="status_neutral_fg">#DFE5E8</color>
 </resources>

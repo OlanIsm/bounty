@@ -131,7 +131,7 @@ public class ChallengeFeedTest {
                     View loading = root.findViewById(loadingId);
                     RecyclerView list = root.findViewById(R.id.challenge_list);
                     if (loading != null && loading.getVisibility() == View.GONE
-                            && (feedSize < 0 || list.getAdapter().getItemCount() == feedSize)) return;
+                            && (feedSize < 0 || list.getAdapter().getItemCount() == feedSize + 1)) return;
                     ui.loopMainThreadForAtLeast(16);
                 } while (SystemClock.uptimeMillis() < end);
                 throw new AssertionError("Room content did not load within 5 seconds");

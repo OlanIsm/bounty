@@ -21,6 +21,9 @@ import androidx.lifecycle.ViewModelProvider;
 import androidx.lifecycle.MutableLiveData;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.recyclerview.widget.ConcatAdapter;
+import android.view.ViewGroup;
+import android.view.LayoutInflater;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.appbar.MaterialToolbar;
@@ -56,6 +59,8 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView navigation;
     private int selectedDestination = R.id.nav_home;
     private int feedRequest;
+    private ChallengeAdapter feedAdapter;
+    private HomeHeaderAdapter homeHeaderAdapter;
     private int balanceRequest;
     private View createScreen;
     private SparseArray<Parcelable> createState;
@@ -186,9 +191,6 @@ public class MainActivity extends AppCompatActivity {
         selectedDestination = destination;
         backToHome.setEnabled(destination != R.id.nav_home);
         User user = new SessionManager(this).getCurrentUser();
-        if (user != null) {
-            bindUser(user);
-        }
         if (destination == R.id.nav_profile) {
             findViewById(R.id.demo_users_retry).setOnClickListener(view -> demoUsersModel.load(ApiClient.getApi()));
             if (demoUsersModel.state.getValue() == null) demoUsersModel.load(ApiClient.getApi());
@@ -200,12 +202,18 @@ public class MainActivity extends AppCompatActivity {
         } else if (destination == R.id.nav_home || destination == R.id.nav_my_challenges) {
             RecyclerView list = findViewById(R.id.challenge_list);
             list.setLayoutManager(new LinearLayoutManager(this));
-            list.setAdapter(new ChallengeAdapter(challenge -> startActivity(
+            feedAdapter = new ChallengeAdapter(challenge -> startActivity(
                     new Intent(this, ChallengeDetailActivity.class)
-                            .putExtra(ChallengeDetailActivity.EXTRA_CHALLENGE_ID, challenge.id))));
+                            .putExtra(ChallengeDetailActivity.EXTRA_CHALLENGE_ID, challenge.id)));
+            list.setItemAnimator(null);
+            if (destination == R.id.nav_home) {
+                homeHeaderAdapter = new HomeHeaderAdapter(user);
+                list.setAdapter(new ConcatAdapter(homeHeaderAdapter, feedAdapter));
+            } else list.setAdapter(feedAdapter);
             findViewById(R.id.feed_retry).setOnClickListener(view -> loadFeed());
             if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) loadFeed();
         }
+        if (user != null) bindUser(user);
         if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) refreshBalance();
         return true;
     }
@@ -318,9 +326,9 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     if (isDestroyed() || isFinishing() || request != feedRequest || findViewById(screenId) != home) return;
                     RecyclerView list = home.findViewById(R.id.challenge_list);
-                    ((ChallengeAdapter) list.getAdapter()).submitList(challenges);
+                    feedAdapter.submitList(challenges);
                     home.findViewById(R.id.feed_loading).setVisibility(View.GONE);
-                    list.setVisibility(challenges.isEmpty() ? View.GONE : View.VISIBLE);
+                    list.setVisibility(mine && challenges.isEmpty() ? View.GONE : View.VISIBLE);
                     TextView message = home.findViewById(R.id.feed_message);
                     message.setText(mine ? R.string.no_my_challenges : R.string.no_available_challenges);
                     message.setVisibility(challenges.isEmpty() ? View.VISIBLE : View.GONE);
@@ -330,7 +338,8 @@ public class MainActivity extends AppCompatActivity {
                 runOnUiThread(() -> {
                     if (isDestroyed() || isFinishing() || request != feedRequest || findViewById(screenId) != home) return;
                     home.findViewById(R.id.feed_loading).setVisibility(View.GONE);
-                    home.findViewById(R.id.challenge_list).setVisibility(View.GONE);
+                    feedAdapter.submitList(Collections.emptyList());
+                    home.findViewById(R.id.challenge_list).setVisibility(mine ? View.GONE : View.VISIBLE);
                     TextView message = home.findViewById(R.id.feed_message);
                     message.setText(R.string.challenge_load_error);
                     message.setVisibility(View.VISIBLE);
@@ -339,6 +348,22 @@ public class MainActivity extends AppCompatActivity {
                 });
             }
         });
+    }
+
+    private static class HomeHeaderAdapter extends RecyclerView.Adapter<RecyclerView.ViewHolder> {
+        User user;
+        HomeHeaderAdapter(User user) { this.user = user; }
+        @Override public RecyclerView.ViewHolder onCreateViewHolder(ViewGroup parent, int type) {
+            return new RecyclerView.ViewHolder(LayoutInflater.from(parent.getContext())
+                    .inflate(R.layout.item_home_header, parent, false)) { };
+        }
+        @Override public void onBindViewHolder(RecyclerView.ViewHolder holder, int position) {
+            if (user == null) return;
+            View root = holder.itemView;
+            ((TextView) root.findViewById(R.id.welcome_text)).setText(root.getContext().getString(R.string.welcome_user, user.name));
+            ((TextView) root.findViewById(R.id.demo_balance_amount)).setText(ChallengeDisplay.rupiah(root.getContext(), user.demoBalance));
+        }
+        @Override public int getItemCount() { return 1; }
     }
 
     private void refreshBalance() {
@@ -370,8 +395,10 @@ public class MainActivity extends AppCompatActivity {
         TextView balance = findViewById(R.id.demo_balance_amount);
         if (balance != null) balance.setText(ChallengeDisplay.rupiah(this, user.demoBalance));
         if (selectedDestination == R.id.nav_home) {
-            ((TextView) findViewById(R.id.welcome_text))
-                    .setText(getString(R.string.welcome_user, user.name));
+            if (homeHeaderAdapter != null) {
+                homeHeaderAdapter.user = user;
+                homeHeaderAdapter.notifyItemChanged(0);
+            }
         } else if (selectedDestination == R.id.nav_profile) {
             ((TextView) findViewById(R.id.profile_name)).setText(user.name);
             ((TextView) findViewById(R.id.user_email)).setText(user.email);

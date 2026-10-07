@@ -17,6 +17,7 @@ import id.ac.binus.bounty.R;
 import id.ac.binus.bounty.database.AppDatabase;
 import id.ac.binus.bounty.models.Challenge;
 import id.ac.binus.bounty.utils.ChallengeDisplay;
+import id.ac.binus.bounty.utils.ActionConfirmation;
 import id.ac.binus.bounty.utils.ScreenInsets;
 import id.ac.binus.bounty.utils.SessionManager;
 
@@ -31,11 +32,20 @@ public class ChallengeDetailActivity extends AppCompatActivity {
         setContentView(R.layout.activity_challenge_detail);
         ScreenInsets.apply(this);
         acceptModel = new ViewModelProvider(this).get(AcceptModel.class);
+        getSupportFragmentManager().setFragmentResultListener("confirm_accept", this, (key, data) -> {
+            User user = new SessionManager(this).getCurrentUser();
+            if (user != null && user.id.equals(data.getString("actor")))
+                acceptModel.accept(AppDatabase.getInstance(this), data.getInt("challenge"), user);
+            else Snackbar.make(findViewById(R.id.main), R.string.accept_unavailable, Snackbar.LENGTH_LONG).show();
+        });
         findViewById(R.id.accept_button).setOnClickListener(view -> {
             User user = new SessionManager(this).getCurrentUser();
-            if (user != null && currentChallenge != null) {
-                acceptModel.accept(AppDatabase.getInstance(this), currentChallenge.id, user);
-            }
+            if (!view.isEnabled() || user == null || currentChallenge == null) return;
+            Bundle data = new Bundle();
+            data.putInt("challenge", currentChallenge.id); data.putString("actor", user.id);
+            ActionConfirmation.show(getSupportFragmentManager(), "confirm_accept", getString(R.string.confirm_accept_title),
+                    getString(R.string.confirm_accept_message, currentChallenge.title,
+                            ChallengeDisplay.rupiah(this, currentChallenge.reward)), getString(R.string.accept_action), data);
         });
         findViewById(R.id.submit_proof_button).setOnClickListener(view -> startActivity(
                 new Intent(this, SubmitProofActivity.class).putExtra(EXTRA_CHALLENGE_ID, currentChallenge.id)));

@@ -2,6 +2,8 @@ package id.ac.binus.bounty.utils;
 
 import android.view.View;
 import android.content.Context;
+import android.graphics.drawable.GradientDrawable;
+import androidx.core.content.ContextCompat;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.bumptech.glide.Glide;
@@ -20,12 +22,29 @@ public final class ChallengeDisplay {
         return context.getString(R.string.rupiah_amount,
                 NumberFormat.getIntegerInstance(Locale.forLanguageTag("id-ID")).format(amount));
     }
+    public static void bindStatus(TextView badge, String status) {
+        int background, foreground;
+        switch (status) {
+            case "OPEN": background = R.color.status_open_bg; foreground = R.color.status_open_fg; break;
+            case "ACCEPTED": background = R.color.status_accepted_bg; foreground = R.color.status_accepted_fg; break;
+            case "SUBMITTED": case "PENDING": background = R.color.status_submitted_bg; foreground = R.color.status_submitted_fg; break;
+            case "COMPLETED": case "APPROVED": background = R.color.status_completed_bg; foreground = R.color.status_completed_fg; break;
+            case "REJECTED": background = R.color.status_rejected_bg; foreground = R.color.status_rejected_fg; break;
+            default: background = R.color.status_neutral_bg; foreground = R.color.status_neutral_fg;
+        }
+        GradientDrawable shape = new GradientDrawable();
+        shape.setCornerRadius(8 * badge.getResources().getDisplayMetrics().density);
+        shape.setColor(ContextCompat.getColor(badge.getContext(), background));
+        badge.setBackground(shape);
+        badge.setTextColor(ContextCompat.getColor(badge.getContext(), foreground));
+        badge.setText(status);
+    }
     public static void bind(View root, Challenge challenge) {
         ((TextView) root.findViewById(R.id.challenge_title)).setText(challenge.title);
         ((TextView) root.findViewById(R.id.challenge_creator)).setText(challenge.creatorName);
         ((TextView) root.findViewById(R.id.challenge_reward)).setText(
                 rupiah(root.getContext(), challenge.reward));
-        ((TextView) root.findViewById(R.id.challenge_status)).setText(challenge.status);
+        bindStatus(root.findViewById(R.id.challenge_status), challenge.status);
         String deadline = challenge.deadline;
         try {
             deadline = LocalDate.parse(deadline).format(DateTimeFormatter.ofPattern("d MMM yyyy", Locale.forLanguageTag("id-ID")));

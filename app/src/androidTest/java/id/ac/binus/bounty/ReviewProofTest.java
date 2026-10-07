@@ -111,6 +111,13 @@ public class ReviewProofTest {
                 assertEquals(Proof.PENDING, db.proofDao().getProofByChallengeId(challenge.id).status);
                 assertEquals(Challenge.SUBMITTED, db.challengeDao().getChallengeById(challenge.id).status);
                 onView(withId(R.id.review_approve)).perform(scrollTo(), click());
+                assertEquals(Challenge.SUBMITTED, db.challengeDao().getChallengeById(challenge.id).status);
+                onView(withId(android.R.id.button2)).perform(click());
+                assertEquals(Proof.PENDING, db.proofDao().getProofByChallengeId(challenge.id).status);
+                onView(withId(R.id.review_approve)).perform(scrollTo(), click());
+                scenario.recreate();
+                onView(withText(R.string.confirm_approve_title)).check(matches(isDisplayed()));
+                onView(withId(android.R.id.button1)).perform(click());
                 waitForStatus(db, challenge.id, Challenge.COMPLETED);
             }
             assertEquals(Proof.APPROVED, db.proofDao().getProofByChallengeId(challenge.id).status);

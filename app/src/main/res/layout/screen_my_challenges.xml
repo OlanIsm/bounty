@@ -13,7 +13,7 @@
         android:layout_height="wrap_content" android:indeterminate="true"
         android:contentDescription="@string/loading_challenges" />
     <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/feed_message" style="@style/BountyBody"
+        android:id="@+id/feed_message" android:accessibilityLiveRegion="polite" style="@style/BountyBody"
         android:layout_marginTop="16dp" android:visibility="gone" />
     <com.google.android.material.button.MaterialButton
         android:id="@+id/feed_retry" style="@style/BountyButton"

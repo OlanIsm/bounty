@@ -91,4 +91,9 @@
     <string name="demo_users_note">Contoh profil dari RandomUser. Akun login tetap akun lokal kamu.</string>
     <string name="demo_users_loading">Memuat user demo</string>
     <string name="demo_users_error">User demo gagal dimuat. Profil contoh lokal ditampilkan; coba lagi.</string>
+    <string name="cancel_action">Batal</string>
+    <string name="confirm_accept_title">Terima challenge?</string>
+    <string name="confirm_accept_message">%1$s\n\nKamu akan menjadi hunter untuk challenge ini. Reward demo %2$s diberikan setelah bukti disetujui.</string>
+    <string name="confirm_approve_title">Setujui bukti?</string>
+    <string name="confirm_approve_message">%1$s\n\nChallenge akan selesai dan reward demo %2$s masuk ke saldo %3$s. Reward ini bukan uang asli.</string>
 </resources>

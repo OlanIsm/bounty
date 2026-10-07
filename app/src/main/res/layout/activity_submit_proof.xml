@@ -14,7 +14,7 @@
         android:layout_weight="1" android:fillViewport="true" android:padding="16dp">
         <LinearLayout style="@style/BountyScreenContent">
             <com.google.android.material.textview.MaterialTextView android:id="@+id/proof_message"
-                style="@style/BountyBody" android:visibility="gone" />
+                android:accessibilityLiveRegion="polite" style="@style/BountyBody" android:visibility="gone" />
             <com.google.android.material.button.MaterialButton android:id="@+id/proof_retry"
                 style="@style/BountyButton" android:text="@string/retry_action" android:visibility="gone" />
             <LinearLayout android:id="@+id/proof_form" android:layout_width="match_parent"
@@ -26,8 +26,8 @@
                     android:scaleType="fitCenter" android:visibility="gone"
                     android:contentDescription="@string/proof_photo_preview" />
                 <com.google.android.material.textview.MaterialTextView android:id="@+id/proof_photo_message"
-                    style="@style/BountyBody" android:layout_marginTop="16dp"
-                    android:text="@string/proof_photo_required" android:accessibilityLiveRegion="polite" />
+                    android:accessibilityLiveRegion="polite" style="@style/BountyBody" android:layout_marginTop="16dp"
+                    android:text="@string/proof_photo_required" />
                 <com.google.android.material.button.MaterialButton android:id="@+id/choose_proof_photo"
                     style="@style/BountyButton" android:layout_marginTop="16dp" android:text="@string/choose_proof_photo" />
                 <com.google.android.material.textfield.TextInputLayout android:id="@+id/proof_description_layout"

@@ -7,4 +7,16 @@
     <color name="bounty_background">#F7F7F7</color>
     <color name="bounty_surface">#FFFFFF</color>
     <color name="bounty_text">#202020</color>
+    <color name="status_open_bg">#FFF0CF</color>
+    <color name="status_open_fg">#6F3500</color>
+    <color name="status_accepted_bg">#E8F0FE</color>
+    <color name="status_accepted_fg">#174EA6</color>
+    <color name="status_submitted_bg">#F3E5F5</color>
+    <color name="status_submitted_fg">#6A1B9A</color>
+    <color name="status_completed_bg">#E0F4E7</color>
+    <color name="status_completed_fg">#17633A</color>
+    <color name="status_rejected_bg">#FDE7E7</color>
+    <color name="status_rejected_fg">#8B2020</color>
+    <color name="status_neutral_bg">#ECEFF1</color>
+    <color name="status_neutral_fg">#424242</color>
 </resources>

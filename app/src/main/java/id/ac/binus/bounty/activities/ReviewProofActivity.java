@@ -27,11 +27,14 @@ import id.ac.binus.bounty.models.Challenge;
 import id.ac.binus.bounty.models.Proof;
 import id.ac.binus.bounty.models.User;
 import id.ac.binus.bounty.utils.ScreenInsets;
+import id.ac.binus.bounty.utils.ActionConfirmation;
+import id.ac.binus.bounty.utils.ChallengeDisplay;
 import id.ac.binus.bounty.utils.SessionManager;
 
 public class ReviewProofActivity extends AppCompatActivity {
     private ReviewModel model;
     private Proof currentProof;
+    private Challenge currentChallenge;
     private boolean imageReady;
     private int request;
 
@@ -43,7 +46,17 @@ public class ReviewProofActivity extends AppCompatActivity {
         ((MaterialToolbar) findViewById(R.id.review_toolbar)).setNavigationOnClickListener(view -> finish());
         findViewById(R.id.review_retry).setOnClickListener(view -> loadReview());
         findViewById(R.id.review_photo_retry).setOnClickListener(view -> loadReview());
-        findViewById(R.id.review_approve).setOnClickListener(view -> review(true));
+        getSupportFragmentManager().setFragmentResultListener("confirm_approve", this, (key, data) -> {
+            SessionManager session = new SessionManager(getApplicationContext());
+            User user = session.getCurrentUser();
+            if (user == null || !user.id.equals(data.getString("actor"))) return;
+            Proof proof = new Proof();
+            proof.id = data.getInt("proof"); proof.challengeId = data.getInt("challenge");
+            proof.hunterId = data.getString("hunter");
+            // Room rechecks creator, latest proof and state, even after dialog recreation.
+            model.review(AppDatabase.getInstance(this), proof, user.id, true, session);
+        });
+        findViewById(R.id.review_approve).setOnClickListener(view -> confirmApproval());
         findViewById(R.id.review_reject).setOnClickListener(view -> review(false));
     }
 
@@ -79,6 +92,7 @@ public class ReviewProofActivity extends AppCompatActivity {
     private void loadReview() {
         int current = ++request;
         currentProof = null;
+        currentChallenge = null;
         imageReady = false;
         updateControls();
         findViewById(R.id.review_loading).setVisibility(View.VISIBLE);
@@ -104,10 +118,11 @@ public class ReviewProofActivity extends AppCompatActivity {
                         showMessage(R.string.review_unavailable, false); return;
                     }
                     currentProof = proof;
+                    currentChallenge = challenge;
                     ((TextView) findViewById(R.id.review_title)).setText(challenge.title);
                     ((TextView) findViewById(R.id.review_hunter)).setText(getString(R.string.accept_hunter, challenge.participantName));
                     ((TextView) findViewById(R.id.review_description)).setText(proof.description);
-                    ((TextView) findViewById(R.id.review_status)).setText(proof.status);
+                    ChallengeDisplay.bindStatus(findViewById(R.id.review_status), proof.status);
                     findViewById(R.id.review_loading).setVisibility(View.GONE);
                     findViewById(R.id.review_content).setVisibility(View.VISIBLE);
                     showImage(proof, current);
@@ -163,6 +178,19 @@ public class ReviewProofActivity extends AppCompatActivity {
         findViewById(R.id.review_reject).setEnabled(ready);
         findViewById(R.id.review_photo_retry).setEnabled(!saving);
         findViewById(R.id.review_saving).setVisibility(saving ? View.VISIBLE : View.GONE);
+    }
+
+    private void confirmApproval() {
+        User user = new SessionManager(this).getCurrentUser();
+        if (user == null || currentProof == null || currentChallenge == null || !imageReady
+                || model.state.getValue() != ReviewModel.IDLE) return;
+        Bundle data = new Bundle();
+        data.putInt("proof", currentProof.id); data.putInt("challenge", currentProof.challengeId);
+        data.putString("hunter", currentProof.hunterId); data.putString("actor", user.id);
+        ActionConfirmation.show(getSupportFragmentManager(), "confirm_approve", getString(R.string.confirm_approve_title),
+                getString(R.string.confirm_approve_message, currentChallenge.title,
+                        ChallengeDisplay.rupiah(this, currentChallenge.reward), currentChallenge.participantName),
+                getString(R.string.approve_proof_action), data);
     }
 
     private void review(boolean approve) {
