@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/home_screen" style="@style/BountyScreen">
+    <LinearLayout style="@style/BountyScreenContent">
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/welcome_text" style="@style/BountyHeading" />
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/BountyBody" android:layout_marginTop="16dp"
+            android:text="@string/home_description" />
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/BountySection" android:layout_marginTop="32dp"
+            android:text="@string/available_challenges" />
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/BountyBody" android:layout_marginTop="16dp"
+            android:text="@string/no_available_challenges" />
+    </LinearLayout>
+</ScrollView>

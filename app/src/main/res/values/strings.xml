@@ -12,6 +12,17 @@
     <string name="login_link">Kembali ke login</string>
     <string name="logout_action">Keluar</string>
     <string name="home_title">Home</string>
+    <string name="my_challenges_title">My Challenges</string>
+    <string name="create_title">Create</string>
+    <string name="profile_title">Profile</string>
+    <string name="home_description">Temukan challenge dan selesaikan untuk mendapatkan reward demo.</string>
+    <string name="available_challenges">Challenge tersedia</string>
+    <string name="no_available_challenges">Belum ada challenge untuk ditampilkan.</string>
+    <string name="no_my_challenges">Belum ada challenge kamu</string>
+    <string name="my_challenges_description">Challenge yang kamu buat atau terima akan tampil di sini.</string>
+    <string name="create_challenge_title">Buat challenge baru</string>
+    <string name="create_description">Tentukan tantangan dan tawarkan reward demo untuk hunter.</string>
+    <string name="create_unavailable">Form pembuatan challenge belum tersedia.</string>
     <string name="welcome_user">Halo, %1$s!</string>
     <string name="signed_in_note">Kamu sudah masuk ke akun demo.</string>
     <string name="invalid_email">Masukkan alamat email yang valid.</string>

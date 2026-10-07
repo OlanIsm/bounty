@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/profile_screen" style="@style/BountyScreen">
+    <LinearLayout style="@style/BountyScreenContent">
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/profile_name" style="@style/BountyHeading" />
+        <com.google.android.material.textview.MaterialTextView
+            android:id="@+id/user_email" style="@style/BountyBody"
+            android:layout_marginTop="8dp" android:textIsSelectable="true" />
+        <com.google.android.material.textview.MaterialTextView
+            style="@style/BountyBody" android:layout_marginTop="24dp"
+            android:text="@string/signed_in_note" />
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/logout_button" style="@style/BountyButton"
+            android:layout_marginTop="32dp" android:text="@string/logout_action" />
+    </LinearLayout>
+</ScrollView>

@@ -23,10 +23,11 @@ public final class ScreenInsets {
         int bottom = root.getPaddingBottom();
         ViewCompat.setOnApplyWindowInsetsListener(root, (view, insets) -> {
             Insets safe = insets.getInsets(WindowInsetsCompat.Type.systemBars()
-                    | WindowInsetsCompat.Type.ime());
+                    | WindowInsetsCompat.Type.displayCutout() | WindowInsetsCompat.Type.ime());
             view.setPadding(left + safe.left, top + safe.top,
                     right + safe.right, bottom + safe.bottom);
-            return insets;
+            // Root handles safe padding; do not let Material navigation add it a second time.
+            return WindowInsetsCompat.CONSUMED;
         });
         ViewCompat.requestApplyInsets(root);
     }

@@ -77,6 +77,7 @@ public class MockAuthenticationTest {
             String userId = user.id;
 
             launch(context, SplashActivity.class);
+            onView(withId(R.id.nav_profile)).perform(click());
             onView(withId(R.id.logout_button)).check(matches(isDisplayed()));
             assertEquals(userId, new SessionManager(context).getCurrentUser().id);
             onView(withId(R.id.logout_button)).perform(click());
@@ -93,6 +94,7 @@ public class MockAuthenticationTest {
             onView(withId(R.id.login_button)).perform(click());
             onView(withId(R.id.welcome_text)).check(matches(withText("Halo, Insan!")));
             assertEquals("local_user_001", session.getCurrentUser().id);
+            onView(withId(R.id.nav_profile)).perform(click());
             onView(withId(R.id.logout_button)).perform(click());
             assertNull(session.getCurrentUser());
         } finally {
