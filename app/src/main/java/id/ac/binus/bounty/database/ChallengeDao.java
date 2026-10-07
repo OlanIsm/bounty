@@ -27,6 +27,13 @@ public interface ChallengeDao {
     @Query("SELECT * FROM challenges WHERE participantId = :participantId ORDER BY createdAt DESC, id DESC")
     List<Challenge> getChallengesByParticipant(String participantId);
 
+    @Query("SELECT * FROM challenges WHERE creatorId = :userId OR participantId = :userId ORDER BY createdAt DESC, id DESC")
+    List<Challenge> getMyChallenges(String userId);
+
+    @Query("UPDATE challenges SET status = 'ACCEPTED', participantId = :hunterId, participantName = :hunterName "
+            + "WHERE id = :id AND status = 'OPEN' AND participantId IS NULL AND creatorId != :hunterId")
+    int acceptChallenge(int id, String hunterId, String hunterName);
+
     @Update
     int updateChallenge(Challenge challenge);
 

@@ -53,4 +53,12 @@
     <string name="required_name">Nama wajib diisi.</string>
     <string name="duplicate_email">Email sudah terdaftar. Kembali ke login untuk masuk.</string>
     <string name="unknown_account">Email belum terdaftar. Gunakan akun demo atau daftar dahulu.</string>
+    <string name="accept_action">Accept challenge</string>
+    <string name="accepting_challenge">Menerima challenge...</string>
+    <string name="challenge_accepted">Challenge diterima. Lihat di My Challenges.</string>
+    <string name="accept_unavailable">Challenge sudah tidak tersedia. Muat ulang untuk melihat status terbaru.</string>
+    <string name="accept_error">Gagal menerima challenge. Coba lagi.</string>
+    <string name="accept_own">Kamu pembuat challenge ini.</string>
+    <string name="accept_hunter">Hunter: %1$s</string>
+    <string name="accept_ready">Challenge ini tersedia untuk diterima.</string>
 </resources>

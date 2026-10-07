@@ -1,11 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/my_challenges_screen" style="@style/BountyScreen">
-    <LinearLayout style="@style/BountyScreenContent">
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/my_challenges_screen" android:layout_width="match_parent"
+    android:layout_height="match_parent" android:orientation="vertical"
+    android:paddingHorizontal="16dp" android:paddingTop="16dp">
         <com.google.android.material.textview.MaterialTextView
-            style="@style/BountyHeading" android:text="@string/no_my_challenges" />
+            style="@style/BountyHeading" android:text="@string/my_challenges_title" />
         <com.google.android.material.textview.MaterialTextView
-            style="@style/BountyBody" android:layout_marginTop="16dp"
+            style="@style/BountyBody" android:layout_marginTop="8dp"
             android:text="@string/my_challenges_description" />
-    </LinearLayout>
-</ScrollView>
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/feed_loading" android:layout_width="match_parent"
+        android:layout_height="wrap_content" android:indeterminate="true"
+        android:contentDescription="@string/loading_challenges" />
+    <com.google.android.material.textview.MaterialTextView
+        android:id="@+id/feed_message" style="@style/BountyBody"
+        android:layout_marginTop="16dp" android:visibility="gone" />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/feed_retry" style="@style/BountyButton"
+        android:text="@string/retry_action" android:visibility="gone" />
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/challenge_list" android:layout_width="match_parent"
+        android:layout_height="0dp" android:layout_weight="1"
+        android:clipToPadding="false" android:paddingBottom="16dp" />
+</LinearLayout>

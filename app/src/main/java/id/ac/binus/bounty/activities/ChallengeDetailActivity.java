@@ -6,6 +6,11 @@ import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.lifecycle.ViewModel;
+import androidx.lifecycle.ViewModelProvider;
+import androidx.lifecycle.MutableLiveData;
+import com.google.android.material.button.MaterialButton;
+import id.ac.binus.bounty.models.User;
 import com.google.android.material.appbar.MaterialToolbar;
 import com.google.android.material.snackbar.Snackbar;
 import id.ac.binus.bounty.R;
@@ -18,11 +23,30 @@ import id.ac.binus.bounty.utils.SessionManager;
 public class ChallengeDetailActivity extends AppCompatActivity {
     public static final String EXTRA_CHALLENGE_ID = "challenge_id";
     private int request;
+    private Challenge currentChallenge;
+    private AcceptModel acceptModel;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_challenge_detail);
         ScreenInsets.apply(this);
+        acceptModel = new ViewModelProvider(this).get(AcceptModel.class);
+        findViewById(R.id.accept_button).setOnClickListener(view -> {
+            User user = new SessionManager(this).getCurrentUser();
+            if (user != null && currentChallenge != null) {
+                acceptModel.accept(AppDatabase.getInstance(this), currentChallenge.id, user);
+            }
+        });
+        acceptModel.state.observe(this, state -> {
+            bindAccept();
+            if (state != AcceptModel.IDLE && state != AcceptModel.SAVING) {
+                int message = state == AcceptModel.SAVED ? R.string.challenge_accepted
+                        : state == AcceptModel.UNAVAILABLE ? R.string.accept_unavailable : R.string.accept_error;
+                acceptModel.state.setValue(AcceptModel.IDLE);
+                loadChallenge();
+                Snackbar.make(findViewById(R.id.main), message, Snackbar.LENGTH_LONG).show();
+            }
+        });
         ((MaterialToolbar) findViewById(R.id.detail_toolbar)).setNavigationOnClickListener(view -> finish());
         findViewById(R.id.detail_retry).setOnClickListener(view -> loadChallenge());
     }
@@ -58,6 +82,8 @@ public class ChallengeDetailActivity extends AppCompatActivity {
                         showMessage(R.string.challenge_not_found, false);
                         return;
                     }
+                    currentChallenge = challenge;
+                    bindAccept();
                     View content = findViewById(R.id.detail_content);
                     ChallengeDisplay.bind(content, challenge);
                     ((TextView) content.findViewById(R.id.challenge_description)).setText(challenge.description);
@@ -74,6 +100,44 @@ public class ChallengeDetailActivity extends AppCompatActivity {
             }
         });
     }
+    private void bindAccept() {
+        User user = new SessionManager(this).getCurrentUser();
+        Challenge challenge = currentChallenge;
+        MaterialButton button = findViewById(R.id.accept_button);
+        boolean saving = acceptModel.state.getValue() == AcceptModel.SAVING;
+        boolean own = challenge != null && user != null && challenge.creatorId.equals(user.id);
+        boolean available = challenge != null && Challenge.OPEN.equals(challenge.status)
+                && challenge.participantId == null;
+        button.setEnabled(user != null && available && !own && !saving);
+        button.setText(saving ? R.string.accepting_challenge : R.string.accept_action);
+        TextView message = findViewById(R.id.accept_message);
+        if (challenge != null && challenge.participantId != null) {
+            message.setText(getString(R.string.accept_hunter, challenge.participantName));
+        } else {
+            message.setText(own ? R.string.accept_own : available ? R.string.accept_ready : R.string.accept_unavailable);
+        }
+    }
+
+    /** Keeps acceptance across rotation; the conditional SQL update chooses one hunter. */
+    public static class AcceptModel extends ViewModel {
+        static final int IDLE = 0, SAVING = 1, SAVED = 2, UNAVAILABLE = 3, ERROR = 4;
+        final MutableLiveData<Integer> state = new MutableLiveData<>(IDLE);
+
+        void accept(AppDatabase db, int id, User user) {
+            if (state.getValue() != IDLE) return;
+            state.setValue(SAVING);
+            db.getTransactionExecutor().execute(() -> {
+                try {
+                    state.postValue(db.challengeDao().acceptChallenge(id, user.id, user.name) == 1
+                            ? SAVED : UNAVAILABLE);
+                } catch (RuntimeException error) {
+                    Log.e("BountyAccept", "Unable to accept challenge", error);
+                    state.postValue(ERROR);
+                }
+            });
+        }
+    }
+
     private void showMessage(int text, boolean retry) {
         findViewById(R.id.detail_loading).setVisibility(View.GONE);
         TextView message = findViewById(R.id.detail_message);

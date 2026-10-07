@@ -126,7 +126,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
-        if (navigation != null && selectedDestination == R.id.nav_home) loadFeed();
+        if (navigation != null && (selectedDestination == R.id.nav_home || selectedDestination == R.id.nav_my_challenges)) loadFeed();
     }
 
     private boolean showScreen(int destination) {
@@ -178,7 +178,7 @@ public class MainActivity extends AppCompatActivity {
                 new SessionManager(this).logout();
                 openLogin();
             });
-        } else if (destination == R.id.nav_home) {
+        } else if (destination == R.id.nav_home || destination == R.id.nav_my_challenges) {
             RecyclerView list = findViewById(R.id.challenge_list);
             list.setLayoutManager(new LinearLayoutManager(this));
             list.setAdapter(new ChallengeAdapter(challenge -> startActivity(
@@ -280,7 +280,11 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void loadFeed() {
-        View home = findViewById(R.id.home_screen);
+        int screenId = selectedDestination == R.id.nav_my_challenges ? R.id.my_challenges_screen : R.id.home_screen;
+        boolean mine = selectedDestination == R.id.nav_my_challenges;
+        User user = new SessionManager(this).getCurrentUser();
+        if (user == null) return;
+        View home = findViewById(screenId);
         if (home == null) return;
         int request = ++feedRequest;
         home.findViewById(R.id.feed_loading).setVisibility(View.VISIBLE);
@@ -289,21 +293,22 @@ public class MainActivity extends AppCompatActivity {
         AppDatabase db = AppDatabase.getInstance(this);
         db.getQueryExecutor().execute(() -> {
             try {
-                List<Challenge> challenges = db.challengeDao().getAllChallenges();
+                List<Challenge> challenges = mine ? db.challengeDao().getMyChallenges(user.id)
+                        : db.challengeDao().getAllChallenges();
                 runOnUiThread(() -> {
-                    if (isDestroyed() || isFinishing() || request != feedRequest || findViewById(R.id.home_screen) != home) return;
+                    if (isDestroyed() || isFinishing() || request != feedRequest || findViewById(screenId) != home) return;
                     RecyclerView list = home.findViewById(R.id.challenge_list);
                     ((ChallengeAdapter) list.getAdapter()).submitList(challenges);
                     home.findViewById(R.id.feed_loading).setVisibility(View.GONE);
                     list.setVisibility(challenges.isEmpty() ? View.GONE : View.VISIBLE);
                     TextView message = home.findViewById(R.id.feed_message);
-                    message.setText(R.string.no_available_challenges);
+                    message.setText(mine ? R.string.no_my_challenges : R.string.no_available_challenges);
                     message.setVisibility(challenges.isEmpty() ? View.VISIBLE : View.GONE);
                 });
             } catch (RuntimeException error) {
                 Log.e("BountyFeed", "Unable to load challenges", error);
                 runOnUiThread(() -> {
-                    if (isDestroyed() || isFinishing() || request != feedRequest || findViewById(R.id.home_screen) != home) return;
+                    if (isDestroyed() || isFinishing() || request != feedRequest || findViewById(screenId) != home) return;
                     home.findViewById(R.id.feed_loading).setVisibility(View.GONE);
                     home.findViewById(R.id.challenge_list).setVisibility(View.GONE);
                     TextView message = home.findViewById(R.id.feed_message);
