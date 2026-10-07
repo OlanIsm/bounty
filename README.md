@@ -4,7 +4,7 @@ Android coursework MVP using Java and XML. M0 project setup, M1 mock
 authentication, M2 main navigation, M3 local database, M4 challenge feed,
 M5 challenge publishing, M6 challenge acceptance, M7 proof submission,
 M8 proof review, M9 mock reward, M10 external demo profiles, and M11 UI polish
-are implemented. M12 testing is in progress; M13 has not started.
+are implemented. M12 testing is verified; M13 has not started.
 
 ## Requirements
 
@@ -34,7 +34,8 @@ with rotation, duplicate protection, persistence, and current-user filtering,
 plus native image picking, transactional proof submission, creator review,
 mock reward/recovery, external API parsing/loading/fallback behavior, and
 confirmation cancellation/recreation before accepting or approving.
-The script checks fresh Login, runs the feature tests and a continuous
+The script resets only the isolated installation to avoid restored backup
+fixtures, checks fresh Login, runs the feature tests and a continuous
 creator/hunter flow, then checks the paid hunter after two actual process
 restarts. It removes only the temporary app/test packages and restores emulator
 animation settings in `finally`. Reports are written under
@@ -357,3 +358,23 @@ status or balance. Pending confirmations restore after activity recreation;
 confirmation still checks the current actor, Room permissions, latest proof,
 and current challenge state. Existing duplicate/busy guards and exactly-once
 mock reward crediting remain in place. No new dependency or database migration.
+
+
+## M12 testing
+
+Use `scripts/Test-Android.ps1` for the complete campaign. The debug-only
+`bountyIsolatedTest` flag installs the app beside normal Bounty, so account-reset
+and destructive fixture checks affect only the disposable test installation.
+The script verifies fresh Login, runs the existing feature tests, and runs
+MainFlowTest through public creator/hunter screens, including native image
+selection, rejection, resubmission, approval, and mock balance updates.
+
+The final paid hunter is retained only for the script's restart checks. The
+script force-stops and relaunches the real process twice and checks the session,
+COMPLETED challenge, and Rp70.000 balance. It then removes the isolated app/test
+packages and restores animation settings, including originally absent values.
+API parsing/rendering/fallback tests use deterministic Retrofit HTTP fixtures.
+Coverage, results, and limitations are recorded in [TEST_REPORT.md](docs/TEST_REPORT.md).
+After a flow failure, `-MainFlowOnly` repeats fresh install, the continuous flow,
+and process restarts without rerunning feature checks. It does not replace the
+full campaign. M13 APK packaging and presentation data remain separate work.

@@ -545,7 +545,7 @@ ActionConfirmation, ChallengeDisplay, shared theme/colors/strings/reward drawabl
 Home header XML, async-message layouts, four existing instrumentation tests,
 README, DESIGN_SYSTEM, and this ledger. Remaining: four existing lint warnings;
 QA used the current phone emulator rather than a separate tablet device. M12
-has not started; its scenario campaign remains unchecked.
+remained pending at M11 completion.
 
 ---
 
@@ -553,28 +553,73 @@ has not started; its scenario campaign remains unchecked.
 
 Test scenario:
 
-- [ ] Fresh install
-- [ ] Register
-- [ ] Login
-- [ ] Logout
-- [ ] View challenge
-- [ ] Create challenge
-- [ ] Accept challenge
-- [ ] Submit proof
-- [ ] Reject proof
-- [ ] Resubmit proof
-- [ ] Approve proof
-- [ ] Balance update
-- [ ] API success
-- [ ] API failure
-- [ ] App restart
-- [ ] Invalid form input
+- [x] Fresh install
+- [x] Register
+- [x] Login
+- [x] Logout
+- [x] View challenge
+- [x] Create challenge
+- [x] Accept challenge
+- [x] Submit proof
+- [x] Reject proof
+- [x] Resubmit proof
+- [x] Approve proof
+- [x] Balance update
+- [x] API success
+- [x] API failure
+- [x] App restart
+- [x] Invalid form input
 
 Target:
 
 ```text
 Main flow tidak crash.
 ```
+
+Implementation and verification (2026-10-08):
+
+All 16 scenarios are verified on Pixel_7/API 37 using a separate
+id.ac.binus.bounty.testing installation. The full feature batch passed 11 tests;
+the final focused runner passed the continuous MainFlowTest, fresh Login, and
+two actual process force-stop/relaunch checks. Hunter session, COMPLETED state,
+and Rp70.000 balance persisted without duplicate credit. Creator stayed at
+Rp50.000. Public UI flow covers creator/hunter registration/login/logout, Create
+validation/publication, Accept confirmation, native photo selection/submission,
+Reject, resubmission, Approve confirmation, and My Challenges/reward rendering.
+Dedicated feature checks cover invalid input, persistence, atomic rollback,
+rotation, stale/duplicate actions, recovery and deterministic API success/failure.
+
+scripts/Test-Android.ps1 builds isolated APKs, resets only the disposable install
+(including potentially restored backup fixtures), checks fresh Login, runs the
+feature batch and continuous flow, and verifies process restarts. It preserves
+plain-text reports under app/build/reports/m12 and restores animation settings
+and removes isolated packages in finally. MainFlowOnly repeats the flow/restart
+part after a failure without repeating already passed feature checks. Normal
+builds retain id.ac.binus.bounty; the debug-only isolation flag does not change
+the namespace or release application ID.
+
+Testing exposed a shifting DocumentsUI grid tap during resubmission; the reused
+picker helper now prefers native accessibility click with the existing tap
+fallback. The corrected full flow and picker feature checks passed. A subsequent
+full campaign passed all 11 feature tests but its flow phase was blocked by an
+ANR dialog from the old canonical app. The trace showed HardwareRenderer/EGL/
+qemu_pipe waits, consistent with an emulator graphics stall. The original process
+was stopped without clearing data or restarting the emulator; focused flow and
+restart reruns passed. The runner brings the launcher forward between batches,
+and UI timeout errors identify the active package. No production rendering
+workaround was added. Aggregate coverage is reported honestly rather than as
+one uninterrupted campaign.
+
+Canonical assembleDebug, assembleDebugAndroidTest, and lintDebug pass with
+0 errors and the same four existing lint warnings. The canonical APK was rebuilt,
+original accounts/data preserved, and temporary app/test installations removed.
+Changed: isolated debug build flag, MainFlowTest, shared SubmitProofTest picker
+helper, Test-Android.ps1, README, TEST_REPORT.md, and this ledger.
+
+Full evidence and reproduction steps: docs/TEST_REPORT.md. Remaining: four old
+lint warnings, the observed long-session emulator renderer stall, no separate
+API 29/tablet device campaign, public API/photo uptime, and local photo URI
+invalidation after moving/deleting the source. M13 has not started.
 
 ---
 

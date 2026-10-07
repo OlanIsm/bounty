@@ -194,7 +194,9 @@ public class MainFlowTest {
             }
             SystemClock.sleep(100);
         } while (SystemClock.uptimeMillis() < end);
-        throw new AssertionError("UI did not show " + resource + " / " + text);
+        AccessibilityNodeInfo active = instrumentation.getUiAutomation().getRootInActiveWindow();
+        throw new AssertionError("UI did not show " + resource + " / " + text + "; active package: "
+                + (active == null ? "none" : active.getPackageName()));
     }
     private AccessibilityNodeInfo find(AccessibilityNodeInfo node, String resource, String text) {
         if (node == null) return null;

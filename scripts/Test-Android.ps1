@@ -1,6 +1,7 @@
 param(
     [string]$Adb = "$env:LOCALAPPDATA/Android/Sdk/platform-tools/adb.exe",
-    [string]$Serial = ""
+    [string]$Serial = "",
+    [switch]$MainFlowOnly
 )
 
 # Run from any directory. Only the fixed .testing installation is disposable.
@@ -9,7 +10,7 @@ $repo = Split-Path $PSScriptRoot -Parent
 $package = 'id.ac.binus.bounty.testing'
 $animations = @{}
 function Invoke-Adb {
-    param([Parameter(ValueFromRemainingArguments)] [string[]]$Command)
+    $Command = $args
     # Transient UI dump readiness can be reported on stderr with a zero exit code.
     $ErrorActionPreference = 'Continue'
     $result = & $Adb -s $Serial @Command 2>&1
@@ -63,23 +64,31 @@ try {
     }
     $null = Invoke-Adb install app/build/outputs/apk/debug/app-debug.apk
     $null = Invoke-Adb install app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+    # Automatic backup restore must not reintroduce old fixtures into the fresh-install check.
+    if ((Invoke-Adb shell pm clear $package).Trim() -ne 'Success') { throw 'Unable to reset the isolated installation.' }
     $null = Invoke-Adb shell am start -n "$package/id.ac.binus.bounty.activities.SplashActivity"
     Wait-View login_button
     Write-Output 'PASS: fresh install opens Login.'
     $reports = 'app/build/reports/m12'
     New-Item -ItemType Directory -Force $reports | Out-Null
     # Run feature checks first. The continuous flow runs last, retaining its paid hunter for restart.
-    Run-Tests notClass id.ac.binus.bounty.MainFlowTest "$reports/regression.txt"
+    $null = Invoke-Adb shell input keyevent KEYCODE_HOME
+    if (!$MainFlowOnly) {
+        Run-Tests notClass id.ac.binus.bounty.MainFlowTest "$reports/regression.txt"
+    }
+    $null = Invoke-Adb shell input keyevent KEYCODE_HOME
     Run-Tests class id.ac.binus.bounty.MainFlowTest "$reports/main-flow.txt"
     $null = Invoke-Adb shell am force-stop $package
     $null = Invoke-Adb shell am start -n "$package/id.ac.binus.bounty.activities.SplashActivity"
     Wait-View welcome_text 'Halo, M12 Hunter!'
     Wait-View demo_balance_amount 'Rp70.000'
+    Wait-View challenge_title 'M12 complete challenge'
+    Wait-View challenge_status 'COMPLETED'
     # A second process restart must not credit the same approved challenge twice.
     $null = Invoke-Adb shell am force-stop $package
     $null = Invoke-Adb shell am start -n "$package/id.ac.binus.bounty.activities.SplashActivity"
     Wait-View demo_balance_amount 'Rp70.000'
-    'PASS: two actual process restarts retain the hunter session and Rp70.000 balance.' |
+    'PASS: two actual process restarts retain the hunter session, COMPLETED challenge and Rp70.000 balance.' |
         Tee-Object -FilePath "$reports/restart.txt"
 } finally {
     foreach ($key in $animations.Keys) {
