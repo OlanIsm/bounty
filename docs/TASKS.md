@@ -30,7 +30,8 @@ Project dapat di-build dan dijalankan di emulator.
 
 Verified: `assembleDebug`, `lintDebug`, and `connectedDebugAndroidTest` passed
 on the Pixel_7 emulator (API 37). The setup smoke test launches the Java activity,
-checks the Bounty title, and checks INTERNET permission. M1 has not been started.
+checks the Bounty title, and checks INTERNET permission. This records the M0
+verification before authentication was added.
 Lint reports 0 errors and 4 non-blocking warnings: target SDK 36, an available
 AGP update, and the template's two unused color resources.
 
@@ -38,19 +39,36 @@ AGP update, and the template's two unused color resources.
 
 # M1 — Mock Authentication
 
-- [ ] Create SplashActivity
-- [ ] Create LoginActivity
-- [ ] Create RegisterActivity
-- [ ] Create SessionManager
-- [ ] Simpan login state dengan SharedPreferences
-- [ ] Create mock current user
-- [ ] Implement logout
+- [x] Create SplashActivity
+- [x] Create LoginActivity
+- [x] Create RegisterActivity
+- [x] Create SessionManager
+- [x] Simpan login state dengan SharedPreferences
+- [x] Create mock current user
+- [x] Implement logout
 
 Target:
 
 ```text
 Login → Home → Logout
 ```
+
+Verified: `assembleDebug`, `lintDebug`, and `connectedDebugAndroidTest` passed
+on Pixel_7 (API 37); both instrumentation tests passed. Authentication checks
+cover invalid input, duplicate registration, normalized email, mock login,
+session persistence, logout, Back behavior, and guarding the signed-in screen.
+Manual emulator checks confirmed session persistence after a process restart,
+login/Home/register layouts, dark mode, 1.3x font scale, and keyboard insets.
+
+Demo login: `demo@bounty.local` (Insan), no password. Registration stores local
+mock accounts and returns to login with the registered email filled in.
+Logout clears the session but retains accounts. MainActivity is only a signed-in
+name/email/logout placeholder for the M1 target; M2 has not been started.
+
+Remaining: lint has 0 errors and 4 non-blocking warnings (target SDK 36,
+available AGP update, the required SplashActivity name triggering the custom
+splash heuristic, and an unused template white color). SplashActivity routes
+immediately without a custom splash layout or artificial delay.
 
 ---
 

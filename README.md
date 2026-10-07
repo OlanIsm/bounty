@@ -1,7 +1,7 @@
 # Bounty
 
-Android coursework MVP using Java and XML. M0 provides a minimal launcher;
-authentication and all later milestones are not implemented yet.
+Android coursework MVP using Java and XML. M0 project setup and M1 mock
+authentication are implemented. M2 navigation and later features are not implemented.
 
 ## Requirements
 
@@ -19,8 +19,10 @@ to your JDK installation.
 ./gradlew.bat connectedDebugAndroidTest
 ```
 
-The second command needs a running device or emulator. The setup smoke test
-launches the Java activity, checks the Bounty title, and checks INTERNET permission.
+The second command needs a running device or emulator. Tests check the launcher,
+INTERNET permission, registration validation, duplicate email handling, login,
+session persistence, logout, and the signed-in screen guard. The authentication
+test resets local mock accounts on the test device.
 The debug APK is written to `app/build/outputs/apk/debug/app-debug.apk`.
 
 ## M0 setup
@@ -36,3 +38,28 @@ Empty packages use `package-info.java` so Git preserves the structure without
 adding placeholder feature classes.
 
 Project requirements and milestone order are in `docs/` and `AGENTS.md`.
+
+## M1 mock authentication
+
+Launch the app to enter login, or resume the signed-in placeholder if a session
+already exists. Use `demo@bounty.local` (name: Insan), or register a name and
+email, then log in with that email. There is no password or authentication
+server: any person using this installation can select a registered mock account.
+Use demo data only.
+
+`SessionManager` stores users by normalized email in `bounty_accounts`
+SharedPreferences and the current email/login state in `bounty_session`.
+Each user has the fields from `docs/DATABASE.md`, including a stable ID,
+an empty local avatar URL, and an initial mock balance of 50000. Balance UI
+and reward updates remain M9 work. Logout clears only the session, preserving
+accounts for later login. Session preferences are excluded from backups and
+device transfer.
+
+The signed-in screen shows the current name/email and a logout button.
+Authentication transitions clear the activity task so Back cannot return to
+the signed-in screen after logout. No bottom navigation or challenge screens
+are included in M1.
+
+Auth forms use Material controls, the documented orange/yellow palette,
+16dp screen padding, scrollable layouts, and keyboard/system-bar insets.
+Button labels use dark text on orange to maintain readable contrast.
