@@ -625,19 +625,57 @@ invalidation after moving/deleting the source. M13 has not started.
 
 # M13 — APK Build
 
-- [ ] Update app icon
-- [ ] Check application name
-- [ ] Remove debug UI
-- [ ] Build APK
-- [ ] Install APK di Android device/emulator
-- [ ] Test APK
-- [ ] Prepare demo account/data
+- [x] Update app icon
+- [x] Check application name
+- [x] Remove debug UI
+- [x] Build APK
+- [x] Install APK di Android device/emulator
+- [x] Test APK
+- [x] Prepare demo account/data
 
 Final output:
 
 ```text
 Bounty.apk
 ```
+
+
+Implementation and verification (2026-10-08):
+
+The native adaptive launcher icon now shows a dark trophy on brand orange,
+including the existing monochrome layer. Obsolete Android template raster icons
+were removed; minSdk 29 supports adaptive icons. Launcher screenshot QA confirms
+Bounty's icon and name. Runtime sources contain no temporary QA/test UI; DEX
+inspection confirms no MainFlowTest or M11QaSetup class in the packaged app.
+
+scripts/Build-Apk.ps1 explicitly builds the canonical ID, runs assembleDebug and
+lintDebug, checks output metadata, and copies the APK to build/Bounty.apk with
+its SHA256. This is a standard debug-signed coursework APK, not a production
+release. APK Signature Scheme v2 verifies; label Bounty, version 1.0, minSdk 29,
+and application ID id.ac.binus.bounty were checked with SDK tools.
+
+The focused isolated runner passed fresh Login, MainFlowTest (1 test, 160.913s)
+and two process restarts, retaining COMPLETED and Rp70.000 without duplicate
+reward. This rerun covers Create/Accept/Submit/Reject/Resubmit/Approve; the 11-test
+feature batch remains the M12 evidence, not a new M13 full-suite claim.
+Canonical rebuild/lint pass with 0 errors and the same four old warnings.
+The final APK was installed with adb install -r on Pixel_7/API 37. Installed
+bytes match the deliverable; existing Insan session, accounts, seed challenges
+and Rp50.000 balance were preserved. Only the isolated test packages were removed.
+
+Presentation data was prepared through the actual canonical UI: registered
+Demo Hunter (hunter@bounty.local), verified login and Rp50.000, and published
+Insan's OPEN Demo: 30 push-ups with Rp20.000 reward and 2026-10-15 deadline.
+The app was returned to Insan/Home; no old account or challenge was cleared.
+These additions are device-local, not bundled into fresh installations.
+docs/DEMO.md documents initial data and the two-account presentation, including
+why newly published challenges are used instead of placeholder creator seeds.
+
+Changed: launcher vector resources/template raster removal, Build-Apk.ps1,
+README, DEMO.md, TEST_REPORT.md, and this ledger. Final APK is an ignored build
+artifact. Remaining: four old lint warnings and M12's device/API/photo limits;
+no production signing or separate API 29/tablet campaign. All M0-M13 milestones
+are complete; no additional feature work was started.
 
 ---
 

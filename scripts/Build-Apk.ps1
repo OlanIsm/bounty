@@ -10,7 +10,7 @@ try {
     New-Item -ItemType Directory -Force build | Out-Null
     Copy-Item -LiteralPath app/build/outputs/apk/debug/app-debug.apk -Destination build/Bounty.apk -Force
     Get-Item build/Bounty.apk | Select-Object FullName, Length
-    Get-FileHash build/Bounty.apk -Algorithm SHA256
+    Write-Output "SHA256: $((Get-FileHash build/Bounty.apk -Algorithm SHA256).Hash)"
 } finally {
     Pop-Location
 }

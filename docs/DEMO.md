@@ -49,3 +49,12 @@ switch accounts on the same device rather than using two devices.
 For another run, publish another challenge. Paid rewards cannot be credited
 twice. Keep the selected proof photo in place until after presentation.
 No password, backend, real money, or debug-only UI is needed.
+
+## Current emulator preparation (2026-10-08)
+
+Pixel_7/API 37 has both Insan and Demo Hunter (`hunter@bounty.local`) registered,
+each at Rp50.000. Insan owns an OPEN `Demo: 30 push-ups` challenge, reward
+Rp20.000, deadline 2026-10-15. It was published through Create, preserving all
+existing data. The app is left signed in as Insan. Use this challenge or publish
+another to demonstrate Create during presentation. These records are local to
+this emulator; a fresh installation still uses the initial data described above.

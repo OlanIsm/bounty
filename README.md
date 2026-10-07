@@ -4,7 +4,12 @@ Android coursework MVP using Java and XML. M0 project setup, M1 mock
 authentication, M2 main navigation, M3 local database, M4 challenge feed,
 M5 challenge publishing, M6 challenge acceptance, M7 proof submission,
 M8 proof review, M9 mock reward, M10 external demo profiles, and M11 UI polish
-are implemented. M12 testing is verified; M13 has not started.
+are implemented. M12 testing is verified; M13 APK packaging is complete.
+
+Build the final installable `build/Bounty.apk` with `./scripts/Build-Apk.ps1`.
+This uses the standard Android debug signature for coursework, not production
+distribution. Installation and account-switching presentation steps are in
+[docs/DEMO.md](docs/DEMO.md).
 
 ## Requirements
 

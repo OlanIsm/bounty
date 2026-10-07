@@ -113,3 +113,29 @@ the existing photo error/retry behavior is covered. This remains a local mock
 application with no production authentication or real payments.
 
 M13 packaging, icon changes, and presentation data are outside this milestone.
+
+## M13 APK delivery verification (2026-10-08)
+
+The final package is `build/Bounty.apk`, 18,440,420 bytes, SHA256
+`E3F76E566A68295F3422001A4172A3F817C35947A86530838B51C4B839DB6B5A`.
+SDK apksigner verifies its v2 signature. aapt2 confirms Bounty, version 1.0,
+canonical application ID and API 29 minimum. It is intentionally a debug-signed,
+debuggable coursework build. It contains no instrumentation/temporary QA class.
+`Build-Apk.ps1` rebuilds this variant, runs lint and prints its checksum.
+
+The final icon/resource change passed `Test-Android.ps1 -MainFlowOnly`: fresh
+Login, one continuous public-UI flow test (160.913 seconds), and two real process
+restarts preserving the paid hunter, COMPLETED record and Rp70.000 balance.
+The earlier M12 feature batch was not rerun for this icon/packaging-only change.
+The canonical APK was rebuilt afterwards; assembleDebug/lintDebug pass with
+0 errors and the same four warnings. `adb install -r build/Bounty.apk` succeeded
+on Pixel_7/API 37. Pulling the installed base APK and comparing SHA256 confirmed
+it matches the delivered file. Home shows the original Insan and Rp50.000.
+Launcher visual QA confirms the orange trophy and Bounty label.
+
+Preparation used public registration/Create UI to add Demo Hunter and an OPEN
+Insan-owned presentation challenge; both accounts retain Rp50.000. Home was
+returned to Insan. No existing data was reset; temporary test packages were
+removed and animations restored. Screenshots are local build artifacts under
+`build/m13/`. Demo instructions are in DEMO.md. Existing device, external API,
+photo URI and long-session renderer limitations above still apply.
