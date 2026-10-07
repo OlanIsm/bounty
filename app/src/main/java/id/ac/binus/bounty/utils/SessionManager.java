@@ -11,10 +11,14 @@ import java.util.Locale;
 import java.util.UUID;
 
 import id.ac.binus.bounty.models.User;
+import id.ac.binus.bounty.models.Challenge;
+import id.ac.binus.bounty.database.AppDatabase;
 
 /** Mock email-only authentication. Never use this as production authentication. */
 public class SessionManager {
     public static final String DEMO_EMAIL = "demo@bounty.local";
+    // ponytail: one-process local demo; use a transactional ledger for a backend/multi-process app.
+    private static final Object REWARD_LOCK = new Object();
     private final SharedPreferences accounts;
     private final SharedPreferences session;
     private final Gson gson = new Gson();
@@ -72,6 +76,45 @@ public class SessionManager {
 
     public void logout() {
         session.edit().clear().apply();
+    }
+
+    /** Off-main-thread recovery: credit each completed/approved challenge once, including after restart. */
+    public double creditCompletedRewards(AppDatabase db, String hunterId) {
+        synchronized (REWARD_LOCK) {
+            User hunter = null;
+            for (String key : accounts.getAll().keySet()) {
+                if (isValidEmail(key)) {
+                    User candidate = getUser(key);
+                    if (candidate != null && candidate.id.equals(hunterId)) { hunter = candidate; break; }
+                }
+            }
+            if (hunter == null) throw new IllegalStateException("Hunter account unavailable");
+            double balance = hunter.demoBalance;
+            if (!Double.isFinite(balance) || balance < 0) throw new IllegalStateException("Invalid demo balance");
+            SharedPreferences.Editor payment = accounts.edit();
+            for (Challenge challenge : db.challengeDao().getRewardableChallenges(hunterId)) {
+                String receipt = "reward_" + challenge.id;
+                if (accounts.contains(receipt)) continue;
+                double next = balance + challenge.reward;
+                if (!Double.isFinite(challenge.reward) || challenge.reward <= 0
+                        || !Double.isFinite(next) || next <= balance) {
+                    throw new IllegalStateException("Invalid demo reward");
+                }
+                balance = next;
+                payment.putString(receipt, hunterId);
+            }
+            double credited = balance - hunter.demoBalance;
+            User updated = new User(hunter.id, hunter.name, hunter.email, hunter.avatarUrl, balance);
+            payment.putString(hunter.email, gson.toJson(updated));
+            // Also retry a failed disk commit whose snapshot is already visible in memory.
+            // Balance and receipts share one snapshot; never write inside the Room transaction.
+            if (!payment.commit()) throw new IllegalStateException("Unable to persist demo reward");
+            return credited;
+        }
+    }
+
+    public boolean isRewardCredited(int challengeId, String hunterId) {
+        return hunterId != null && hunterId.equals(accounts.getString("reward_" + challengeId, ""));
     }
 
     private User getUser(String email) {

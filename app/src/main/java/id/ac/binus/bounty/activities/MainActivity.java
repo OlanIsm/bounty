@@ -38,6 +38,7 @@ import java.time.ZoneId;
 import java.time.format.DateTimeParseException;
 import id.ac.binus.bounty.models.User;
 import id.ac.binus.bounty.utils.ScreenInsets;
+import id.ac.binus.bounty.utils.ChallengeDisplay;
 import id.ac.binus.bounty.utils.SessionManager;
 
 /** Four top-level destinations with a local Room challenge feed. */
@@ -45,6 +46,7 @@ public class MainActivity extends AppCompatActivity {
     private BottomNavigationView navigation;
     private int selectedDestination = R.id.nav_home;
     private int feedRequest;
+    private int balanceRequest;
     private View createScreen;
     private SparseArray<Parcelable> createState;
     private PublishModel publishModel;
@@ -126,6 +128,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        refreshBalance();
         if (navigation != null && (selectedDestination == R.id.nav_home || selectedDestination == R.id.nav_my_challenges)) loadFeed();
     }
 
@@ -187,6 +190,7 @@ public class MainActivity extends AppCompatActivity {
             findViewById(R.id.feed_retry).setOnClickListener(view -> loadFeed());
             if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) loadFeed();
         }
+        if (getLifecycle().getCurrentState().isAtLeast(Lifecycle.State.STARTED)) refreshBalance();
         return true;
     }
 
@@ -321,7 +325,34 @@ public class MainActivity extends AppCompatActivity {
         });
     }
 
+    private void refreshBalance() {
+        if (navigation == null || (selectedDestination != R.id.nav_home && selectedDestination != R.id.nav_profile)) return;
+        SessionManager session = new SessionManager(getApplicationContext());
+        User user = session.getCurrentUser();
+        if (user == null) return;
+        int request = ++balanceRequest;
+        AppDatabase db = AppDatabase.getInstance(this);
+        db.getTransactionExecutor().execute(() -> {
+            try {
+                session.creditCompletedRewards(db, user.id);
+                runOnUiThread(() -> {
+                    User current = session.getCurrentUser();
+                    if (!isDestroyed() && !isFinishing() && request == balanceRequest
+                            && current != null && current.id.equals(user.id)) bindUser(current);
+                });
+            } catch (RuntimeException error) {
+                Log.e("BountyReward", "Unable to recover demo rewards", error);
+                runOnUiThread(() -> {
+                    if (!isDestroyed() && !isFinishing() && request == balanceRequest)
+                        showSnackbar(R.string.reward_refresh_error);
+                });
+            }
+        });
+    }
+
     private void bindUser(User user) {
+        TextView balance = findViewById(R.id.demo_balance_amount);
+        if (balance != null) balance.setText(ChallengeDisplay.rupiah(this, user.demoBalance));
         if (selectedDestination == R.id.nav_home) {
             ((TextView) findViewById(R.id.welcome_text))
                     .setText(getString(R.string.welcome_user, user.name));

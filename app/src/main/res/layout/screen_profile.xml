@@ -7,6 +7,7 @@
         <com.google.android.material.textview.MaterialTextView
             android:id="@+id/user_email" style="@style/BountyBody"
             android:layout_marginTop="8dp" android:textIsSelectable="true" />
+        <include layout="@layout/component_demo_balance" />
         <com.google.android.material.textview.MaterialTextView
             style="@style/BountyBody" android:layout_marginTop="24dp"
             android:text="@string/signed_in_note" />

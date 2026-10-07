@@ -51,8 +51,9 @@ public class ReviewProofActivity extends AppCompatActivity {
         super.onPostCreate(state);
         model.state.observe(this, result -> {
             updateControls();
-            if (result == ReviewModel.APPROVED || result == ReviewModel.REJECTED) {
-                Toast.makeText(this, result == ReviewModel.APPROVED ? R.string.review_approved
+            if (result == ReviewModel.APPROVED || result == ReviewModel.REJECTED || result == ReviewModel.REWARD_PENDING) {
+                Toast.makeText(this, result == ReviewModel.APPROVED ? R.string.reward_approved
+                        : result == ReviewModel.REWARD_PENDING ? R.string.reward_pending
                         : R.string.review_rejected, Toast.LENGTH_LONG).show();
                 finish();
             } else if (result == ReviewModel.ERROR || result == ReviewModel.UNAVAILABLE) {
@@ -167,19 +168,29 @@ public class ReviewProofActivity extends AppCompatActivity {
     private void review(boolean approve) {
         if (currentProof == null || (approve && !imageReady)) return;
         User user = new SessionManager(this).getCurrentUser();
-        if (user != null) model.review(AppDatabase.getInstance(this), currentProof, user.id, approve);
+        if (user != null) model.review(AppDatabase.getInstance(this), currentProof, user.id, approve, new SessionManager(getApplicationContext()));
     }
 
     public static class ReviewModel extends ViewModel {
-        static final int IDLE = 0, SAVING = 1, APPROVED = 2, REJECTED = 3, UNAVAILABLE = 4, ERROR = 5;
+        static final int IDLE = 0, SAVING = 1, APPROVED = 2, REJECTED = 3, UNAVAILABLE = 4, ERROR = 5, REWARD_PENDING = 6;
         final MutableLiveData<Integer> state = new MutableLiveData<>(IDLE);
-        void review(AppDatabase db, Proof proof, String creatorId, boolean approve) {
+        void review(AppDatabase db, Proof proof, String creatorId, boolean approve, SessionManager session) {
             if (state.getValue() != IDLE) return;
             state.setValue(SAVING);
             db.getTransactionExecutor().execute(() -> {
                 try {
-                    state.postValue(db.reviewProof(proof.challengeId, proof.id, creatorId, approve)
-                            ? (approve ? APPROVED : REJECTED) : UNAVAILABLE);
+                    if (!db.reviewProof(proof.challengeId, proof.id, creatorId, approve)) {
+                        state.postValue(UNAVAILABLE);
+                        return;
+                    }
+                    if (!approve) { state.postValue(REJECTED); return; }
+                    try {
+                        session.creditCompletedRewards(db, proof.hunterId);
+                        state.postValue(APPROVED);
+                    } catch (RuntimeException error) {
+                        Log.e("BountyReward", "Approved proof awaits demo reward recovery", error);
+                        state.postValue(REWARD_PENDING);
+                    }
                 } catch (RuntimeException error) {
                     Log.e("BountyReview", "Unable to review proof", error);
                     state.postValue(ERROR);

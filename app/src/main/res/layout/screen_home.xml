@@ -8,6 +8,7 @@
         <com.google.android.material.textview.MaterialTextView
             style="@style/BountyBody" android:layout_marginTop="8dp"
             android:text="@string/home_description" />
+        <include layout="@layout/component_demo_balance" />
         <com.google.android.material.textview.MaterialTextView
             style="@style/BountySection" android:layout_marginTop="24dp" android:layout_marginBottom="12dp"
             android:text="@string/available_challenges" />

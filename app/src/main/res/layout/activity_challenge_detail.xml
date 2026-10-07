@@ -39,6 +39,8 @@
                     style="@style/BountyBody" android:layout_marginTop="24dp" />
                 <com.google.android.material.textview.MaterialTextView android:id="@+id/challenge_status"
                     style="@style/BountyStatus" android:layout_marginTop="8dp" />
+                <com.google.android.material.textview.MaterialTextView android:id="@+id/reward_result"
+                    style="@style/BountyBody" android:layout_marginTop="16dp" android:visibility="gone" />
                 <com.google.android.material.textview.MaterialTextView android:id="@+id/accept_message"
                     style="@style/BountyBody" android:layout_marginTop="16dp" />
                 <com.google.android.material.button.MaterialButton android:id="@+id/accept_button"

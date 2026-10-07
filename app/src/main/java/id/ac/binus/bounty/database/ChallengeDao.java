@@ -37,6 +37,11 @@ public interface ChallengeDao {
     @Query("UPDATE challenges SET status = 'SUBMITTED' WHERE id = :id AND status = 'ACCEPTED' AND participantId = :hunterId")
     int markSubmitted(int id, String hunterId);
 
+    @Query("SELECT * FROM challenges WHERE status = 'COMPLETED' AND participantId = :hunterId "
+            + "AND EXISTS (SELECT 1 FROM proofs WHERE challengeId = challenges.id "
+            + "AND hunterId = :hunterId AND status = 'APPROVED') ORDER BY id")
+    List<Challenge> getRewardableChallenges(String hunterId);
+
     @Update
     int updateChallenge(Challenge challenge);
 

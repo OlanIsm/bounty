@@ -119,6 +119,15 @@ public class ChallengeDetailActivity extends AppCompatActivity {
                 ? View.VISIBLE : View.GONE);
         findViewById(R.id.review_proof_button).setVisibility(own && Challenge.SUBMITTED.equals(challenge.status)
                 ? View.VISIBLE : View.GONE);
+        TextView result = findViewById(R.id.reward_result);
+        boolean completed = challenge != null && Challenge.COMPLETED.equals(challenge.status);
+        result.setVisibility(completed ? View.VISIBLE : View.GONE);
+        if (completed) {
+            boolean paid = new SessionManager(this).isRewardCredited(challenge.id, challenge.participantId);
+            result.setText(paid ? getString(R.string.reward_result_paid,
+                    ChallengeDisplay.rupiah(this, challenge.reward), challenge.participantName)
+                    : getString(R.string.reward_pending));
+        }
         TextView message = findViewById(R.id.accept_message);
         if (challenge != null && challenge.participantId != null) {
             message.setText(getString(R.string.accept_hunter, challenge.participantName));
