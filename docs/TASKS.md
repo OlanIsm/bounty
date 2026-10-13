@@ -701,7 +701,7 @@ already met. Implement M14 tasks in order and update this ledger with evidence.
 
 - [x] Confirm cloud provider and backend/API approach: Supabase PostgreSQL,
   Supabase Auth, and PostgREST; Random User API remains the qualifying external API
-- [ ] Define and document cloud data schema for users, challenges, proofs, and
+- [x] Define and document cloud data schema for users, challenges, proofs, and
   mock rewards; keep real payment out of scope
 - [ ] Define the Bounty backend/API contract for reading and managing app data
 - [ ] Migrate app source from Java to Kotlin while preserving existing flows
