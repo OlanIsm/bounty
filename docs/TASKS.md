@@ -710,6 +710,7 @@ already met. Implement M14 tasks in order and update this ledger with evidence.
 - [x] Define the Firebase data access contract for reading and managing app data
 - [ ] Migrate app source from Java to Kotlin while preserving existing flows
   - [x] Migrate Login and Register screens to Kotlin
+  - [x] Migrate the challenge feed adapter to Kotlin without changing its UI contract
   - [ ] Migrate remaining application screens and data flows to Kotlin
 - [ ] Connect challenge, proof, account, and mock reward data to the cloud
   - [x] Implement Firebase Auth login/register and `users/{uid}` profile sync
