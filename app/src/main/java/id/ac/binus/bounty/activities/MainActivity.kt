@@ -17,6 +17,7 @@ import androidx.activity.OnBackPressedCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.core.os.BundleCompat
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -77,7 +78,9 @@ class MainActivity : AppCompatActivity() {
         navigation = findViewById(R.id.bottom_navigation)
         publishModel = ViewModelProvider(this)[PublishModel::class.java]
         demoUsersModel = ViewModelProvider(this)[DemoUsersModel::class.java]
-        createState = savedInstanceState?.getSparseParcelableArray("create_state")
+        createState = savedInstanceState?.let {
+            BundleCompat.getSparseParcelableArray(it, "create_state", Parcelable::class.java)
+        }
         onBackPressedDispatcher.addCallback(this, backToHome)
         val nav = navigation ?: return
         nav.setOnItemSelectedListener { showScreen(it.itemId) }

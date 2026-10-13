@@ -96,9 +96,9 @@ class SubmitProofActivity : AppCompatActivity() {
         loadChallenge()
     }
 
-    override fun onSaveInstanceState(state: Bundle) {
-        imageUri?.let { state.putString("proof_image", it.toString()) }
-        super.onSaveInstanceState(state)
+    override fun onSaveInstanceState(outState: Bundle) {
+        imageUri?.let { outState.putString("proof_image", it.toString()) }
+        super.onSaveInstanceState(outState)
     }
 
     private fun showPhoto() {

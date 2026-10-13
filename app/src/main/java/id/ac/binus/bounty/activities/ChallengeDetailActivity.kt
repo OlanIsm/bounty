@@ -145,10 +145,12 @@ class ChallengeDetailActivity : AppCompatActivity() {
         val result = findViewById<TextView>(R.id.reward_result)
         val completed = challenge?.status == Challenge.COMPLETED
         result.visibility = if (completed) View.VISIBLE else View.GONE
-        if (completed && challenge != null) {
-            val paid = SessionManager(this).isRewardCredited(challenge.id, challenge.participantId)
+        if (completed) {
+            val completedChallenge = requireNotNull(challenge)
+            val paid = SessionManager(this).isRewardCredited(completedChallenge.id, completedChallenge.participantId)
             result.text = if (paid) getString(
-                R.string.reward_result_paid, ChallengeDisplay.rupiah(this, challenge.reward), challenge.participantName
+                R.string.reward_result_paid,
+                ChallengeDisplay.rupiah(this, completedChallenge.reward), completedChallenge.participantName
             ) else getString(R.string.reward_pending)
         }
         val message = findViewById<TextView>(R.id.accept_message)

@@ -118,6 +118,7 @@ class SessionManager(context: Context) {
     private fun getUser(email: String?): User? {
         return try {
             val user = gson.fromJson(accounts.getString(email, ""), User::class.java)
+            @Suppress("SENSELESS_COMPARISON")
             user?.takeIf { it.id != null && it.name != null && email == it.email }
         } catch (_: JsonParseException) {
             null
