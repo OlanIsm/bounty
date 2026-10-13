@@ -191,6 +191,11 @@ class MainActivity : AppCompatActivity() {
                 list.adapter = ConcatAdapter(homeHeaderAdapter!!, feedAdapter!!)
             } else list.adapter = feedAdapter
             findViewById<View>(R.id.feed_retry).setOnClickListener { loadFeed() }
+            if (destination == R.id.nav_my_challenges) {
+                findViewById<View>(R.id.empty_create_challenge).setOnClickListener {
+                    navigation?.selectedItemId = R.id.nav_create
+                }
+            }
             if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) loadFeed()
         }
         user?.let(::bindUser)
@@ -281,6 +286,7 @@ class MainActivity : AppCompatActivity() {
         home.findViewById<View>(R.id.feed_loading).visibility = View.VISIBLE
         home.findViewById<View>(R.id.feed_message).visibility = View.GONE
         home.findViewById<View>(R.id.feed_retry).visibility = View.GONE
+        home.findViewById<View>(R.id.empty_create_challenge)?.visibility = View.GONE
         FirebaseBountyRepository.loadChallenges(user.id, mine) { result ->
             if (isDestroyed || isFinishing || request != feedRequest || findViewById<View>(screenId) !== home) return@loadChallenges
             val list = home.findViewById<RecyclerView>(R.id.challenge_list)
@@ -293,6 +299,8 @@ class MainActivity : AppCompatActivity() {
                     setText(if (mine) R.string.no_my_challenges else R.string.no_available_challenges)
                     visibility = if (challenges.isEmpty()) View.VISIBLE else View.GONE
                 }
+                home.findViewById<View>(R.id.empty_create_challenge)?.visibility =
+                    if (mine && challenges.isEmpty()) View.VISIBLE else View.GONE
             } else {
                 Log.e("BountyFeed", "Unable to load challenges", result.exceptionOrNull())
                 feedAdapter?.submitList(emptyList())
@@ -302,6 +310,7 @@ class MainActivity : AppCompatActivity() {
                     visibility = View.VISIBLE
                 }
                 home.findViewById<View>(R.id.feed_retry).visibility = View.VISIBLE
+                home.findViewById<View>(R.id.empty_create_challenge)?.visibility = View.GONE
                 showSnackbar(R.string.challenge_load_error)
             }
         }

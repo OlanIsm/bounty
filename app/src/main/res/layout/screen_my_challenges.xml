@@ -18,6 +18,9 @@
     <com.google.android.material.button.MaterialButton
         android:id="@+id/feed_retry" style="@style/BountyButton"
         android:text="@string/retry_action" android:visibility="gone" />
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/empty_create_challenge" style="@style/BountyButton"
+        android:text="@string/create_first_challenge" android:visibility="gone" />
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/challenge_list" android:layout_width="match_parent"
         android:layout_height="0dp" android:layout_weight="1"

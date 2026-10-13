@@ -82,7 +82,13 @@ adb install -r build/Bounty.apk
 
 ## Akun aplikasi
 
-Buat akun melalui layar Register menggunakan email dan password. Firebase Auth mengelola kredensial; profil, challenge, proof, dan receipt reward tersimpan di Firestore. Pastikan Firestore Rules di `firebase/firestore.rules` terpasang. Firebase Storage tidak digunakan.
+Buat akun melalui layar Register menggunakan email dan password. Firebase Auth mengelola kredensial; profil, challenge, proof, dan receipt reward tersimpan di Firestore. Deploy Rules dan composite indexes sebelum menjalankan flow My Challenges:
+
+```powershell
+firebase deploy --only firestore:rules,firestore:indexes --project bounty-7b996
+```
+
+Firebase Storage tidak digunakan.
 
 ## Push perubahan ke GitHub
 

@@ -26,7 +26,8 @@
     <string name="challenge_deadline">Batas waktu: %1$s</string>
     <string name="challenge_not_found">Challenge tidak ditemukan atau sudah dihapus.</string>
     <string name="back_action">Kembali</string>
-    <string name="no_my_challenges">Belum ada challenge kamu</string>
+    <string name="no_my_challenges">Belum ada challenge kamu. Jadilah yang pertama membuat challenge!</string>
+    <string name="create_first_challenge">Buat challenge pertama</string>
     <string name="my_challenges_description">Challenge yang kamu buat atau terima akan tampil di sini.</string>
     <string name="create_challenge_title">Buat challenge baru</string>
     <string name="create_description">Tentukan tantangan dan tawarkan reward demo untuk hunter.</string>

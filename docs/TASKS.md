@@ -730,6 +730,7 @@ already met. Implement M14 tasks in order and update this ledger with evidence.
   creator/hunter flows
 - [x] Build and verify the app against the updated requirements
 - [x] Update README and architecture/database/API docs to match final design
+- [x] Show first-challenge empty state and shortcut to Create from My Challenges
 
 Firebase Storage is intentionally not used: it requires Blaze, which the project
 will not enable. Proof images use compressed Firestore bytes (512 KiB app cap).
