@@ -260,7 +260,9 @@ Balance setelah approved:
 Rp70.000
 ```
 
-Data hanya tersimpan sebagai nilai lokal/mock.
+Data disimpan sebagai mock balance/reward di Cloud Firestore; nilainya bukan
+uang sungguhan. Saldo dihitung dari saldo awal demo dan receipt reward yang
+dibuat saat proof disetujui.
 
 UI harus memberi label seperti:
 

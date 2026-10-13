@@ -1,5 +1,26 @@
 # M12 test report
 
+## M14 verification update (2026-10-14)
+
+The Firebase Auth and Firestore Emulator Suite passed two focused
+instrumentation tests on Pixel_7 (API 37): full cloud challenge flow (create,
+own-accept rejection, hunter accept, submit, reject/resubmit, approve, receipt,
+and Rp70.000 balance) and proof-image compression under the 512 KiB cap.
+Emulator test accounts and documents were local and removed when emulators
+stopped. No production user/data was created.
+
+`assembleDebug` and `lintDebug` pass. Lint reports existing non-blocking
+warnings (target SDK, splash screen, available dependency updates, unused
+resource, and KTX suggestions). Compiler also reports deprecated Firestore
+persistence configuration and the existing experimental Kotlin source-set
+Gradle option.
+
+The older full instrumentation suite remains non-green: legacy flow tests use
+mock sessions and expect local Room behavior. The focused cloud tests pass, but
+the old suite must be migrated before claiming every historical test passes.
+Firebase Storage is intentionally excluded because the project remains on Spark;
+proof bytes use Firestore instead.
+
 ## M14 addendum (2026-10-13)
 
 The merged Google Services configuration retains both `id.ac.binus.bounty` and

@@ -31,7 +31,8 @@ class ChallengeAdapter(private val onOpen: Consumer<Challenge>) :
 
     private companion object {
         val DIFF_CALLBACK = object : DiffUtil.ItemCallback<Challenge>() {
-            override fun areItemsTheSame(oldItem: Challenge, newItem: Challenge) = oldItem.id == newItem.id
+            override fun areItemsTheSame(oldItem: Challenge, newItem: Challenge) =
+                (oldItem.cloudId ?: oldItem.id.toString()) == (newItem.cloudId ?: newItem.id.toString())
 
             override fun areContentsTheSame(oldItem: Challenge, newItem: Challenge) =
                 oldItem.title == newItem.title && oldItem.description == newItem.description &&

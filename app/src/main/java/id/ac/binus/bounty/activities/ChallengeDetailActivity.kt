@@ -13,7 +13,7 @@ import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.snackbar.Snackbar
 import id.ac.binus.bounty.R
-import id.ac.binus.bounty.database.AppDatabase
+import id.ac.binus.bounty.data.FirebaseBountyRepository
 import id.ac.binus.bounty.models.Challenge
 import id.ac.binus.bounty.models.User
 import id.ac.binus.bounty.utils.ActionConfirmation
@@ -34,7 +34,7 @@ class ChallengeDetailActivity : AppCompatActivity() {
         supportFragmentManager.setFragmentResultListener("confirm_accept", this) { _, data ->
             val user = SessionManager(this).getCurrentUser()
             if (user != null && user.id == data.getString("actor")) {
-                acceptModel.accept(AppDatabase.getInstance(this), data.getInt("challenge"), user)
+                acceptModel.accept(data.getString("challenge").orEmpty(), user)
             } else {
                 Snackbar.make(findViewById(R.id.main), R.string.accept_unavailable, Snackbar.LENGTH_LONG).show()
             }
@@ -44,7 +44,7 @@ class ChallengeDetailActivity : AppCompatActivity() {
             val challenge = currentChallenge ?: return@setOnClickListener
             if (!view.isEnabled || user == null) return@setOnClickListener
             val data = Bundle().apply {
-                putInt("challenge", challenge.id)
+                putString("challenge", challenge.cloudId)
                 putString("actor", user.id)
             }
             ActionConfirmation.show(
@@ -54,12 +54,12 @@ class ChallengeDetailActivity : AppCompatActivity() {
             )
         }
         findViewById<View>(R.id.submit_proof_button).setOnClickListener {
-            val id = currentChallenge?.id ?: return@setOnClickListener
-            startActivity(Intent(this, SubmitProofActivity::class.java).putExtra(EXTRA_CHALLENGE_ID, id))
+            val id = currentChallenge?.cloudId ?: return@setOnClickListener
+            startActivity(Intent(this, SubmitProofActivity::class.java).putExtra(EXTRA_CLOUD_CHALLENGE_ID, id))
         }
         findViewById<View>(R.id.review_proof_button).setOnClickListener {
-            val id = currentChallenge?.id ?: return@setOnClickListener
-            startActivity(Intent(this, ReviewProofActivity::class.java).putExtra(EXTRA_CHALLENGE_ID, id))
+            val id = currentChallenge?.cloudId ?: return@setOnClickListener
+            startActivity(Intent(this, ReviewProofActivity::class.java).putExtra(EXTRA_CLOUD_CHALLENGE_ID, id))
         }
         acceptModel.state.observe(this) { state ->
             bindAccept()
@@ -95,36 +95,29 @@ class ChallengeDetailActivity : AppCompatActivity() {
         findViewById<View>(R.id.detail_content).visibility = View.GONE
         findViewById<View>(R.id.detail_message).visibility = View.GONE
         findViewById<View>(R.id.detail_retry).visibility = View.GONE
-        val id = intent.getIntExtra(EXTRA_CHALLENGE_ID, -1)
-        if (id <= 0) {
+        val id = intent.getStringExtra(EXTRA_CLOUD_CHALLENGE_ID)
+        if (id.isNullOrBlank()) {
             showMessage(R.string.challenge_not_found, false)
             return
         }
-        val db = AppDatabase.getInstance(this)
-        db.queryExecutor.execute {
-            try {
-                val challenge = db.challengeDao().getChallengeById(id)
-                runOnUiThread {
-                    if (isDestroyed || isFinishing || currentRequest != request) return@runOnUiThread
-                    if (challenge == null) {
-                        showMessage(R.string.challenge_not_found, false)
-                        return@runOnUiThread
-                    }
-                    currentChallenge = challenge
-                    bindAccept()
-                    val content = findViewById<View>(R.id.detail_content)
-                    ChallengeDisplay.bind(content, challenge)
-                    content.findViewById<TextView>(R.id.challenge_description).text = challenge.description
-                    findViewById<View>(R.id.detail_loading).visibility = View.GONE
-                    content.visibility = View.VISIBLE
+        FirebaseBountyRepository.getChallenge(id) { result ->
+            if (isDestroyed || isFinishing || currentRequest != request) return@getChallenge
+            result.onSuccess { challenge ->
+                if (challenge == null) {
+                    showMessage(R.string.challenge_not_found, false)
+                    return@onSuccess
                 }
-            } catch (error: RuntimeException) {
+                currentChallenge = challenge
+                bindAccept()
+                val content = findViewById<View>(R.id.detail_content)
+                ChallengeDisplay.bind(content, challenge)
+                content.findViewById<TextView>(R.id.challenge_description).text = challenge.description
+                findViewById<View>(R.id.detail_loading).visibility = View.GONE
+                content.visibility = View.VISIBLE
+            }.onFailure { error ->
                 Log.e("BountyDetail", "Unable to load challenge $id", error)
-                runOnUiThread {
-                    if (isDestroyed || isFinishing || currentRequest != request) return@runOnUiThread
-                    showMessage(R.string.challenge_load_error, true)
-                    Snackbar.make(findViewById(R.id.main), R.string.challenge_load_error, Snackbar.LENGTH_LONG).show()
-                }
+                showMessage(R.string.challenge_load_error, true)
+                Snackbar.make(findViewById(R.id.main), R.string.challenge_load_error, Snackbar.LENGTH_LONG).show()
             }
         }
     }
@@ -147,11 +140,10 @@ class ChallengeDetailActivity : AppCompatActivity() {
         result.visibility = if (completed) View.VISIBLE else View.GONE
         if (completed) {
             val completedChallenge = requireNotNull(challenge)
-            val paid = SessionManager(this).isRewardCredited(completedChallenge.id, completedChallenge.participantId)
-            result.text = if (paid) getString(
+            result.text = getString(
                 R.string.reward_result_paid,
                 ChallengeDisplay.rupiah(this, completedChallenge.reward), completedChallenge.participantName
-            ) else getString(R.string.reward_pending)
+            )
         }
         val message = findViewById<TextView>(R.id.accept_message)
         message.text = if (challenge?.participantId != null) {
@@ -173,16 +165,15 @@ class ChallengeDetailActivity : AppCompatActivity() {
     class AcceptModel : ViewModel() {
         val state = MutableLiveData(IDLE)
 
-        fun accept(db: AppDatabase, id: Int, user: User) {
+        fun accept(id: String, user: User) {
             if (state.value != IDLE) return
             state.value = SAVING
-            db.transactionExecutor.execute {
-                try {
-                    state.postValue(if (db.challengeDao().acceptChallenge(id, user.id, user.name) == 1) SAVED else UNAVAILABLE)
-                } catch (error: RuntimeException) {
-                    Log.e("BountyAccept", "Unable to accept challenge", error)
-                    state.postValue(ERROR)
-                }
+            FirebaseBountyRepository.acceptChallenge(id, user.id, user.name) { result ->
+                result.onSuccess { state.value = if (it) SAVED else UNAVAILABLE }
+                    .onFailure { error ->
+                        Log.e("BountyAccept", "Unable to accept challenge", error)
+                        state.value = ERROR
+                    }
             }
         }
 
@@ -197,5 +188,6 @@ class ChallengeDetailActivity : AppCompatActivity() {
 
     companion object {
         const val EXTRA_CHALLENGE_ID = "challenge_id"
+        const val EXTRA_CLOUD_CHALLENGE_ID = "cloud_challenge_id"
     }
 }

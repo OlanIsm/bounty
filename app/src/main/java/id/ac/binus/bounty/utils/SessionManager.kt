@@ -66,6 +66,12 @@ class SessionManager(context: Context) {
         session.edit().putString("user_email", normalizedEmail).putBoolean("logged_in", true).apply()
     }
 
+    fun updateDemoBalance(uid: String, balance: Double) {
+        val email = session.getString("user_email", "") ?: return
+        val user = getUser(email)?.takeIf { it.id == uid } ?: return
+        accounts.edit().putString(email, gson.toJson(User(user.id, user.name, user.email, user.avatarUrl, balance))).apply()
+    }
+
     fun isLoggedIn() = getCurrentUser() != null
 
     fun isFirebaseAuthenticated(): Boolean {

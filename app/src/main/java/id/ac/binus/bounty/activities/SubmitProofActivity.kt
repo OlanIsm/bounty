@@ -2,6 +2,7 @@ package id.ac.binus.bounty.activities
 
 import android.content.Context
 import android.content.Intent
+import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.os.Bundle
@@ -23,13 +24,14 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import id.ac.binus.bounty.R
-import id.ac.binus.bounty.database.AppDatabase
+import id.ac.binus.bounty.data.FirebaseBountyRepository
 import id.ac.binus.bounty.models.Challenge
 import id.ac.binus.bounty.models.Proof
 import id.ac.binus.bounty.models.User
 import id.ac.binus.bounty.utils.ScreenInsets
 import id.ac.binus.bounty.utils.SessionManager
 import java.io.IOException
+import java.io.ByteArrayOutputStream
 
 class SubmitProofActivity : AppCompatActivity() {
     private var imageUri: Uri? = null
@@ -119,32 +121,30 @@ class SubmitProofActivity : AppCompatActivity() {
         findViewById<View>(R.id.proof_message).visibility = View.GONE
         findViewById<View>(R.id.proof_retry).visibility = View.GONE
         val user = SessionManager(this).getCurrentUser() ?: return
-        val id = intent.getIntExtra(ChallengeDetailActivity.EXTRA_CHALLENGE_ID, -1)
-        val db = AppDatabase.getInstance(this)
-        db.queryExecutor.execute {
-            try {
-                val challenge = db.challengeDao().getChallengeById(id)
-                runOnUiThread {
-                    if (isDestroyed || isFinishing || current != request) return@runOnUiThread
-                    if (challenge == null) {
-                        showMessage(R.string.challenge_not_found, false)
-                        return@runOnUiThread
-                    }
-                    eligible = challenge.status == Challenge.ACCEPTED && user.id == challenge.participantId
-                    if (!eligible && model.state.value != ProofModel.SAVING) {
-                        showMessage(R.string.proof_unavailable, false)
-                        return@runOnUiThread
-                    }
-                    findViewById<TextView>(R.id.proof_challenge_title).text = challenge.title
-                    findViewById<View>(R.id.proof_loading).visibility = View.GONE
-                    findViewById<View>(R.id.proof_form).visibility = View.VISIBLE
-                    updateSaving()
+        val id = intent.getStringExtra(ChallengeDetailActivity.EXTRA_CLOUD_CHALLENGE_ID)
+        if (id.isNullOrBlank()) {
+            showMessage(R.string.challenge_not_found, false)
+            return
+        }
+        FirebaseBountyRepository.getChallenge(id) { result ->
+            if (isDestroyed || isFinishing || current != request) return@getChallenge
+            result.onSuccess { challenge ->
+                if (challenge == null) {
+                    showMessage(R.string.challenge_not_found, false)
+                    return@onSuccess
                 }
-            } catch (error: RuntimeException) {
+                eligible = challenge.status == Challenge.ACCEPTED && user.id == challenge.participantId
+                if (!eligible && model.state.value != ProofModel.SAVING) {
+                    showMessage(R.string.proof_unavailable, false)
+                    return@onSuccess
+                }
+                findViewById<TextView>(R.id.proof_challenge_title).text = challenge.title
+                findViewById<View>(R.id.proof_loading).visibility = View.GONE
+                findViewById<View>(R.id.proof_form).visibility = View.VISIBLE
+                updateSaving()
+            }.onFailure { error ->
                 Log.e("BountyProof", "Unable to load challenge", error)
-                runOnUiThread {
-                    if (!isDestroyed && !isFinishing && current == request) showMessage(R.string.challenge_load_error, true)
-                }
+                showMessage(R.string.challenge_load_error, true)
             }
         }
     }
@@ -183,7 +183,7 @@ class SubmitProofActivity : AppCompatActivity() {
         if (imageUri == null) findViewById<TextView>(R.id.proof_photo_message).setText(R.string.proof_photo_required)
         if (!valid || imageUri == null) return
         val proof = Proof().apply {
-            challengeId = intent.getIntExtra(ChallengeDetailActivity.EXTRA_CHALLENGE_ID, -1)
+            challengeCloudId = intent.getStringExtra(ChallengeDetailActivity.EXTRA_CLOUD_CHALLENGE_ID)
             hunterId = user.id
             this.description = description
             imageUri = image.toString()
@@ -198,27 +198,49 @@ class SubmitProofActivity : AppCompatActivity() {
         fun submit(context: Context, proof: Proof) {
             if (state.value != IDLE) return
             state.value = SAVING
-            val db = AppDatabase.getInstance(context)
-            db.transactionExecutor.execute {
+            Thread {
                 try {
-                    val stream = context.contentResolver.openInputStream(Uri.parse(proof.imageUri))
-                        ?: throw IOException("Unable to open proof image")
-                    stream.use {
-                        val options = BitmapFactory.Options().apply { inJustDecodeBounds = true }
-                        BitmapFactory.decodeStream(it, null, options)
-                        if (options.outWidth <= 0 || options.outHeight <= 0) throw IllegalArgumentException("Unreadable image")
+                    val imageData = compressProofImage(context, Uri.parse(proof.imageUri))
+                    val challengeId = proof.challengeCloudId ?: throw IllegalArgumentException("Missing challenge ID")
+                    FirebaseBountyRepository.submitProof(challengeId, proof, imageData) { result ->
+                        result.onSuccess { state.value = if (it) SAVED else UNAVAILABLE }
+                            .onFailure { error ->
+                                Log.e("BountyProof", "Unable to submit proof", error)
+                                state.value = ERROR
+                            }
                     }
                 } catch (error: Exception) {
                     Log.e("BountyProof", "Unable to read proof image", error)
-                    state.postValue(IMAGE_ERROR)
-                    return@execute
+                    state.postValue(if (error is IOException || error is IllegalArgumentException) IMAGE_ERROR else ERROR)
                 }
-                try {
-                    state.postValue(if (db.submitProof(proof) > 0) SAVED else UNAVAILABLE)
-                } catch (error: RuntimeException) {
-                    Log.e("BountyProof", "Unable to submit proof", error)
-                    state.postValue(ERROR)
+            }.start()
+        }
+
+        internal fun compressProofImage(context: Context, uri: Uri): ByteArray {
+            val resolver = context.contentResolver
+            val bounds = resolver.openInputStream(uri)?.use { stream ->
+                BitmapFactory.Options().apply { inJustDecodeBounds = true }.also { BitmapFactory.decodeStream(stream, null, it) }
+            } ?: throw IOException("Unable to open proof image")
+            if (bounds.outWidth <= 0 || bounds.outHeight <= 0) throw IOException("Unreadable proof image")
+            var sample = 1
+            while (maxOf(bounds.outWidth, bounds.outHeight) / sample > 1280) sample *= 2
+            var bitmap = resolver.openInputStream(uri)?.use {
+                BitmapFactory.decodeStream(it, null, BitmapFactory.Options().apply { inSampleSize = sample })
+            } ?: throw IOException("Unable to decode proof image")
+            try {
+                while (true) {
+                    for (quality in listOf(82, 72, 62, 52, 42)) {
+                        val output = ByteArrayOutputStream()
+                        bitmap.compress(Bitmap.CompressFormat.JPEG, quality, output)
+                        if (output.size() <= FirebaseBountyRepository.MAX_PROOF_IMAGE_BYTES) return output.toByteArray()
+                    }
+                    if (bitmap.width <= 320 || bitmap.height <= 320) throw IllegalArgumentException("Proof image is too large")
+                    val smaller = Bitmap.createScaledBitmap(bitmap, (bitmap.width * 0.75).toInt(), (bitmap.height * 0.75).toInt(), true)
+                    if (smaller !== bitmap) bitmap.recycle()
+                    bitmap = smaller
                 }
+            } finally {
+                if (!bitmap.isRecycled) bitmap.recycle()
             }
         }
 

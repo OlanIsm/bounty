@@ -1,6 +1,6 @@
 # Bounty
 
-Bounty adalah aplikasi Android untuk membuat dan menyelesaikan challenge berhadiah. Creator membuat challenge dengan reward demo; hunter menerima challenge, mengirim bukti foto, lalu creator menyetujui atau menolak bukti. Reward dan saldo hanya simulasi, bukan uang sungguhan. Integrasi M14 masih berjalan: autentikasi dan profil sudah memakai Firebase, sedangkan challenge, proof, dan reward masih lokal.
+Bounty adalah aplikasi Android untuk membuat dan menyelesaikan challenge berhadiah. Creator membuat challenge dengan reward demo; hunter menerima challenge, mengirim bukti foto, lalu creator menyetujui atau menolak bukti. Reward dan saldo hanya simulasi, bukan uang sungguhan.
 
 Project ini dibuat sebagai MVP/coursework Android. Aplikasi juga menggunakan Random User API untuk menampilkan profil demo; data API tersebut tidak digunakan sebagai akun Bounty.
 
@@ -17,9 +17,9 @@ Project ini dibuat sebagai MVP/coursework Android. Aplikasi juga menggunakan Ran
 ## Teknologi
 
 - Android native app: Kotlin, XML Layout, Material Components
-- Firebase Authentication dan Cloud Firestore untuk akun/profil
-- Penyimpanan challenge dan proof: Room/SQLite
-- Cache sesi, saldo demo, dan catatan reward lokal: SharedPreferences
+- Firebase Authentication dan Cloud Firestore untuk akun, challenge, proof, dan reward mock
+- Foto proof disimpan sebagai bytes terkompresi pada dokumen Firestore; batas aplikasi 512 KiB
+- SharedPreferences hanya menyimpan cache sesi; Room tetap tersedia untuk skema lokal lama
 - HTTP/API: Retrofit dan Gson
 - Foto avatar: Glide
 - Minimum Android: API 29 (Android 10); compile SDK: API 37
@@ -27,23 +27,18 @@ Project ini dibuat sebagai MVP/coursework Android. Aplikasi juga menggunakan Ran
 ## Arsitektur
 
 ```text
-Login/Register Kotlin + XML
-        +-- FirebaseAccountRepository
-              +-- Firebase Auth
-              +-- Firestore: users/{uid}
-
-Kotlin Activities + XML (fitur lain masih lokal)
-        +-- Room: Challenge, Proof
-        +-- SharedPreferences: cache sesi dan reward demo
-        +-- Retrofit + Gson: Random User API
-        +-- Glide: avatar
+Kotlin Activities + XML
+        +-- FirebaseAccountRepository -> Firebase Auth + Firestore users
+        +-- FirebaseBountyRepository -> Firestore challenges/proofs/receipts
+        +-- Retrofit + Gson -> Random User API (profil demo)
+        +-- Glide -> avatar dan foto proof
 ```
 
-Kode aplikasi berada di `app/src/main/java/id/ac/binus/bounty/` dan dibagi ke package `activities`, `adapters`, `models`, `database`, `data`, `network`, serta `utils`. Seluruh kode aplikasi utama (`app/src/main`) menggunakan Kotlin. `FirebaseAccountRepository` memisahkan operasi Auth/profil dari layar login dan registrasi. Fitur challenge saat ini masih memakai DAO Room; integrasi Firestore untuk challenge/proof/reward belum selesai. Satu challenge hanya memiliki satu hunter aktif.
+Kode aplikasi berada di `app/src/main/java/id/ac/binus/bounty/` dan dibagi ke package `activities`, `adapters`, `models`, `database`, `data`, `network`, serta `utils`. Seluruh kode utama menggunakan Kotlin. Repository memisahkan operasi Firebase dari UI. Satu challenge hanya memiliki satu hunter aktif.
 
 Status challenge: `OPEN` → `ACCEPTED` → `SUBMITTED` → `COMPLETED`. Jika proof ditolak, status kembali ke `ACCEPTED`. Persetujuan proof menyelesaikan challenge dan menambahkan reward mock ke saldo hunter satu kali.
 
-Challenge, proof, foto, dan saldo/reward demo tetap lokal. Random User API (`https://randomuser.me/api/?results=10`) hanya memasok profil demo; data tersebut tidak membuat akun aplikasi. Foto proof dipilih dari perangkat dan disimpan sebagai URI lokal, belum diunggah ke Firebase Storage.
+Challenge, proof, receipts, dan saldo demo disimpan/dihitung melalui Firestore. Foto proof dikompres dan disimpan sebagai bytes dalam Firestore, sehingga tidak memerlukan Firebase Storage/Blaze. Random User API (`https://randomuser.me/api/?results=10`) hanya memasok profil demo; data tersebut tidak membuat akun aplikasi.
 
 ## Ambil project
 
@@ -87,7 +82,7 @@ adb install -r build/Bounty.apk
 
 ## Akun aplikasi
 
-Buat akun melalui layar Register menggunakan email dan password. Firebase Auth mengelola kredensial; profil dibuat di Firestore. Challenge demo awal masih berasal dari Room lokal. Alur lintas perangkat belum tersedia sampai migrasi challenge/proof/reward ke Firestore selesai.
+Buat akun melalui layar Register menggunakan email dan password. Firebase Auth mengelola kredensial; profil, challenge, proof, dan receipt reward tersimpan di Firestore. Pastikan Firestore Rules di `firebase/firestore.rules` terpasang. Firebase Storage tidak digunakan.
 
 ## Push perubahan ke GitHub
 

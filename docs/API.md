@@ -37,17 +37,17 @@ documents directly.
 | Challenge detail | Read one challenge and latest proof | Show missing/unauthorized state |
 | Create challenge | Create `OPEN` challenge with current UID/name | Validate fields before write |
 | Accept challenge | Transaction updates only `OPEN` challenge | Reject own challenge and stale/competing accepts |
-| Submit proof | Upload photo, then transaction creates proof and changes challenge to `SUBMITTED` | Keep description/photo draft on failure |
+| Submit proof | Transaction stores compressed image bytes in proof and changes challenge to `SUBMITTED` | Keep description/photo draft on failure; cap image at 512 KiB |
 | Review proof | Transaction updates latest proof and challenge | Approve creates one reward receipt; reject returns to `ACCEPTED` |
 | Demo Balance | Read own profile and reward receipts | Initial Rp50.000 plus receipts; never client-write a balance |
 
-Schema, Storage paths, and authorization behavior are documented in
+Schema, proof image storage, and authorization behavior are documented in
 [`DATABASE.md`](DATABASE.md). Firebase security rules belong in the repository
 and must be deployed before the app writes cloud data.
 
-Current implementation only connects authentication and account profiles.
-Challenge/proof/reward operations in the table above are the target contract;
-they still use Room/SharedPreferences until their M14 migration is completed.
+These operations use Firestore in the M14 app flow. Firebase Storage is not
+used because it requires Blaze; proof images are stored as compressed Firestore
+bytes. Room remains as legacy local schema and does not back active Bounty flows.
 
 ## Qualifying public API: Random User
 
@@ -67,4 +67,5 @@ Place the Firebase Android app configuration at `app/google-services.json`.
 The Google Services Gradle plugin generates the SDK resources from this file.
 It contains app identifiers, not an Admin SDK credential; never put a service
 account key in client code. Firebase Authentication Email/Password, Cloud
-Firestore, and Storage must be enabled in the matching Firebase project.
+Firestore and Email/Password Authentication must be enabled in the matching
+Firebase project. Firebase Storage is not required.

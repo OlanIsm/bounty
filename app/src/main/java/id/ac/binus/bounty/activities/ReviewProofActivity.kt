@@ -21,7 +21,7 @@ import com.bumptech.glide.request.target.Target
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.snackbar.Snackbar
 import id.ac.binus.bounty.R
-import id.ac.binus.bounty.database.AppDatabase
+import id.ac.binus.bounty.data.FirebaseBountyRepository
 import id.ac.binus.bounty.models.Challenge
 import id.ac.binus.bounty.models.Proof
 import id.ac.binus.bounty.models.User
@@ -50,11 +50,11 @@ class ReviewProofActivity : AppCompatActivity() {
             val user = session.getCurrentUser()
             if (user == null || user.id != data.getString("actor")) return@setFragmentResultListener
             val proof = Proof().apply {
-                id = data.getInt("proof")
-                challengeId = data.getInt("challenge")
+                cloudId = data.getString("proof")
+                challengeCloudId = data.getString("challenge")
                 hunterId = data.getString("hunter").orEmpty()
             }
-            model.review(AppDatabase.getInstance(this), proof, user.id, true, session)
+            model.review(proof, user.id, true)
         }
         findViewById<View>(R.id.review_approve).setOnClickListener { confirmApproval() }
         findViewById<View>(R.id.review_reject).setOnClickListener { review(false) }
@@ -106,22 +106,29 @@ class ReviewProofActivity : AppCompatActivity() {
         findViewById<View>(R.id.review_message).visibility = View.GONE
         findViewById<View>(R.id.review_retry).visibility = View.GONE
         val user = SessionManager(this).getCurrentUser() ?: return
-        val id = intent.getIntExtra(ChallengeDetailActivity.EXTRA_CHALLENGE_ID, -1)
-        val db = AppDatabase.getInstance(this)
-        db.queryExecutor.execute {
-            try {
-                val challenge = db.challengeDao().getChallengeById(id)
-                val proof = db.proofDao().getProofByChallengeId(id)
-                runOnUiThread {
-                    if (isDestroyed || isFinishing || current != request) return@runOnUiThread
-                    when {
-                        challenge == null -> showMessage(R.string.challenge_not_found, false)
-                        user.id != challenge.creatorId || challenge.status != Challenge.SUBMITTED ->
-                            showMessage(R.string.review_unavailable, false)
-                        proof == null -> showMessage(R.string.review_missing_proof, true)
-                        proof.status != Proof.PENDING || proof.hunterId != challenge.participantId ->
-                            showMessage(R.string.review_unavailable, false)
-                        else -> {
+        val id = intent.getStringExtra(ChallengeDetailActivity.EXTRA_CLOUD_CHALLENGE_ID)
+        if (id.isNullOrBlank()) {
+            showMessage(R.string.challenge_not_found, false)
+            return
+        }
+        FirebaseBountyRepository.getChallenge(id) { challengeResult ->
+            if (isDestroyed || isFinishing || current != request) return@getChallenge
+            challengeResult.onSuccess { challenge ->
+                when {
+                    challenge == null -> showMessage(R.string.challenge_not_found, false)
+                    user.id != challenge.creatorId || challenge.status != Challenge.SUBMITTED ->
+                        showMessage(R.string.review_unavailable, false)
+                    else -> FirebaseBountyRepository.getLatestProof(challenge) { proofResult ->
+                        if (isDestroyed || isFinishing || current != request) return@getLatestProof
+                        proofResult.onSuccess { proof ->
+                            if (proof == null) {
+                                showMessage(R.string.review_missing_proof, true)
+                                return@onSuccess
+                            }
+                            if (proof.status != Proof.PENDING || proof.hunterId != challenge.participantId || proof.imageData == null) {
+                                showMessage(R.string.review_unavailable, false)
+                                return@onSuccess
+                            }
                             currentProof = proof
                             currentChallenge = challenge
                             findViewById<TextView>(R.id.review_title).text = challenge.title
@@ -133,14 +140,15 @@ class ReviewProofActivity : AppCompatActivity() {
                             findViewById<View>(R.id.review_content).visibility = View.VISIBLE
                             showImage(proof, current)
                             updateControls()
+                        }.onFailure { error ->
+                            Log.e("BountyReview", "Unable to load proof", error)
+                            showMessage(R.string.challenge_load_error, true)
                         }
                     }
                 }
-            } catch (error: RuntimeException) {
-                Log.e("BountyReview", "Unable to load proof", error)
-                runOnUiThread {
-                    if (!isDestroyed && !isFinishing && current == request) showMessage(R.string.challenge_load_error, true)
-                }
+            }.onFailure { error ->
+                Log.e("BountyReview", "Unable to load challenge", error)
+                showMessage(R.string.challenge_load_error, true)
             }
         }
     }
@@ -150,7 +158,7 @@ class ReviewProofActivity : AppCompatActivity() {
         photo.visibility = View.VISIBLE
         findViewById<View>(R.id.review_photo_error).visibility = View.GONE
         findViewById<View>(R.id.review_photo_retry).visibility = View.GONE
-        Glide.with(this).load(Uri.parse(proof.imageUri)).listener(object : RequestListener<Drawable> {
+        Glide.with(this).load(proof.imageData).listener(object : RequestListener<Drawable> {
             override fun onLoadFailed(error: GlideException?, model: Any?, target: Target<Drawable>?, first: Boolean): Boolean {
                 if (!isDestroyed && current == request) {
                     imageReady = false
@@ -199,8 +207,8 @@ class ReviewProofActivity : AppCompatActivity() {
         val challenge = currentChallenge ?: return
         if (!imageReady || model.state.value != ReviewModel.IDLE) return
         val data = Bundle().apply {
-            putInt("proof", proof.id)
-            putInt("challenge", proof.challengeId)
+            putString("proof", proof.cloudId)
+            putString("challenge", proof.challengeCloudId)
             putString("hunter", proof.hunterId)
             putString("actor", user.id)
         }
@@ -216,35 +224,26 @@ class ReviewProofActivity : AppCompatActivity() {
         val proof = currentProof ?: return
         if (approve && !imageReady) return
         val user = SessionManager(this).getCurrentUser() ?: return
-        model.review(AppDatabase.getInstance(this), proof, user.id, approve, SessionManager(applicationContext))
+        model.review(proof, user.id, approve)
     }
 
     class ReviewModel : ViewModel() {
         val state = MutableLiveData(IDLE)
 
-        fun review(db: AppDatabase, proof: Proof, creatorId: String, approve: Boolean, session: SessionManager) {
+        fun review(proof: Proof, creatorId: String, approve: Boolean) {
             if (state.value != IDLE) return
             state.value = SAVING
-            db.transactionExecutor.execute {
-                try {
-                    if (!db.reviewProof(proof.challengeId, proof.id, creatorId, approve)) {
-                        state.postValue(UNAVAILABLE)
-                        return@execute
+            val challenge = Challenge().apply { cloudId = proof.challengeCloudId }
+            FirebaseBountyRepository.reviewProof(challenge, proof, creatorId, approve) { result ->
+                result.onSuccess { saved ->
+                    state.value = when {
+                        !saved -> UNAVAILABLE
+                        approve -> APPROVED
+                        else -> REJECTED
                     }
-                    if (!approve) {
-                        state.postValue(REJECTED)
-                        return@execute
-                    }
-                    try {
-                        session.creditCompletedRewards(db, proof.hunterId)
-                        state.postValue(APPROVED)
-                    } catch (error: RuntimeException) {
-                        Log.e("BountyReward", "Approved proof awaits demo reward recovery", error)
-                        state.postValue(REWARD_PENDING)
-                    }
-                } catch (error: RuntimeException) {
+                }.onFailure { error ->
                     Log.e("BountyReview", "Unable to review proof", error)
-                    state.postValue(ERROR)
+                    state.value = ERROR
                 }
             }
         }

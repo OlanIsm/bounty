@@ -34,7 +34,7 @@ import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import id.ac.binus.bounty.R
 import id.ac.binus.bounty.adapters.ChallengeAdapter
-import id.ac.binus.bounty.database.AppDatabase
+import id.ac.binus.bounty.data.FirebaseBountyRepository
 import id.ac.binus.bounty.models.Challenge
 import id.ac.binus.bounty.models.User
 import id.ac.binus.bounty.network.ApiClient
@@ -183,7 +183,7 @@ class MainActivity : AppCompatActivity() {
             list.layoutManager = LinearLayoutManager(this)
             feedAdapter = ChallengeAdapter { challenge ->
                 startActivity(Intent(this, ChallengeDetailActivity::class.java)
-                    .putExtra(ChallengeDetailActivity.EXTRA_CHALLENGE_ID, challenge.id))
+                    .putExtra(ChallengeDetailActivity.EXTRA_CLOUD_CHALLENGE_ID, challenge.cloudId))
             }
             list.itemAnimator = null
             if (destination == R.id.nav_home) {
@@ -251,7 +251,7 @@ class MainActivity : AppCompatActivity() {
             creatorAvatar = user.avatarUrl
             createdAt = System.currentTimeMillis()
         }
-        publishModel.publish(AppDatabase.getInstance(this), challenge)
+        publishModel.publish(challenge)
     }
 
     private fun inputText(id: Int): String =
@@ -281,35 +281,28 @@ class MainActivity : AppCompatActivity() {
         home.findViewById<View>(R.id.feed_loading).visibility = View.VISIBLE
         home.findViewById<View>(R.id.feed_message).visibility = View.GONE
         home.findViewById<View>(R.id.feed_retry).visibility = View.GONE
-        val db = AppDatabase.getInstance(this)
-        db.queryExecutor.execute {
-            try {
-                val challenges = if (mine) db.challengeDao().getMyChallenges(user.id) else db.challengeDao().getAllChallenges()
-                runOnUiThread {
-                    if (isDestroyed || isFinishing || request != feedRequest || findViewById<View>(screenId) !== home) return@runOnUiThread
-                    val list = home.findViewById<RecyclerView>(R.id.challenge_list)
-                    feedAdapter?.submitList(challenges)
-                    home.findViewById<View>(R.id.feed_loading).visibility = View.GONE
-                    list.visibility = if (mine && challenges.isEmpty()) View.GONE else View.VISIBLE
-                    home.findViewById<TextView>(R.id.feed_message).apply {
-                        setText(if (mine) R.string.no_my_challenges else R.string.no_available_challenges)
-                        visibility = if (challenges.isEmpty()) View.VISIBLE else View.GONE
-                    }
+        FirebaseBountyRepository.loadChallenges(user.id, mine) { result ->
+            if (isDestroyed || isFinishing || request != feedRequest || findViewById<View>(screenId) !== home) return@loadChallenges
+            val list = home.findViewById<RecyclerView>(R.id.challenge_list)
+            home.findViewById<View>(R.id.feed_loading).visibility = View.GONE
+            if (result.isSuccess) {
+                val challenges = result.getOrThrow()
+                feedAdapter?.submitList(challenges)
+                list.visibility = if (mine && challenges.isEmpty()) View.GONE else View.VISIBLE
+                home.findViewById<TextView>(R.id.feed_message).apply {
+                    setText(if (mine) R.string.no_my_challenges else R.string.no_available_challenges)
+                    visibility = if (challenges.isEmpty()) View.VISIBLE else View.GONE
                 }
-            } catch (error: RuntimeException) {
-                Log.e("BountyFeed", "Unable to load challenges", error)
-                runOnUiThread {
-                    if (isDestroyed || isFinishing || request != feedRequest || findViewById<View>(screenId) !== home) return@runOnUiThread
-                    home.findViewById<View>(R.id.feed_loading).visibility = View.GONE
-                    feedAdapter?.submitList(emptyList())
-                    home.findViewById<RecyclerView>(R.id.challenge_list).visibility = if (mine) View.GONE else View.VISIBLE
-                    home.findViewById<TextView>(R.id.feed_message).apply {
-                        setText(R.string.challenge_load_error)
-                        visibility = View.VISIBLE
-                    }
-                    home.findViewById<View>(R.id.feed_retry).visibility = View.VISIBLE
-                    showSnackbar(R.string.challenge_load_error)
+            } else {
+                Log.e("BountyFeed", "Unable to load challenges", result.exceptionOrNull())
+                feedAdapter?.submitList(emptyList())
+                list.visibility = if (mine) View.GONE else View.VISIBLE
+                home.findViewById<TextView>(R.id.feed_message).apply {
+                    setText(R.string.challenge_load_error)
+                    visibility = View.VISIBLE
                 }
+                home.findViewById<View>(R.id.feed_retry).visibility = View.VISIBLE
+                showSnackbar(R.string.challenge_load_error)
             }
         }
     }
@@ -336,19 +329,14 @@ class MainActivity : AppCompatActivity() {
         val session = SessionManager(applicationContext)
         val user = session.getCurrentUser() ?: return
         val request = ++balanceRequest
-        val db = AppDatabase.getInstance(this)
-        db.transactionExecutor.execute {
-            try {
-                session.creditCompletedRewards(db, user.id)
-                runOnUiThread {
-                    val current = session.getCurrentUser()
-                    if (!isDestroyed && !isFinishing && request == balanceRequest && current != null && current.id == user.id) bindUser(current)
-                }
-            } catch (error: RuntimeException) {
-                Log.e("BountyReward", "Unable to recover demo rewards", error)
-                runOnUiThread {
-                    if (!isDestroyed && !isFinishing && request == balanceRequest) showSnackbar(R.string.reward_refresh_error)
-                }
+        FirebaseBountyRepository.loadBalance(user.id) { result ->
+            if (isDestroyed || isFinishing || request != balanceRequest) return@loadBalance
+            result.onSuccess { balance ->
+                session.updateDemoBalance(user.id, balance)
+                session.getCurrentUser()?.let(::bindUser)
+            }.onFailure { error ->
+                Log.e("BountyReward", "Unable to load demo balance", error)
+                showSnackbar(R.string.reward_refresh_error)
             }
         }
     }
@@ -439,17 +427,15 @@ class MainActivity : AppCompatActivity() {
     class PublishModel : ViewModel() {
         @JvmField val state = MutableLiveData(IDLE)
 
-        fun publish(db: AppDatabase, challenge: Challenge) {
+        fun publish(challenge: Challenge) {
             if (state.value == SAVING || state.value == SAVED) return
             state.value = SAVING
-            db.transactionExecutor.execute {
-                try {
-                    db.challengeDao().insertChallenge(challenge)
-                    state.postValue(SAVED)
-                } catch (error: RuntimeException) {
-                    Log.e("BountyCreate", "Unable to publish challenge", error)
-                    state.postValue(ERROR)
-                }
+            FirebaseBountyRepository.createChallenge(challenge) { result ->
+                result.onSuccess { state.value = SAVED }
+                    .onFailure { error ->
+                        Log.e("BountyCreate", "Unable to publish challenge", error)
+                        state.value = ERROR
+                    }
             }
         }
 

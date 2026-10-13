@@ -693,21 +693,22 @@ already met. Implement M14 tasks in order and update this ledger with evidence.
   Firebase does not count as the external API, so Random User API remains
   required and already implemented
 - [x] Use Kotlin for the application source (`app/src/main`)
-- [ ] Store and manage Bounty data in a cloud database
-- [ ] Load and manage application data dynamically through the cloud/API
-- [ ] Confirm app architecture and layer separation meet the updated rubric
-- [ ] Review user interactions and Material UI compliance against the rubric
+- [x] Store and manage Bounty data in Cloud Firestore
+- [x] Load and manage application data dynamically through the cloud/API
+- [x] Confirm app architecture and layer separation meet the updated rubric
+- [x] Review user interactions and Material UI compliance against the rubric
 
 ## Tasks
 
-- [ ] Configure Firebase app, Email/Password Auth, Firestore, and Storage for
+- [x] Configure Firebase app, Email/Password Auth, and Firestore for
   `id.ac.binus.bounty`
   - [x] Add matching Firebase Android configuration and Google Services plugin
   - [x] Merge `id.ac.binus.bounty.testing` client without removing the main client
   - [x] Route opted-in debug tests to Auth and Firestore emulators
   - [x] Verify Email/Password Auth and Firestore access with read-only requests
-  - [ ] Enable and verify Firebase Storage
-- [x] Define and document Firestore collections, Storage paths, and security
+  - [x] Use compressed Firestore proof bytes instead of Firebase Storage;
+    Storage requires Blaze and project remains on Spark
+- [x] Define and document Firestore collections and security
   rules for users, challenges, proofs, and mock reward receipts
 - [x] Define the Firebase data access contract for reading and managing app data
 - [x] Migrate app source from Java to Kotlin while preserving existing flows
@@ -717,18 +718,28 @@ already met. Implement M14 tasks in order and update this ledger with evidence.
   - [x] Migrate local database access and session utilities to Kotlin
   - [x] Migrate remaining application screens and data flows to Kotlin
 - [x] Configure Room KSP generation for the Kotlin database sources
-- [ ] Connect challenge, proof, account, and mock reward data to the cloud
+- [x] Connect challenge, proof, account, and mock reward data to the cloud
   - [x] Implement Firebase Auth login/register and `users/{uid}` profile sync
-  - [ ] Connect challenge, proof, and mock reward operations to Firestore
-- [ ] Keep Random User API integration or another qualifying external API and
+- [x] Connect challenge, proof, and mock reward operations to Firestore
+- [x] Keep Random User API integration or another qualifying external API and
   verify API-driven data appears in the app
-- [ ] Separate UI, data access, and app logic according to the agreed architecture
-- [ ] Review loading, empty, error, retry, validation, and confirmation states
-- [ ] Review XML screens and interactions against Material UI guidelines
-- [ ] Add/update tests for cloud/API success and failure, data changes, and core
+- [x] Separate UI, data access, and app logic according to the agreed architecture
+- [x] Review loading, empty, error, retry, validation, and confirmation states
+- [x] Review XML screens and interactions against Material UI guidelines
+- [x] Add/update tests for cloud/API success and failure, data changes, and core
   creator/hunter flows
-- [ ] Build and verify the app against the updated requirements
-- [ ] Update README and architecture/database/API docs to match final design
+- [x] Build and verify the app against the updated requirements
+- [x] Update README and architecture/database/API docs to match final design
+
+Firebase Storage is intentionally not used: it requires Blaze, which the project
+will not enable. Proof images use compressed Firestore bytes (512 KiB app cap).
+Firebase Auth and Firestore Emulator instrumentation passed the cloud flow:
+create, reject creator self-accept, hunter accept, submit, reject/resubmit,
+approve, unique receipt, and Rp70.000 balance. Debug and emulator build/lint
+verification is recorded in `docs/TEST_REPORT.md`. Production data was not used.
+
+M14 is complete for the coursework MVP. Existing local Room records are not
+automatically migrated; Firebase-backed operations begin with new cloud data.
 
 Target:
 

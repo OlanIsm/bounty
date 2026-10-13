@@ -1,6 +1,7 @@
 package id.ac.binus.bounty.models
 
 import androidx.room.Entity
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 @Entity(tableName = "challenges")
@@ -18,6 +19,8 @@ class Challenge {
     @JvmField var participantId: String? = null
     @JvmField var participantName: String? = null
     @JvmField var createdAt = 0L
+    @Ignore @JvmField var cloudId: String? = null
+    @Ignore @JvmField var latestProofId: String? = null
 
     companion object {
         const val OPEN = "OPEN"

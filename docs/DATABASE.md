@@ -32,10 +32,11 @@ an OPEN challenge as themselves.
 
 ### `challenges/{challengeId}/proofs/{proofId}`
 
-Each submitted proof is a separate document with `hunterId`, `description`,
-`imagePath`, `status` (`PENDING`, `APPROVED`, or `REJECTED`), and `submittedAt`.
-Only the challenge creator and assigned hunter can read proof documents.
-Resubmission creates a new proof document after rejection.
+Each submitted proof is a separate document with `challengeId`, `hunterId`,
+`description`, `imageData` (Firestore bytes), `status` (`PENDING`, `APPROVED`,
+or `REJECTED`), and `submittedAt`. The app compresses photos and limits bytes to
+512 KiB, below Firestore's 1 MiB document limit. Only the challenge creator and
+assigned hunter can read proofs. Resubmission creates a new proof document.
 
 ### `users/{uid}/rewardReceipts/{challengeId}`
 
@@ -44,21 +45,20 @@ and `creditedAt`. A receipt is created atomically with approval. Its document ID
 prevents duplicate mock rewards. Balance is `initialDemoBalance + sum(receipts)`;
 this is not payment processing or transferable money.
 
-## Storage
+## Proof image storage
 
-Store proof photos in a private Firebase Storage bucket at
-`proofs/{challengeId}/{hunterUid}/{uniqueFileName}`. Only the assigned hunter
-can upload while the challenge is ACCEPTED. Only the challenge creator and
-hunter can read a proof photo. Store the cloud object path in `imagePath`, not
-the device's local content URI.
+Firebase Storage is not used. Storage access requires Blaze, while this project
+must remain on Firebase Spark. Compressed image bytes live in each proof
+document's `imageData` field. Firestore rules enforce the 512 KiB app limit and
+member-only reads. Keep the size cap to leave room under Firestore's 1 MiB
+document limit.
 
 ## Atomic operations and rules
 
 - Accept: transaction changes one OPEN challenge to ACCEPTED and assigns the
   signed-in hunter; creator cannot accept their own challenge.
-- Submit: upload the photo, then use a Firestore transaction to create a PENDING
-  proof and set the challenge to SUBMITTED with `latestProofId`. If the database
-  write fails, keep form data for retry; the uploaded orphan can be removed later.
+- Submit: use one Firestore transaction to create a PENDING proof containing
+  compressed image bytes and set the challenge to SUBMITTED with `latestProofId`.
 - Review: transaction checks creator, SUBMITTED state, and latest pending proof.
   Approve marks proof/challenge complete and creates one reward receipt; reject
   marks proof rejected and returns challenge to ACCEPTED.
@@ -74,10 +74,9 @@ users must register in Firebase and create cloud challenges after setup.
 
 ## Current M14 implementation status
 
-Firebase Authentication is integrated, and the app implements reads/writes for
-`users/{uid}`. The profile write has not been end-to-end verified with a real
-account; no user or sample document was created during this implementation.
-Challenge and proof operations still use the previous local Room schema, and
-mock balances/reward receipts still use SharedPreferences. Firebase Storage and
-cloud challenge transactions remain pending; the app has not yet uploaded local
-challenge/proof data.
+Firebase Authentication and Firestore operations are implemented. An Auth and
+Firestore emulator instrumentation flow verifies create, accept, proof submit,
+reject/resubmit, approve, completed status, receipt uniqueness, and balance.
+No production user or sample document was created during testing. Existing local
+Room data is not migrated automatically; users create new cloud data after
+signing in. Firebase Storage is intentionally unused on the Spark plan.

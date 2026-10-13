@@ -3,6 +3,7 @@ package id.ac.binus.bounty.models
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
+import androidx.room.Ignore
 import androidx.room.PrimaryKey
 
 @Entity(
@@ -24,6 +25,9 @@ class Proof {
     @JvmField var imageUri = ""
     @JvmField var status = PENDING
     @JvmField var submittedAt = 0L
+    @Ignore @JvmField var cloudId: String? = null
+    @Ignore @JvmField var challengeCloudId: String? = null
+    @Ignore @JvmField var imageData: ByteArray? = null
 
     companion object {
         const val PENDING = "PENDING"
