@@ -13,7 +13,7 @@ import id.ac.binus.bounty.utils.SessionManager
 class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        if (SessionManager(this).isFirebaseAuthenticated) {
+        if (SessionManager(this).isFirebaseAuthenticated()) {
             openHome()
             return
         }
