@@ -2,14 +2,13 @@
 
 ## M14 implementation status
 
-The application is in a staged migration from its Java/local prototype to a
-Kotlin/Firebase architecture. Current implementation and planned target are
-listed separately so remaining local-only behavior is explicit.
+The app source uses Kotlin and XML. Firebase Auth owns account identity and
+profiles; challenge, proof, and reward flows remain local pending later M14 work.
 
 ## Current layers
 
 ```text
-LoginActivity.kt / RegisterActivity.kt + XML
+Kotlin Activities + XML
                  |
                  v
 FirebaseAccountRepository.kt
@@ -17,7 +16,7 @@ FirebaseAccountRepository.kt
        v                     v
 Firebase Authentication   Cloud Firestore users/{uid}
 
-Existing Java feature Activities + XML
+Kotlin feature Activities + XML
        |                     |
        v                     v
 Room: Challenge/Proof    Random User API (Retrofit/Gson)
@@ -26,13 +25,12 @@ Room: Challenge/Proof    Random User API (Retrofit/Gson)
 SharedPreferences: local session cache and mock reward ledger
 ```
 
-- `activities`: Android screens and user interaction. Login and registration
-  are Kotlin; the existing challenge, proof, and profile screens remain Java.
+- `activities`: Kotlin Android screens and user interaction.
 - `data`: Firebase account operations, isolated from the Auth form UI.
-- `models`: app user, challenge, and proof models.
-- `database`: legacy Room schema and local challenge/proof operations.
-- `network`: read-only Random User API integration, independent of Firebase.
-- `utils`: screen helpers and the current local-session/reward compatibility
+- `models`: Kotlin user, challenge, and proof models.
+- `database`: Kotlin Room schema and local challenge/proof operations.
+- `network`: Kotlin read-only Random User API integration, independent of Firebase.
+- `utils`: Kotlin screen helpers and the current local-session/reward compatibility
   layer. No password is stored in SharedPreferences.
 
 Registration creates an Auth account, updates its display name, and creates

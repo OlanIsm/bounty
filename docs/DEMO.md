@@ -35,7 +35,7 @@ state keeps the rest of the app usable.
 ## M14 limitations
 
 Only authentication and profile synchronization have been implemented against
-Firebase so far. Cloud challenge/proof/reward persistence, Firebase Storage,
-and full Java-to-Kotlin migration remain incomplete. The real Firebase account
+Firebase so far. Cloud challenge/proof/reward persistence and Firebase Storage
+remain incomplete. The real Firebase account
 and profile write flow was not exercised during this implementation; connection
 checks were read-only to avoid creating user or test data.

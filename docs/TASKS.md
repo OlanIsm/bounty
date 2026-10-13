@@ -692,7 +692,7 @@ already met. Implement M14 tasks in order and update this ledger with evidence.
 - [x] Select Firebase Authentication and Cloud Firestore as the cloud backend;
   Firebase does not count as the external API, so Random User API remains
   required and already implemented
-- [ ] Use Kotlin for the application code
+- [x] Use Kotlin for the application source (`app/src/main`)
 - [ ] Store and manage Bounty data in a cloud database
 - [ ] Load and manage application data dynamically through the cloud/API
 - [ ] Confirm app architecture and layer separation meet the updated rubric
@@ -708,12 +708,12 @@ already met. Implement M14 tasks in order and update this ledger with evidence.
 - [x] Define and document Firestore collections, Storage paths, and security
   rules for users, challenges, proofs, and mock reward receipts
 - [x] Define the Firebase data access contract for reading and managing app data
-- [ ] Migrate app source from Java to Kotlin while preserving existing flows
+- [x] Migrate app source from Java to Kotlin while preserving existing flows
   - [x] Migrate Login and Register screens to Kotlin
   - [x] Migrate the challenge feed adapter to Kotlin without changing its UI contract
   - [x] Migrate models, Random User API integration, and shared UI helpers to Kotlin
   - [x] Migrate local database access and session utilities to Kotlin
-  - [ ] Migrate remaining application screens and data flows to Kotlin
+  - [x] Migrate remaining application screens and data flows to Kotlin
 - [ ] Connect challenge, proof, account, and mock reward data to the cloud
   - [x] Implement Firebase Auth login/register and `users/{uid}` profile sync
   - [ ] Connect challenge, proof, and mock reward operations to Firestore

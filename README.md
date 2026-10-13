@@ -16,7 +16,7 @@ Project ini dibuat sebagai MVP/coursework Android. Aplikasi juga menggunakan Ran
 
 ## Teknologi
 
-- Android native: Java dan Kotlin, XML Layout, Material Components
+- Android native app: Kotlin, XML Layout, Material Components
 - Firebase Authentication dan Cloud Firestore untuk akun/profil
 - Penyimpanan challenge dan proof: Room/SQLite
 - Cache sesi, saldo demo, dan catatan reward lokal: SharedPreferences
@@ -32,14 +32,14 @@ Login/Register Kotlin + XML
               +-- Firebase Auth
               +-- Firestore: users/{uid}
 
-Java Activities + XML (fitur lain masih lokal)
+Kotlin Activities + XML (fitur lain masih lokal)
         +-- Room: Challenge, Proof
         +-- SharedPreferences: cache sesi dan reward demo
         +-- Retrofit + Gson: Random User API
         +-- Glide: avatar
 ```
 
-Kode aplikasi berada di `app/src/main/java/id/ac/binus/bounty/` dan dibagi ke package `activities`, `adapters`, `models`, `database`, `data`, `network`, serta `utils`. `FirebaseAccountRepository` memisahkan operasi Auth/profil dari layar login dan registrasi. Fitur challenge saat ini masih memakai DAO Room; migrasi seluruh fitur ke Kotlin dan Firestore belum selesai. Satu challenge hanya memiliki satu hunter aktif.
+Kode aplikasi berada di `app/src/main/java/id/ac/binus/bounty/` dan dibagi ke package `activities`, `adapters`, `models`, `database`, `data`, `network`, serta `utils`. Seluruh kode aplikasi utama (`app/src/main`) menggunakan Kotlin. `FirebaseAccountRepository` memisahkan operasi Auth/profil dari layar login dan registrasi. Fitur challenge saat ini masih memakai DAO Room; integrasi Firestore untuk challenge/proof/reward belum selesai. Satu challenge hanya memiliki satu hunter aktif.
 
 Status challenge: `OPEN` → `ACCEPTED` → `SUBMITTED` → `COMPLETED`. Jika proof ditolak, status kembali ke `ACCEPTED`. Persetujuan proof menyelesaikan challenge dan menambahkan reward mock ke saldo hunter satu kali.
 
