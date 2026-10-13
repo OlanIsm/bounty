@@ -679,6 +679,63 @@ are complete; no additional feature work was started.
 
 ---
 
+# M14 — General Requirement Alignment
+
+This milestone tracks the additional coursework requirements. M0-M13 describe
+the existing Java/local-first MVP; they do not mean these new requirements are
+already met. Implement M14 tasks in order and update this ledger with evidence.
+
+## Current status
+
+- [x] Consume at least one external API: Random User API via Retrofit/Gson
+  (demo profiles only; this does not provide Bounty backend or cloud storage)
+- [ ] Use Kotlin for the application code
+- [ ] Store and manage Bounty data in a cloud database
+- [ ] Load and manage application data dynamically through the cloud/API
+- [ ] Confirm app architecture and layer separation meet the updated rubric
+- [ ] Review user interactions and Material UI compliance against the rubric
+
+## Tasks
+
+- [ ] Confirm the required cloud provider and backend/API approach before
+  implementation; Firebase/Supabase may be cloud storage but do not replace the
+  requirement to consume an external API
+- [ ] Define and document cloud data schema for users, challenges, proofs, and
+  mock rewards; keep real payment out of scope
+- [ ] Define the Bounty backend/API contract for reading and managing app data
+- [ ] Migrate app source from Java to Kotlin while preserving existing flows
+- [ ] Connect challenge, proof, account, and mock reward data to the cloud
+- [ ] Keep Random User API integration or another qualifying external API and
+  verify API-driven data appears in the app
+- [ ] Separate UI, data access, and app logic according to the agreed architecture
+- [ ] Review loading, empty, error, retry, validation, and confirmation states
+- [ ] Review XML screens and interactions against Material UI guidelines
+- [ ] Add/update tests for cloud/API success and failure, data changes, and core
+  creator/hunter flows
+- [ ] Build and verify the app against the updated requirements
+- [ ] Update README and architecture/database/API docs to match final design
+
+Target:
+
+```text
+App uses Kotlin, manages Bounty data dynamically with cloud persistence,
+consumes at least one qualifying external API, and meets the agreed UI and
+architecture requirements.
+```
+
+Acceptance criteria:
+
+- Bounty data remains available after reinstalling or signing in on another
+  device, according to the chosen account/data policy
+- Create, accept, submit, approve, and reject actions read/write cloud data
+- At least one external API is called and its response is displayed
+- Loading, empty, error, retry, and validation states are handled
+- Kotlin and the agreed separation of UI, data, and app logic are evident
+- XML/Compose screens follow the agreed Material UI checks
+- Build and relevant automated/manual flow checks pass
+
+---
+
 # Final Demo Flow
 
 Gunakan flow ini saat presentasi:
