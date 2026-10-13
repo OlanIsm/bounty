@@ -13,14 +13,16 @@ User profiles as Bounty accounts or modify cloud data from that API.
 
 ## Firebase Authentication
 
-Use Firebase Authentication's Email/Password provider. Registration requires
-name, email, and password; login uses email and password. Firebase SDK retains
-the signed-in session. Never store the password in app preferences. Handle
-invalid credentials, duplicate email, weak password, network failure, and
-signed-out states in the forms.
+The implemented login/register screens use Firebase Authentication's
+Email/Password provider. Registration requires name, email, and a password of
+at least six characters; login uses email and password. Passwords are sent only
+to Firebase Auth and are never stored in app preferences. The app handles form
+validation, invalid login, duplicate email, weak password, and network errors.
 
-Create `users/{uid}` after successful registration using the Firebase Auth UID.
-The profile stores display name, email, initial mock balance, and creation time.
+`FirebaseAccountRepository` creates/reads `users/{uid}` using the Firebase Auth
+UID. The profile stores display name, email, initial mock balance, and a
+server-generated creation time. If profile synchronization fails, the app
+signs out and keeps the user on the auth screen for retry.
 
 ## Firebase data operations
 
@@ -42,6 +44,10 @@ documents directly.
 Schema, Storage paths, and authorization behavior are documented in
 [`DATABASE.md`](DATABASE.md). Firebase security rules belong in the repository
 and must be deployed before the app writes cloud data.
+
+Current implementation only connects authentication and account profiles.
+Challenge/proof/reward operations in the table above are the target contract;
+they still use Room/SharedPreferences until their M14 migration is completed.
 
 ## Qualifying public API: Random User
 

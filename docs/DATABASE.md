@@ -71,3 +71,13 @@ M0-M13 used Room/SQLite for challenges and proofs and SharedPreferences for mock
 accounts, sessions, balances, and reward receipts. M14 replaces that active data
 path with Firebase. Existing local records are not uploaded automatically;
 users must register in Firebase and create cloud challenges after setup.
+
+## Current M14 implementation status
+
+Firebase Authentication is integrated, and the app implements reads/writes for
+`users/{uid}`. The profile write has not been end-to-end verified with a real
+account; no user or sample document was created during this implementation.
+Challenge and proof operations still use the previous local Room schema, and
+mock balances/reward receipts still use SharedPreferences. Firebase Storage and
+cloud challenge transactions remain pending; the app has not yet uploaded local
+challenge/proof data.

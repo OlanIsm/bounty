@@ -44,8 +44,8 @@ Satu akun dapat menjadi creator maupun hunter.
 ## 4. MVP Scope
 
 ### Included
-- Login mock
-- Register mock
+- Login/register with Firebase Authentication Email/Password
+- Cloud Firestore for account and application data
 - Home / challenge feed
 - Detail challenge
 - Create challenge
@@ -56,7 +56,7 @@ Satu akun dapat menjadi creator maupun hunter.
 - Profile
 - Mock balance / mock reward
 - External API untuk data user/avatar demo
-- Local/mock data
+- Mock balance and rewards only; no real money or payments
 
 ### Out of Scope
 - Pembayaran uang asli
@@ -69,7 +69,7 @@ Satu akun dapat menjadi creator maupun hunter.
 - Identity verification
 - Admin dashboard
 - Production backend
-- Real authentication server
+- Custom backend server; Firebase managed Auth/Firestore are used instead
 
 ---
 
@@ -127,13 +127,15 @@ Mock reward masuk
 
 ## 6. Core Features
 
-### 6.1 Mock Authentication
+### 6.1 Firebase Authentication
 User dapat:
 - Login
 - Register
 - Logout
 
-Untuk MVP, authentication tidak perlu terhubung server.
+Login/register menggunakan Firebase Authentication Email/Password. Profil
+akun disimpan pada Cloud Firestore dengan Firebase UID. Password tidak boleh
+disimpan di database lokal atau SharedPreferences.
 
 ---
 
@@ -340,7 +342,7 @@ Profile
 ## 11. Functional Requirements
 
 ### FR-01
-User dapat login menggunakan mock account.
+User dapat login menggunakan akun Firebase Email/Password.
 
 ### FR-02
 User dapat melihat challenge feed.
@@ -388,7 +390,7 @@ Aplikasi mengambil data dari external API.
 Project dianggap selesai jika:
 
 - APK berhasil dibuat
-- Login mock berjalan
+- Firebase Auth login/register berjalan dan profil akun tersimpan di Firestore
 - Challenge feed tampil
 - User dapat create challenge
 - User dapat accept challenge
@@ -396,4 +398,5 @@ Project dianggap selesai jika:
 - Creator dapat approve proof
 - Reward mock berubah setelah approval
 - External API berhasil dipanggil dan data ditampilkan
+- Challenge, proof, and mock reward data sync through the cloud database
 - Tidak ada crash pada main flow

@@ -6,6 +6,7 @@ import android.util.Patterns;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonParseException;
+import com.google.firebase.auth.FirebaseAuth;
 
 import java.util.Locale;
 import java.util.UUID;
@@ -66,15 +67,44 @@ public class SessionManager {
     }
 
     public User getCurrentUser() {
+        com.google.firebase.auth.FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseUser != null) {
+            String email = normalizeEmail(firebaseUser.getEmail());
+            User cached = getUser(email);
+            return session.getBoolean("logged_in", false) && cached != null
+                    && firebaseUser.getUid().equals(cached.id) ? cached : null;
+        }
         return session.getBoolean("logged_in", false)
                 ? getUser(session.getString("user_email", "")) : null;
+    }
+
+    public void cacheFirebaseUser(String uid, String name, String email) {
+        email = normalizeEmail(email);
+        if (uid == null || uid.trim().isEmpty() || name == null || name.trim().isEmpty()
+                || !isValidEmail(email)) {
+            throw new IllegalArgumentException("Invalid Firebase account profile");
+        }
+        User previous = getUser(email);
+        double balance = previous != null && uid.equals(previous.id) ? previous.demoBalance : 50000;
+        User user = new User(uid, name.trim(), email, "", balance);
+        accounts.edit().putString(email, gson.toJson(user)).apply();
+        session.edit().putString("user_email", email).putBoolean("logged_in", true).apply();
     }
 
     public boolean isLoggedIn() {
         return getCurrentUser() != null;
     }
 
+    public boolean isFirebaseAuthenticated() {
+        com.google.firebase.auth.FirebaseUser firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
+        if (firebaseUser == null || firebaseUser.getEmail() == null) return false;
+        User user = getUser(normalizeEmail(firebaseUser.getEmail()));
+        return session.getBoolean("logged_in", false) && user != null
+                && firebaseUser.getUid().equals(user.id);
+    }
+
     public void logout() {
+        FirebaseAuth.getInstance().signOut();
         session.edit().clear().apply();
     }
 

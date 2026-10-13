@@ -67,7 +67,7 @@ public class ChallengeDetailActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        if (!new SessionManager(this).isLoggedIn()) {
+        if (!new SessionManager(this).isFirebaseAuthenticated()) {
             startActivity(new Intent(this, LoginActivity.class)
                     .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK));
             finish();

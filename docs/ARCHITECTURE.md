@@ -1,275 +1,72 @@
-# Bounty — Application Architecture
+# Bounty Application Architecture
 
-## 1. Architecture Goal
+## M14 implementation status
 
-Architecture Bounty dibuat sesederhana mungkin untuk project Android coursework.
+The application is in a staged migration from its Java/local prototype to a
+Kotlin/Firebase architecture. Current implementation and planned target are
+listed separately so remaining local-only behavior is explicit.
 
-Tidak menggunakan backend production.
-
-Main stack:
-
-```text
-Android Studio
-Java
-XML Layout
-Retrofit
-Gson
-Room / local data
-Random User API
-```
-
----
-
-## 2. High-Level Architecture
+## Current layers
 
 ```text
-┌──────────────────────────┐
-│       Android UI         │
-│ Activity / Fragment / XML│
-└─────────────┬────────────┘
-              │
-              ▼
-┌──────────────────────────┐
-│      App Logic           │
-│ Challenge / User Logic   │
-└───────┬──────────┬───────┘
-        │          │
-        ▼          ▼
-┌─────────────┐ ┌─────────────────┐
-│ Local Data  │ │ External API    │
-│ Room / Mock │ │ Random User API │
-└─────────────┘ └─────────────────┘
+LoginActivity.kt / RegisterActivity.kt + XML
+                 |
+                 v
+FirebaseAccountRepository.kt
+       |                     |
+       v                     v
+Firebase Authentication   Cloud Firestore users/{uid}
+
+Existing Java feature Activities + XML
+       |                     |
+       v                     v
+Room: Challenge/Proof    Random User API (Retrofit/Gson)
+       |
+       v
+SharedPreferences: local session cache and mock reward ledger
 ```
 
----
+- `activities`: Android screens and user interaction. Login and registration
+  are Kotlin; the existing challenge, proof, and profile screens remain Java.
+- `data`: Firebase account operations, isolated from the Auth form UI.
+- `models`: app user, challenge, and proof models.
+- `database`: legacy Room schema and local challenge/proof operations.
+- `network`: read-only Random User API integration, independent of Firebase.
+- `utils`: screen helpers and the current local-session/reward compatibility
+  layer. No password is stored in SharedPreferences.
 
-## 3. Technology Stack
+Registration creates an Auth account, updates its display name, and creates
+`users/{uid}` with a server timestamp and initial mock balance. Login reads that
+profile; if a profile is missing, it creates one from the authenticated user.
+The app enters its authenticated screens only after profile synchronization
+succeeds. Failed profile synchronization signs out the current Auth session so
+the user can retry without entering a partially initialized app.
 
-### Language
+## Current data ownership
+
+Firebase owns authentication and account profile documents. Challenge feed,
+create/accept, proof submission/review, and mock reward remain in Room and
+SharedPreferences. Proof photos remain local content URIs. Those operations are
+not yet cloud-synchronized and do not persist across devices.
+
+Random User API remains the qualifying public API and supplies display-only demo
+profiles. It is not used for authentication or Bounty-owned records.
+
+## M14 target architecture
 
 ```text
-Java
+XML Activities (Kotlin)
+          |
+          v
+Feature/data repositories
+     |              |
+     v              v
+Firebase Auth   Firestore + Firebase Storage
+          \
+           +---- Retrofit: Random User API
 ```
 
-### UI
-
-```text
-Android XML Layout
-Material Components
-```
-
-### HTTP Client
-
-```text
-Retrofit
-```
-
-### JSON Parser
-
-```text
-Gson Converter
-```
-
-### Local Persistence
-
-Recommended:
-
-```text
-Room Database
-```
-
-Untuk data yang sangat sederhana:
-
-```text
-SharedPreferences
-```
-
-SharedPreferences hanya digunakan untuk:
-- Current mock user
-- Login state
-- Demo balance sederhana
-
-Room digunakan untuk:
-- Challenge
-- Proof
-- Participant
-
----
-
-## 4. Suggested Package Structure
-
-```text
-com.example.bounty
-│
-├── activities
-│   ├── LoginActivity.java
-│   ├── RegisterActivity.java
-│   ├── MainActivity.java
-│   ├── ChallengeDetailActivity.java
-│   ├── CreateChallengeActivity.java
-│   ├── SubmitProofActivity.java
-│   └── ReviewProofActivity.java
-│
-├── adapters
-│   └── ChallengeAdapter.java
-│
-├── models
-│   ├── User.java
-│   ├── Challenge.java
-│   └── Proof.java
-│
-├── database
-│   ├── AppDatabase.java
-│   ├── ChallengeDao.java
-│   └── ProofDao.java
-│
-├── network
-│   ├── ApiClient.java
-│   ├── RandomUserApi.java
-│   └── RandomUserResponse.java
-│
-└── utils
-    └── SessionManager.java
-```
-
----
-
-## 5. Screen Navigation
-
-```text
-Splash
-  ↓
-Login
-  ↓
-MainActivity
-  │
-  ├── Home
-  │     ↓
-  │   Challenge Detail
-  │     ↓
-  │   Accept
-  │
-  ├── My Challenges
-  │     ↓
-  │   Submit Proof / Review Proof
-  │
-  ├── Create Challenge
-  │
-  └── Profile
-```
-
----
-
-## 6. Challenge State Flow
-
-```text
-OPEN
-  ↓ Accept
-ACCEPTED
-  ↓ Submit Proof
-SUBMITTED
-  ├── Reject → ACCEPTED
-  └── Approve → COMPLETED
-```
-
----
-
-## 7. Local-First Data
-
-Challenge utama tidak bergantung pada internet.
-
-```text
-Challenge
-Proof
-Reward
-Status
-```
-
-disimpan secara lokal.
-
-External API hanya digunakan sebagai requirement API consumption dan untuk enrich UI menggunakan demo user/avatar.
-
-Keuntungan:
-- Demo tetap berjalan jika internet buruk
-- Scope backend kecil
-- Tidak perlu deployment server
-- Lebih aman untuk deadline tugas
-
----
-
-## 8. External API Flow
-
-```text
-Android App
-    ↓
-Retrofit
-    ↓
-GET randomuser.me/api
-    ↓
-JSON Response
-    ↓
-Gson
-    ↓
-User Model
-    ↓
-RecyclerView / Profile UI
-```
-
----
-
-## 9. Image Handling
-
-Untuk avatar dari API dapat menggunakan:
-
-```text
-Glide
-```
-
-Untuk proof:
-- User memilih image dari gallery
-- Simpan URI lokal
-- URI direferensikan oleh data Proof
-
-Tidak perlu upload image ke cloud untuk MVP.
-
----
-
-## 10. Error Handling
-
-Jika API gagal:
-
-```text
-Show fallback avatar
-Show local/mock username
-App tetap berjalan
-```
-
-Jika form invalid:
-
-```text
-TextInputLayout.setError(...)
-```
-
-Jika database operation gagal:
-
-```text
-Show Toast / Snackbar
-```
-
----
-
-## 11. Security Scope
-
-Karena aplikasi bersifat prototype/coursework:
-
-Tidak ada:
-- Real payment
-- Sensitive banking information
-- Production authentication
-- Real prize transfer
-
-Jangan menyimpan:
-- Credit card
-- Bank account
-- Password production
-- API secret sensitif
+The target keeps presentation, app data access, and network integration
+separate. Firestore transactions and deployed security rules must enforce
+challenge state changes and exactly-once mock reward receipts. Real payment is
+out of scope. Remaining M14 work is tracked in [`TASKS.md`](TASKS.md).

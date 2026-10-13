@@ -1,5 +1,19 @@
 # M12 test report
 
+## M14 addendum (2026-10-13)
+
+Read-only Firebase checks now confirm Email/Password Auth is active
+(`INVALID_LOGIN_CREDENTIALS` for a deliberately nonexistent address) and
+Firestore responds with the expected unauthenticated `PERMISSION_DENIED`. No
+Firebase user or document was created. `:app:assembleDebug` and
+`:app:assembleDebugAndroidTest` pass after the Auth/Profile integration.
+
+The new Firebase form test covers client-side validation only. Instrumentation
+execution was not possible because no Android device/emulator is connected; the
+legacy M12 end-to-end flow still assumes mock login and must be migrated before
+it can validate Firebase-based sessions. Authenticated profile writes have not
+been exercised to honor the no-test-user constraint.
+
 Date: 2026-10-08. Status: all 16 M12 scenarios verified.
 
 Environment: Windows PowerShell, bundled Android Studio JBR, Pixel_7 emulator

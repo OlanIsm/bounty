@@ -76,7 +76,7 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (!new SessionManager(this).isLoggedIn()) {
+        if (!new SessionManager(this).isFirebaseAuthenticated()) {
             openLogin();
             return;
         }
@@ -124,8 +124,9 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onStart() {
         super.onStart();
-        User user = new SessionManager(this).getCurrentUser();
-        if (user == null) {
+        SessionManager session = new SessionManager(this);
+        User user = session.getCurrentUser();
+        if (!session.isFirebaseAuthenticated() || user == null) {
             openLogin();
             return;
         }
