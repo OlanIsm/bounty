@@ -7,9 +7,11 @@ provides account identity. The Android app accesses cloud data with Firebase's
 Android SDK. Firebase is the cloud database/backend and does not satisfy the
 separate external API requirement; Random User API remains the qualifying API.
 
-Firebase project setup uses local values from the Firebase Android app
-configuration. Keep those values in ignored `local.properties`; do not add
-service account credentials or commit local configuration.
+Firebase project setup uses `app/google-services.json` for the Android app.
+It contains non-secret app identifiers; do not add service account credentials
+to the repository or client. Deploy rules and indexes from
+`firebase/firestore.rules`, `firebase/storage.rules`, and
+`firebase/firestore.indexes.json` with the Firebase CLI.
 
 ## Firestore collections
 

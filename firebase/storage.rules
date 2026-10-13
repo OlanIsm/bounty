@@ -1,0 +1,26 @@
+rules_version = '2';
+
+service firebase.storage {
+  match /b/{bucket}/o {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function challenge(challengeId) {
+      return firestore.get(/databases/(default)/documents/challenges/$(challengeId)).data;
+    }
+
+    match /proofs/{challengeId}/{hunterId}/{fileName} {
+      allow create: if signedIn()
+        && request.auth.uid == hunterId
+        && challenge(challengeId).participantId == request.auth.uid
+        && challenge(challengeId).status == 'ACCEPTED'
+        && request.resource.size <= 5 * 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|png|webp)');
+      allow read: if signedIn()
+        && (challenge(challengeId).creatorId == request.auth.uid
+          || challenge(challengeId).participantId == request.auth.uid);
+      allow update, delete: if false;
+    }
+  }
+}

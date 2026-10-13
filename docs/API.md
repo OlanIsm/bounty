@@ -57,8 +57,8 @@ do not affect Bounty authentication or cloud records.
 
 ## Configuration
 
-Read Firebase API key, app ID, project ID, sender ID, and Storage bucket from
-ignored `local.properties` through Gradle `BuildConfig` fields. These identify
-the Firebase Android app; never put an Admin SDK/service account key in client
-code. Firebase Authentication Email/Password, Cloud Firestore, and Storage must
-be enabled in the matching Firebase project.
+Place the Firebase Android app configuration at `app/google-services.json`.
+The Google Services Gradle plugin generates the SDK resources from this file.
+It contains app identifiers, not an Admin SDK credential; never put a service
+account key in client code. Firebase Authentication Email/Password, Cloud
+Firestore, and Storage must be enabled in the matching Firebase project.

@@ -1,0 +1,153 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function challengePath(challengeId) {
+      return /databases/$(database)/documents/challenges/$(challengeId);
+    }
+
+    function proofPath(challengeId, proofId) {
+      return /databases/$(database)/documents/challenges/$(challengeId)/proofs/$(proofId);
+    }
+
+    function receiptPath(uid, challengeId) {
+      return /databases/$(database)/documents/users/$(uid)/rewardReceipts/$(challengeId);
+    }
+
+    function isChallengeMember(challengeId) {
+      let challenge = get(challengePath(challengeId)).data;
+      return signedIn()
+        && (request.auth.uid == challenge.creatorId
+          || request.auth.uid == challenge.participantId);
+    }
+
+    match /users/{uid} {
+      allow create: if signedIn()
+        && request.auth.uid == uid
+        && request.resource.data.keys().hasOnly(['displayName', 'email', 'initialDemoBalance', 'createdAt'])
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() > 0
+        && request.resource.data.displayName.size() <= 80
+        && request.resource.data.email == request.auth.token.email
+        && request.resource.data.initialDemoBalance == 50000
+        && request.resource.data.createdAt == request.time;
+      allow read: if signedIn() && request.auth.uid == uid;
+      allow update: if signedIn()
+        && request.auth.uid == uid
+        && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['displayName'])
+        && request.resource.data.displayName is string
+        && request.resource.data.displayName.size() > 0
+        && request.resource.data.displayName.size() <= 80;
+      allow delete: if false;
+
+      match /rewardReceipts/{challengeId} {
+        allow read: if signedIn() && request.auth.uid == uid;
+        allow create: if signedIn()
+          && exists(challengePath(challengeId))
+          && get(challengePath(challengeId)).data.creatorId == request.auth.uid
+          && get(challengePath(challengeId)).data.status == 'SUBMITTED'
+          && get(challengePath(challengeId)).data.participantId == uid
+          && getAfter(challengePath(challengeId)).data.status == 'COMPLETED'
+          && getAfter(challengePath(challengeId)).data.latestProofId == request.resource.data.proofId
+          && getAfter(proofPath(challengeId, request.resource.data.proofId)).data.status == 'APPROVED'
+          && request.resource.data.keys().hasOnly(['challengeId', 'proofId', 'amount', 'creditedAt'])
+          && request.resource.data.challengeId == challengeId
+          && request.resource.data.amount == get(challengePath(challengeId)).data.rewardAmount
+          && request.resource.data.creditedAt == request.time;
+        allow update, delete: if false;
+      }
+    }
+
+    match /challenges/{challengeId} {
+      allow read: if signedIn();
+      allow create: if signedIn()
+        && request.resource.data.keys().hasOnly([
+          'creatorId', 'creatorName', 'title', 'description', 'rewardAmount',
+          'deadline', 'status', 'participantId', 'participantName',
+          'latestProofId', 'createdAt'
+        ])
+        && request.resource.data.creatorId == request.auth.uid
+        && request.resource.data.creatorName == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.displayName
+        && request.resource.data.title is string
+        && request.resource.data.title.size() > 0
+        && request.resource.data.title.size() <= 100
+        && request.resource.data.description is string
+        && request.resource.data.description.size() > 0
+        && request.resource.data.description.size() <= 2000
+        && request.resource.data.rewardAmount is int
+        && request.resource.data.rewardAmount > 0
+        && request.resource.data.deadline is string
+        && request.resource.data.status == 'OPEN'
+        && request.resource.data.participantId == null
+        && request.resource.data.participantName == null
+        && request.resource.data.latestProofId == null
+        && request.resource.data.createdAt == request.time;
+
+      allow update: if signedIn() && (
+        (resource.data.status == 'OPEN'
+          && resource.data.creatorId != request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly([
+            'status', 'participantId', 'participantName'
+          ])
+          && request.resource.data.status == 'ACCEPTED'
+          && request.resource.data.participantId == request.auth.uid
+          && request.resource.data.participantName == get(/databases/$(database)/documents/users/$(request.auth.uid)).data.displayName)
+        ||
+        (resource.data.status == 'ACCEPTED'
+          && resource.data.participantId == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status', 'latestProofId'])
+          && request.resource.data.status == 'SUBMITTED'
+          && request.resource.data.latestProofId is string
+          && getAfter(proofPath(challengeId, request.resource.data.latestProofId)).data.challengeId == challengeId
+          && getAfter(proofPath(challengeId, request.resource.data.latestProofId)).data.hunterId == request.auth.uid
+          && getAfter(proofPath(challengeId, request.resource.data.latestProofId)).data.status == 'PENDING')
+        ||
+        (resource.data.status == 'SUBMITTED'
+          && resource.data.creatorId == request.auth.uid
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+          && ((request.resource.data.status == 'COMPLETED'
+              && getAfter(proofPath(challengeId, resource.data.latestProofId)).data.status == 'APPROVED'
+              && existsAfter(receiptPath(resource.data.participantId, challengeId)))
+            || (request.resource.data.status == 'ACCEPTED'
+              && getAfter(proofPath(challengeId, resource.data.latestProofId)).data.status == 'REJECTED')))
+      );
+      allow delete: if false;
+
+      match /proofs/{proofId} {
+        allow read: if isChallengeMember(challengeId);
+        allow create: if signedIn()
+          && get(challengePath(challengeId)).data.status == 'ACCEPTED'
+          && get(challengePath(challengeId)).data.participantId == request.auth.uid
+          && getAfter(challengePath(challengeId)).data.status == 'SUBMITTED'
+          && getAfter(challengePath(challengeId)).data.latestProofId == proofId
+          && request.resource.data.keys().hasOnly([
+            'challengeId', 'hunterId', 'description', 'imagePath', 'status', 'submittedAt'
+          ])
+          && request.resource.data.challengeId == challengeId
+          && request.resource.data.hunterId == request.auth.uid
+          && request.resource.data.description is string
+          && request.resource.data.description.size() > 0
+          && request.resource.data.description.size() <= 2000
+          && request.resource.data.imagePath.matches('proofs/' + challengeId + '/' + request.auth.uid + '/[^/]+')
+          && request.resource.data.status == 'PENDING'
+          && request.resource.data.submittedAt == request.time;
+        allow update: if signedIn()
+          && get(challengePath(challengeId)).data.creatorId == request.auth.uid
+          && get(challengePath(challengeId)).data.status == 'SUBMITTED'
+          && get(challengePath(challengeId)).data.latestProofId == proofId
+          && resource.data.status == 'PENDING'
+          && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['status'])
+          && ((request.resource.data.status == 'APPROVED'
+              && getAfter(challengePath(challengeId)).data.status == 'COMPLETED'
+              && existsAfter(receiptPath(resource.data.hunterId, challengeId)))
+            || (request.resource.data.status == 'REJECTED'
+              && getAfter(challengePath(challengeId)).data.status == 'ACCEPTED'));
+        allow delete: if false;
+      }
+    }
+  }
+}

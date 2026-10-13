@@ -701,10 +701,12 @@ already met. Implement M14 tasks in order and update this ledger with evidence.
 ## Tasks
 
 - [ ] Configure Firebase app, Email/Password Auth, Firestore, and Storage for
-  `id.ac.binus.bounty`; provide local Firebase config without committing it
-- [ ] Define and document Firestore collections, Storage paths, and security
+  `id.ac.binus.bounty`
+  - [x] Add matching Firebase Android configuration and Google Services plugin
+  - [ ] Enable Email/Password Auth, Firestore, and Storage in Firebase Console
+- [x] Define and document Firestore collections, Storage paths, and security
   rules for users, challenges, proofs, and mock reward receipts
-- [ ] Define the Firebase data access contract for reading and managing app data
+- [x] Define the Firebase data access contract for reading and managing app data
 - [ ] Migrate app source from Java to Kotlin while preserving existing flows
 - [ ] Connect challenge, proof, account, and mock reward data to the cloud
 - [ ] Keep Random User API integration or another qualifying external API and
