@@ -716,6 +716,7 @@ already met. Implement M14 tasks in order and update this ledger with evidence.
   - [x] Migrate models, Random User API integration, and shared UI helpers to Kotlin
   - [x] Migrate local database access and session utilities to Kotlin
   - [x] Migrate remaining application screens and data flows to Kotlin
+- [x] Configure Room KSP generation for the Kotlin database sources
 - [ ] Connect challenge, proof, account, and mock reward data to the cloud
   - [x] Implement Firebase Auth login/register and `users/{uid}` profile sync
   - [ ] Connect challenge, proof, and mock reward operations to Firestore

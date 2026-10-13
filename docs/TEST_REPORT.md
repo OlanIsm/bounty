@@ -17,6 +17,14 @@ expected view. This prevents claiming a passing full flow. No production
 Firebase user or document was created. Authenticated profile writes remain
 unverified; existing M12 full-flow tests still use mock sessions.
 
+Room generation is now configured through KSP, and `AppDatabaseTest` passes in
+the isolated emulator suite. A rerun of all 12 instrumentation tests still has
+9 failures: legacy flow tests expect local mock sessions, while the app now
+requires Firebase Auth; their expected signed-in screens do not open. The
+Firebase Auth form and project setup tests pass. A read-only Firebase Storage
+request returns HTTP 404, so Storage is not yet verified or ready for proof
+uploads. No production writes were made.
+
 Date: 2026-10-08. Status: all 16 M12 scenarios verified.
 
 Environment: Windows PowerShell, bundled Android Studio JBR, Pixel_7 emulator
