@@ -689,8 +689,9 @@ already met. Implement M14 tasks in order and update this ledger with evidence.
 
 - [x] Consume at least one external API: Random User API via Retrofit/Gson
   (demo profiles only; this does not provide Bounty backend or cloud storage)
-- [x] Select Supabase PostgreSQL as cloud database; use Supabase Auth and
-  PostgREST for user identity and Bounty data access
+- [x] Select Firebase Authentication and Cloud Firestore as the cloud backend;
+  Firebase does not count as the external API, so Random User API remains
+  required and already implemented
 - [ ] Use Kotlin for the application code
 - [ ] Store and manage Bounty data in a cloud database
 - [ ] Load and manage application data dynamically through the cloud/API
@@ -699,11 +700,11 @@ already met. Implement M14 tasks in order and update this ledger with evidence.
 
 ## Tasks
 
-- [x] Confirm cloud provider and backend/API approach: Supabase PostgreSQL,
-  Supabase Auth, and PostgREST; Random User API remains the qualifying external API
-- [x] Define and document cloud data schema for users, challenges, proofs, and
-  mock rewards; keep real payment out of scope
-- [x] Define the Bounty backend/API contract for reading and managing app data
+- [ ] Configure Firebase app, Email/Password Auth, Firestore, and Storage for
+  `id.ac.binus.bounty`; provide local Firebase config without committing it
+- [ ] Define and document Firestore collections, Storage paths, and security
+  rules for users, challenges, proofs, and mock reward receipts
+- [ ] Define the Firebase data access contract for reading and managing app data
 - [ ] Migrate app source from Java to Kotlin while preserving existing flows
 - [ ] Connect challenge, proof, account, and mock reward data to the cloud
 - [ ] Keep Random User API integration or another qualifying external API and

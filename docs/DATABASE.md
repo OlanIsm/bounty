@@ -2,84 +2,70 @@
 
 ## M14 cloud database
 
-Bounty uses Supabase PostgreSQL as its source of truth. Supabase Auth identifies
-app users; the Android app reads and writes application data through Supabase's
-PostgREST API. Random User API remains a separate external API used for demo
-profiles. The Supabase publishable/anon key is a client key, not a service-role
-secret; Row Level Security (RLS) and database functions enforce access.
+Bounty uses Cloud Firestore as its source of truth. Firebase Authentication
+provides account identity. The Android app accesses cloud data with Firebase's
+Android SDK. Firebase is the cloud database/backend and does not satisfy the
+separate external API requirement; Random User API remains the qualifying API.
 
-The migration is [`supabase/migrations/20261013000000_bounty_cloud.sql`](../supabase/migrations/20261013000000_bounty_cloud.sql).
-Run it once in the Supabase SQL Editor before using the cloud-backed app.
-Credentials belong in the ignored `local.properties`, never in Git.
+Firebase project setup uses local values from the Firebase Android app
+configuration. Keep those values in ignored `local.properties`; do not add
+service account credentials or commit local configuration.
 
-## Tables
+## Firestore collections
 
-### `profiles`
+### `users/{uid}`
 
-| Field | Type | Description |
-|---|---|---|
-| `id` | UUID | Primary key and Supabase Auth user ID |
-| `display_name` | text | Name shown in the app |
-| `demo_balance` | bigint | Local-style mock balance, starts at Rp50.000 |
-| `created_at` | timestamptz | Account creation time |
+`uid` matches Firebase Authentication. Fields: `displayName`, `email`,
+`initialDemoBalance` (50000), and `createdAt`. Current balance is derived from
+the initial amount plus that user's reward receipt documents; clients cannot
+write a balance field.
 
-An Auth trigger creates the profile. Users can read their own profile and
-change their own display name. Only the review database function can change
-`demo_balance`.
+### `challenges/{challengeId}`
 
-### `challenges`
+Fields: `creatorId`, `creatorName`, `title`, `description`, `rewardAmount`,
+`deadline`, `status`, `participantId`, `participantName`, `latestProofId`, and
+`createdAt`. `status` is `OPEN`, `ACCEPTED`, `SUBMITTED`, or `COMPLETED`.
+Challenge cards are readable by signed-in users. Only the creator can create
+an OPEN challenge as themselves.
 
-| Field | Type | Description |
-|---|---|---|
-| `id` | UUID | Challenge ID |
-| `creator_id` | UUID | Creator profile/Auth ID |
-| `creator_name` | text | Name snapshot used in the feed |
-| `title` | text | Required, maximum 100 characters |
-| `description` | text | Required, maximum 2000 characters |
-| `reward_amount` | bigint | Positive mock reward in whole rupiah |
-| `deadline` | date | Challenge deadline |
-| `status` | text | `OPEN`, `ACCEPTED`, `SUBMITTED`, or `COMPLETED` |
-| `participant_id` | UUID nullable | Accepted hunter ID |
-| `participant_name` | text nullable | Hunter name snapshot |
-| `created_at` | timestamptz | Creation time |
+### `challenges/{challengeId}/proofs/{proofId}`
 
-Authenticated users can browse the feed and create challenges as themselves.
-Accept, submit, and review operations use database functions, not unrestricted
-client updates.
+Each submitted proof is a separate document with `hunterId`, `description`,
+`imagePath`, `status` (`PENDING`, `APPROVED`, or `REJECTED`), and `submittedAt`.
+Only the challenge creator and assigned hunter can read proof documents.
+Resubmission creates a new proof document after rejection.
 
-### `proofs`
+### `users/{uid}/rewardReceipts/{challengeId}`
 
-Each submission is a separate row, so a hunter can resubmit after rejection.
-Fields: `id` (UUID), `challenge_id`, `hunter_id`, `description`, `image_path`,
-`status` (`PENDING`, `APPROVED`, `REJECTED`), and `submitted_at`. Only the
-challenge creator and assigned hunter can read its proofs. A private Storage
-bucket stores proof photos; `image_path` stores the object path, not a local
-device URI.
+One receipt per completed challenge stores `challengeId`, `proofId`, `amount`,
+and `creditedAt`. A receipt is created atomically with approval. Its document ID
+prevents duplicate mock rewards. Balance is `initialDemoBalance + sum(receipts)`;
+this is not payment processing or transferable money.
 
-### `mock_reward_receipts`
+## Storage
 
-Stores `challenge_id` (unique), `hunter_id`, `proof_id` (unique), reward
-`amount`, and `credited_at`. Unique constraints plus the review function prevent
-duplicate mock credits. This is not payment processing or transferable money.
+Store proof photos in a private Firebase Storage bucket at
+`proofs/{challengeId}/{hunterUid}/{uniqueFileName}`. Only the assigned hunter
+can upload while the challenge is ACCEPTED. Only the challenge creator and
+hunter can read a proof photo. Store the cloud object path in `imagePath`, not
+the device's local content URI.
 
-## Atomic operations
+## Atomic operations and rules
 
-- `accept_challenge(challenge_id)` assigns one hunter only while the challenge
-  is `OPEN` and rejects the creator.
-- `submit_proof(challenge_id, description, image_path)` changes `ACCEPTED` to
-  `SUBMITTED` and inserts the proof in one transaction.
-- `review_proof(challenge_id, proof_id, approve)` checks the creator and latest
-  pending proof, updates proof and challenge together, then credits the hunter
-  once when approved. Reject returns the challenge to `ACCEPTED`.
-
-RLS protects profile, challenge, proof, reward, and private-photo access. The
-app must use only the publishable/anon key. Never put a service-role key in the
-Android app.
+- Accept: transaction changes one OPEN challenge to ACCEPTED and assigns the
+  signed-in hunter; creator cannot accept their own challenge.
+- Submit: upload the photo, then use a Firestore transaction to create a PENDING
+  proof and set the challenge to SUBMITTED with `latestProofId`. If the database
+  write fails, keep form data for retry; the uploaded orphan can be removed later.
+- Review: transaction checks creator, SUBMITTED state, and latest pending proof.
+  Approve marks proof/challenge complete and creates one reward receipt; reject
+  marks proof rejected and returns challenge to ACCEPTED.
+- Security rules validate owner, state transition, and related atomic writes.
+  Never use the Firebase Admin/service account key in the Android app.
 
 ## Previous local schema
 
-M0-M13 used Room/SQLite table models `Challenge` and `Proof`, plus
-SharedPreferences for mock accounts, session, balance, and reward receipts.
-That local schema is retained only as migration history and will be removed
-from the active data path after M14 cloud integration is complete. Do not seed
-cloud production data with local test accounts automatically.
+M0-M13 used Room/SQLite for challenges and proofs and SharedPreferences for mock
+accounts, sessions, balances, and reward receipts. M14 replaces that active data
+path with Firebase. Existing local records are not uploaded automatically;
+users must register in Firebase and create cloud challenges after setup.

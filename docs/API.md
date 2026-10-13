@@ -1,79 +1,47 @@
-# Bounty API Contract
+# Bounty API and Cloud Data Contract
 
-## API boundaries
+## Integration boundaries
 
-Bounty uses two network services:
+- **Firebase Authentication and Cloud Firestore** provide app sign-in and
+  cloud application data. They are not the qualifying third-party API for the
+  coursework requirement.
+- **Random User API** is the qualifying public external API. It provides
+  read-only demo names, email addresses, and profile photos.
 
-1. **Supabase Auth and PostgREST** provide app sign-in and cloud CRUD/RPC over
-   the Supabase PostgreSQL database. Supabase is the app backend, but does not
-   count as the required independent external API for the coursework rubric.
-2. **Random User API** is the qualifying public external API. It provides
-   read-only demo names, email addresses, and avatars in Profile.
+Keep account, challenge, proof, and reward data in Firebase. Do not use Random
+User profiles as Bounty accounts or modify cloud data from that API.
 
-The client uses the Supabase project URL and publishable/anon key. Every
-authenticated request also uses the signed-in user's access token. Never put a
-service-role key in the Android app or Git.
+## Firebase Authentication
 
-## Supabase request headers
+Use Firebase Authentication's Email/Password provider. Registration requires
+name, email, and password; login uses email and password. Firebase SDK retains
+the signed-in session. Never store the password in app preferences. Handle
+invalid credentials, duplicate email, weak password, network failure, and
+signed-out states in the forms.
 
-```http
-apikey: <SUPABASE_PUBLISHABLE_KEY>
-Authorization: Bearer <access_token>
-Content-Type: application/json
-```
+Create `users/{uid}` after successful registration using the Firebase Auth UID.
+The profile stores display name, email, initial mock balance, and creation time.
 
-Use the anon key for pre-authentication sign-in and sign-up requests; use the
-access token returned by Supabase Auth for protected resources. RLS policies in
-[`supabase/migrations/20261013000000_bounty_cloud.sql`](../supabase/migrations/20261013000000_bounty_cloud.sql)
-authorize reads and writes.
+## Firebase data operations
 
-## Authentication
+The repository layer exposes these app operations through Firestore. Auth and
+Firestore rules are the trust boundary; UI code does not write arbitrary
+documents directly.
 
-Base path: `/auth/v1`
-
-| Operation | Request | Purpose |
+| Operation | Read/write | Required behavior |
 |---|---|---|
-| Register | `POST /signup` with email/password and `data.name` | Create Auth user; DB trigger creates profile |
-| Login | `POST /token?grant_type=password` with email/password | Return access and refresh tokens |
-| Current user | `GET /user` | Restore/check signed-in identity |
-| Logout | `POST /logout` | End current session |
+| Challenge feed | Read `challenges` | Newest first; handle empty, loading, and retry |
+| My Challenges | Read `challenges` where creator or participant is current UID | Refresh after mutations |
+| Challenge detail | Read one challenge and latest proof | Show missing/unauthorized state |
+| Create challenge | Create `OPEN` challenge with current UID/name | Validate fields before write |
+| Accept challenge | Transaction updates only `OPEN` challenge | Reject own challenge and stale/competing accepts |
+| Submit proof | Upload photo, then transaction creates proof and changes challenge to `SUBMITTED` | Keep description/photo draft on failure |
+| Review proof | Transaction updates latest proof and challenge | Approve creates one reward receipt; reject returns to `ACCEPTED` |
+| Demo Balance | Read own profile and reward receipts | Initial Rp50.000 plus receipts; never client-write a balance |
 
-Passwords are sent only to Supabase Auth over HTTPS. Save refreshable session
-tokens in app-private storage; never store the password. Registration must show
-an email-confirmation state if confirmation is enabled in the Supabase project.
-
-## Bounty data
-
-Base path: `/rest/v1`. UUIDs identify users, challenges, and proof rows.
-
-| Operation | Request | Contract |
-|---|---|---|
-| Feed | `GET /challenges?select=*&order=created_at.desc` | RLS-protected challenge list |
-| My challenges | `GET /challenges?select=*&or=(creator_id.eq.<uid>,participant_id.eq.<uid>)&order=created_at.desc` | Challenges created or accepted by current user |
-| Detail | `GET /challenges?id=eq.<challenge_uuid>&select=*` | One challenge |
-| Create | `POST /challenges` with `Prefer: return=representation` | Insert `creator_id`, `creator_name`, title, description, reward, deadline, and `OPEN` status |
-| Accept | `POST /rpc/accept_challenge` with `{"target_challenge":"<uuid>"}` | Atomically assign one hunter; returns boolean |
-| Latest proof | `GET /proofs?challenge_id=eq.<uuid>&select=*&order=submitted_at.desc,id.desc&limit=1` | RLS permits challenge creator and hunter |
-| Submit | `POST /rpc/submit_proof` with challenge UUID, description, and object path | Atomically insert proof and change challenge to `SUBMITTED`; returns proof UUID |
-| Review | `POST /rpc/review_proof` with challenge UUID, proof UUID, and `approve` boolean | Atomically approve/reject, update status, and credit mock reward once |
-| Profile | `GET /profiles?id=eq.<uid>&select=id,display_name,demo_balance` | Current user's profile only |
-
-Challenge creation, acceptance, submission, and review must show progress while
-requests run. Handle permission, conflict/stale-state, validation, network, and
-server errors without losing form input. Refresh feed/detail after a successful
-mutation. A false RPC result means the challenge/proof is no longer actionable.
-
-## Proof photo storage
-
-Bucket: `bounty-proof-photos` (private, maximum 5 MiB, JPEG/PNG/WebP).
-
-1. Upload image bytes to `POST /storage/v1/object/bounty-proof-photos/<uid>/<challenge_uuid>/<unique-file>`, with the standard headers and the image `Content-Type`.
-2. Send the object path to `submit_proof` only after upload succeeds.
-3. Request a time-limited URL with `POST /storage/v1/object/sign/bounty-proof-photos/<object_path>` and `{"expiresIn":3600}` when displaying a private image.
-
-Storage RLS restricts uploads to the assigned hunter and reads to challenge
-members. If proof insertion fails after upload, retain the form for retry; the
-unused object can be cleaned up later without changing challenge state.
+Schema, Storage paths, and authorization behavior are documented in
+[`DATABASE.md`](DATABASE.md). Firebase security rules belong in the repository
+and must be deployed before the app writes cloud data.
 
 ## Qualifying public API: Random User
 
@@ -84,11 +52,13 @@ GET /api/?results=10
 ```
 
 Use only `login.uuid`, `name.first`, `name.last`, `email`, and `picture.large`.
-Show loading, retry, and local fallback states. These demo profiles do not
-create Bounty accounts or modify cloud data.
+Show loading, retry, and local fallback states. API users remain read-only and
+do not affect Bounty authentication or cloud records.
 
 ## Configuration
 
-Set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` in the ignored local
-`local.properties` file. Never commit credentials or generated local config.
-Keep the Android app's `INTERNET` permission enabled.
+Read Firebase API key, app ID, project ID, sender ID, and Storage bucket from
+ignored `local.properties` through Gradle `BuildConfig` fields. These identify
+the Firebase Android app; never put an Admin SDK/service account key in client
+code. Firebase Authentication Email/Password, Cloud Firestore, and Storage must
+be enabled in the matching Firebase project.
