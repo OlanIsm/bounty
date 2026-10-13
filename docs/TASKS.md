@@ -689,6 +689,8 @@ already met. Implement M14 tasks in order and update this ledger with evidence.
 
 - [x] Consume at least one external API: Random User API via Retrofit/Gson
   (demo profiles only; this does not provide Bounty backend or cloud storage)
+- [x] Select Supabase PostgreSQL as cloud database; use Supabase Auth and
+  PostgREST for user identity and Bounty data access
 - [ ] Use Kotlin for the application code
 - [ ] Store and manage Bounty data in a cloud database
 - [ ] Load and manage application data dynamically through the cloud/API
@@ -697,9 +699,8 @@ already met. Implement M14 tasks in order and update this ledger with evidence.
 
 ## Tasks
 
-- [ ] Confirm the required cloud provider and backend/API approach before
-  implementation; Firebase/Supabase may be cloud storage but do not replace the
-  requirement to consume an external API
+- [x] Confirm cloud provider and backend/API approach: Supabase PostgreSQL,
+  Supabase Auth, and PostgREST; Random User API remains the qualifying external API
 - [ ] Define and document cloud data schema for users, challenges, proofs, and
   mock rewards; keep real payment out of scope
 - [ ] Define the Bounty backend/API contract for reading and managing app data
