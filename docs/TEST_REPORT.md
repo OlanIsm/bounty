@@ -2,17 +2,20 @@
 
 ## M14 addendum (2026-10-13)
 
-Read-only Firebase checks now confirm Email/Password Auth is active
-(`INVALID_LOGIN_CREDENTIALS` for a deliberately nonexistent address) and
-Firestore responds with the expected unauthenticated `PERMISSION_DENIED`. No
-Firebase user or document was created. `:app:assembleDebug` and
-`:app:assembleDebugAndroidTest` pass after the Auth/Profile integration.
+The merged Google Services configuration retains both `id.ac.binus.bounty` and
+`id.ac.binus.bounty.testing`. Gradle's Google Services processing and
+`:app:assembleDebugAndroidTest` pass. Opt-in debug builds using
+`-PbountyFirebaseEmulator=true` connect Auth to `10.0.2.2:9099` and Firestore to
+`10.0.2.2:8080`; regular debug and release builds do not enable emulator routing.
 
-The new Firebase form test covers client-side validation only. Instrumentation
-execution was not possible because no Android device/emulator is connected; the
-legacy M12 end-to-end flow still assumes mock login and must be migrated before
-it can validate Firebase-based sessions. Authenticated profile writes have not
-been exercised to honor the no-test-user constraint.
+Firebase Emulator Suite started successfully. The focused
+`FirebaseAuthenticationFormTest` passed on Pixel_7 (API 37). The requested full
+`:app:connectedDebugAndroidTest` ran against the emulator but failed: Room did
+not generate `AppDatabase_Impl` after the Java-to-Kotlin migration, causing
+database-dependent tests to fail; `MainNavigationTest` also could not find its
+expected view. This prevents claiming a passing full flow. No production
+Firebase user or document was created. Authenticated profile writes remain
+unverified; existing M12 full-flow tests still use mock sessions.
 
 Date: 2026-10-08. Status: all 16 M12 scenarios verified.
 

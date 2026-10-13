@@ -703,6 +703,8 @@ already met. Implement M14 tasks in order and update this ledger with evidence.
 - [ ] Configure Firebase app, Email/Password Auth, Firestore, and Storage for
   `id.ac.binus.bounty`
   - [x] Add matching Firebase Android configuration and Google Services plugin
+  - [x] Merge `id.ac.binus.bounty.testing` client without removing the main client
+  - [x] Route opted-in debug tests to Auth and Firestore emulators
   - [x] Verify Email/Password Auth and Firestore access with read-only requests
   - [ ] Enable and verify Firebase Storage
 - [x] Define and document Firestore collections, Storage paths, and security

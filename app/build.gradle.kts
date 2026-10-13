@@ -15,6 +15,7 @@ android {
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
+        buildConfigField("boolean", "USE_FIREBASE_EMULATORS", "false")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         javaCompileOptions {
@@ -26,6 +27,11 @@ android {
 
     buildTypes {
         debug {
+            buildConfigField(
+                "boolean",
+                "USE_FIREBASE_EMULATORS",
+                (providers.gradleProperty("bountyFirebaseEmulator").orNull == "true").toString()
+            )
             // Disposable installation for instrumentation and the M12 restart check.
             if (providers.gradleProperty("bountyIsolatedTest").orNull == "true") {
                 applicationIdSuffix = ".testing"
