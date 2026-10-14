@@ -56,7 +56,7 @@ Atau pilih **Code → Download ZIP** di halaman GitHub, lalu ekstrak ZIP. Buka f
 - Android Studio dengan JDK 21 (JBR bawaan Android Studio bisa digunakan)
 - Android SDK Platform 37 dan SDK Build Tools yang diminta Gradle
 - Emulator atau perangkat Android API 29 atau lebih baru untuk menjalankan aplikasi
-- Firebase Email/Password Auth dan Cloud Firestore aktif untuk registrasi/login; file `app/google-services.json` mencocokkan package aplikasi
+- Firebase Email/Password Auth dan Cloud Firestore aktif untuk registrasi/login. Unduh konfigurasi Android dari Firebase Console untuk package aplikasi, lalu simpan lokal sebagai `app/google-services.json`; file ini tidak dilacak Git.
 
 Android Studio biasanya membuat `local.properties` saat SDK dikonfigurasi. Untuk build dari terminal, gunakan PowerShell dan pastikan `JAVA_HOME` menunjuk ke JDK 21.
 
