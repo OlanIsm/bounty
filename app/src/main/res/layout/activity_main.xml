@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bounty_background"
-    android:orientation="vertical">
+    android:background="@color/bounty_background">
 
     <com.google.android.material.appbar.MaterialToolbar
         android:id="@+id/main_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
         android:background="@color/bounty_surface"
         android:elevation="1dp"
         android:minHeight="?attr/actionBarSize"
@@ -20,20 +20,36 @@
     <FrameLayout
         android:id="@+id/screen_content"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1" />
+        android:layout_height="match_parent"
+        android:layout_below="@id/main_toolbar" />
 
-    <com.google.android.material.bottomnavigation.BottomNavigationView
-        android:id="@+id/bottom_navigation"
+    <!-- Stitch Floating Pill Navigation Dock -->
+    <com.google.android.material.card.MaterialCardView
+        android:id="@+id/nav_card"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/bounty_surface"
-        android:elevation="8dp"
-        app:menu="@menu/main_navigation"
-        app:labelVisibilityMode="labeled"
-        app:itemMaxLines="2"
-        app:itemHorizontalTranslationEnabled="false"
-        app:itemIconTint="@color/navigation_foreground"
-        app:itemTextColor="@color/navigation_foreground"
-        app:itemActiveIndicatorStyle="@style/BountyNavigationIndicator" />
-</LinearLayout>
+        android:layout_height="64dp"
+        android:layout_alignParentBottom="true"
+        android:layout_marginHorizontal="16dp"
+        android:layout_marginBottom="12dp"
+        app:cardCornerRadius="32dp"
+        app:cardElevation="8dp"
+        app:strokeWidth="1dp"
+        app:strokeColor="#15000000"
+        app:cardBackgroundColor="@color/bounty_surface">
+
+        <com.google.android.material.bottomnavigation.BottomNavigationView
+            android:id="@+id/bottom_navigation"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="@android:color/transparent"
+            app:elevation="0dp"
+            app:menu="@menu/main_navigation"
+            app:labelVisibilityMode="labeled"
+            app:itemMaxLines="1"
+            app:itemIconSize="26dp"
+            app:itemHorizontalTranslationEnabled="false"
+            app:itemIconTint="@null"
+            app:itemTextColor="@color/navigation_foreground"
+            app:itemActiveIndicatorStyle="@style/BountyNavigationIndicator" />
+    </com.google.android.material.card.MaterialCardView>
+</RelativeLayout>

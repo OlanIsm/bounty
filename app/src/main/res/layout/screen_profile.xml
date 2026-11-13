@@ -7,7 +7,7 @@
 
     <LinearLayout
         style="@style/BountyScreenContent"
-        android:paddingBottom="48dp">
+        android:paddingBottom="96dp">
 
         <!-- Profile Header Card (Stitch style) -->
         <com.google.android.material.card.MaterialCardView

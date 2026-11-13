@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Big Blue Circular Button Background -->
+    <path
+        android:fillColor="#4648D4"
+        android:pathData="M24,24m-22,0a22,22 0,1,1 44,0a22,22 0,1,1 -44,0" />
+    <!-- White Plus Icon -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M26,14h-4v8h-8v4h8v8h4v-8h8v-4h-8z" />
+</vector>

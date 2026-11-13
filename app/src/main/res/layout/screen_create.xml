@@ -7,7 +7,7 @@
 
     <LinearLayout
         style="@style/BountyScreenContent"
-        android:paddingBottom="48dp">
+        android:paddingBottom="96dp">
 
         <TextView
             style="@style/BountyHeading"

@@ -1,20 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/home_screen" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:orientation="vertical"
-    android:paddingHorizontal="16dp" android:paddingTop="16dp">
+    android:id="@+id/home_screen"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bounty_background"
+    android:paddingHorizontal="16dp"
+    android:paddingTop="8dp">
+
     <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/feed_loading" android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:indeterminate="true"
+        android:id="@+id/feed_loading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
         android:contentDescription="@string/loading_challenges" />
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/feed_message" android:accessibilityLiveRegion="polite" style="@style/BountyBody"
-        android:layout_marginTop="16dp" android:visibility="gone" />
+
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/feed_retry" style="@style/BountyButton"
-        android:text="@string/retry_action" android:visibility="gone" />
+        android:id="@+id/feed_retry"
+        style="@style/BountyButton"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="8dp"
+        android:text="@string/retry_action"
+        android:visibility="gone" />
+
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/challenge_list" android:layout_width="match_parent"
-        android:layout_height="0dp" android:layout_weight="1"
-        android:clipToPadding="false" android:paddingBottom="16dp" />
+        android:id="@+id/challenge_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:clipToPadding="false"
+        android:paddingBottom="88dp" />
 </LinearLayout>

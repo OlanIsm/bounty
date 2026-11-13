@@ -15,7 +15,7 @@
     <string name="profile_title">Profile</string>
     <string name="home_description">Temukan challenge dan selesaikan untuk mendapatkan reward demo.</string>
     <string name="available_challenges">Challenge tersedia</string>
-    <string name="no_available_challenges">Belum ada challenge untuk ditampilkan.</string>
+    <string name="no_available_challenges">Challenge belum tersedia nih, jadi yang pertama untuk membuat challenge!</string>
     <string name="loading_challenges">Memuat challenge</string>
     <string name="challenge_load_error">Challenge gagal dimuat. Coba lagi.</string>
     <string name="retry_action">Coba lagi</string>
@@ -103,4 +103,5 @@
     <string name="confirm_accept_message">%1$s\n\nKamu akan menjadi hunter untuk challenge ini. Reward demo %2$s diberikan setelah bukti disetujui.</string>
     <string name="confirm_approve_title">Setujui bukti?</string>
     <string name="confirm_approve_message">%1$s\n\nChallenge akan selesai dan reward demo %2$s masuk ke saldo %3$s. Reward ini bukan uang asli.</string>
+    <string name="leaderboard_soon">Fitur Peringkat segera hadir!</string>
 </resources>

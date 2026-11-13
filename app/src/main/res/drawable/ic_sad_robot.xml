@@ -1,0 +1,45 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="80dp"
+    android:height="80dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+    <!-- Antenna -->
+    <path
+        android:fillColor="@color/bounty_outline"
+        android:pathData="M24,4A3,3 0,1,0 24,10A3,3 0,1,0 24,4Z" />
+    <path
+        android:strokeColor="@color/bounty_outline"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M24,10v4" />
+    <!-- Ears -->
+    <path
+        android:fillColor="@color/bounty_outline_variant"
+        android:pathData="M6,22a2,2 0,0,1 2,-2v10a2,2 0,0,1 -2,-2zM42,22a2,2 0,0,0 -2,-2v10a2,2 0,0,0 2,-2z" />
+    <!-- Robot Head Outline -->
+    <path
+        android:fillColor="@color/bounty_surface_container"
+        android:strokeColor="@color/bounty_outline"
+        android:strokeWidth="2"
+        android:pathData="M12,14h24a4,4 0,0,1 4,4v18a4,4 0,0,1 -4,4H12a4,4 0,0,1 -4,-4V18a4,4 0,0,1 4,-4z" />
+    <!-- Sad Eyebrows (tilted inwards/upwards = sad expression) -->
+    <path
+        android:strokeColor="@color/bounty_outline"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M14,21l4,-2M34,21l-4,-2" />
+    <!-- Eyes -->
+    <path
+        android:fillColor="@color/bounty_text"
+        android:pathData="M17,26a2.5,2.5 0,1,0 0,-5a2.5,2.5 0,0,0 0,5zM31,26a2.5,2.5 0,1,0 0,-5a2.5,2.5 0,0,0 0,5z" />
+    <!-- Sad Downward Curved Mouth -->
+    <path
+        android:strokeColor="@color/bounty_outline"
+        android:strokeWidth="2.5"
+        android:strokeLineCap="round"
+        android:pathData="M18,34c2,-3 10,-3 12,0" />
+    <!-- Small Teardrop Accent -->
+    <path
+        android:fillColor="@color/bounty_primary"
+        android:pathData="M35,27c0,1.2 -1,2.2 -2,2.2s-2,-1 -2,-2.2c0,-1 2,-3 2,-3s2,2 2,3z" />
+</vector>

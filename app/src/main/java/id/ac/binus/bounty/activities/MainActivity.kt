@@ -84,10 +84,27 @@ class MainActivity : AppCompatActivity() {
         }
         onBackPressedDispatcher.addCallback(this, backToHome)
         val nav = navigation ?: return
-        nav.setOnItemSelectedListener { showScreen(it.itemId) }
+        nav.itemIconTintList = null
+        nav.setOnItemSelectedListener { item ->
+            if (item.itemId == R.id.nav_leaderboard) {
+                showSnackbar(R.string.leaderboard_soon)
+                false
+            } else {
+                showScreen(item.itemId)
+            }
+        }
         val destination = savedInstanceState?.getInt("selected_destination", R.id.nav_home) ?: R.id.nav_home
         nav.selectedItemId = if (nav.menu.findItem(destination) == null) R.id.nav_home else destination
         nav.setOnItemReselectedListener { }
+        nav.post {
+            val createView = nav.findViewById<View>(R.id.nav_create)
+            createView?.let { view ->
+                view.scaleX = 1.35f
+                view.scaleY = 1.35f
+                view.translationY = -6f
+                ViewMotion.applySpringPress(view)
+            }
+        }
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -193,7 +210,9 @@ class MainActivity : AppCompatActivity() {
             }
             list.itemAnimator = null
             if (destination == R.id.nav_home) {
-                homeHeaderAdapter = HomeHeaderAdapter(user)
+                homeHeaderAdapter = HomeHeaderAdapter(user) {
+                    navigation?.selectedItemId = R.id.nav_create
+                }
                 list.adapter = ConcatAdapter(homeHeaderAdapter!!, feedAdapter!!)
             } else list.adapter = feedAdapter
             val retryFeed = findViewById<View>(R.id.feed_retry)
@@ -292,9 +311,13 @@ class MainActivity : AppCompatActivity() {
         val home = findViewById<View>(screenId) ?: return
         val request = ++feedRequest
         home.findViewById<View>(R.id.feed_loading).visibility = View.VISIBLE
-        home.findViewById<View>(R.id.feed_message).visibility = View.GONE
+        home.findViewById<View>(R.id.feed_message)?.visibility = View.GONE
         home.findViewById<View>(R.id.feed_retry).visibility = View.GONE
         home.findViewById<View>(R.id.empty_create_challenge)?.visibility = View.GONE
+        if (!mine) {
+            homeHeaderAdapter?.isEmpty = false
+            homeHeaderAdapter?.errorMessage = null
+        }
         FirebaseBountyRepository.loadChallenges(user.id, mine) { result ->
             if (isDestroyed || isFinishing || request != feedRequest || findViewById<View>(screenId) !== home) return@loadChallenges
             val list = home.findViewById<RecyclerView>(R.id.challenge_list)
@@ -302,40 +325,90 @@ class MainActivity : AppCompatActivity() {
             if (result.isSuccess) {
                 val challenges = result.getOrThrow()
                 feedAdapter?.submitList(challenges)
-                list.visibility = if (mine && challenges.isEmpty()) View.GONE else View.VISIBLE
-                home.findViewById<TextView>(R.id.feed_message).apply {
-                    setText(if (mine) R.string.no_my_challenges else R.string.no_available_challenges)
-                    visibility = if (challenges.isEmpty()) View.VISIBLE else View.GONE
+                if (mine) {
+                    list.visibility = if (challenges.isEmpty()) View.GONE else View.VISIBLE
+                    home.findViewById<TextView>(R.id.feed_message)?.apply {
+                        setText(R.string.no_my_challenges)
+                        visibility = if (challenges.isEmpty()) View.VISIBLE else View.GONE
+                    }
+                    home.findViewById<View>(R.id.empty_create_challenge)?.visibility =
+                        if (challenges.isEmpty()) View.VISIBLE else View.GONE
+                } else {
+                    list.visibility = View.VISIBLE
+                    homeHeaderAdapter?.isEmpty = challenges.isEmpty()
                 }
-                home.findViewById<View>(R.id.empty_create_challenge)?.visibility =
-                    if (mine && challenges.isEmpty()) View.VISIBLE else View.GONE
             } else {
                 Log.e("BountyFeed", "Unable to load challenges", result.exceptionOrNull())
                 feedAdapter?.submitList(emptyList())
-                list.visibility = if (mine) View.GONE else View.VISIBLE
-                home.findViewById<TextView>(R.id.feed_message).apply {
-                    setText(R.string.challenge_load_error)
-                    visibility = View.VISIBLE
+                if (mine) {
+                    list.visibility = View.GONE
+                    home.findViewById<TextView>(R.id.feed_message)?.apply {
+                        setText(R.string.challenge_load_error)
+                        visibility = View.VISIBLE
+                    }
+                    home.findViewById<View>(R.id.feed_retry).visibility = View.VISIBLE
+                } else {
+                    list.visibility = View.VISIBLE
+                    homeHeaderAdapter?.errorMessage = getString(R.string.challenge_load_error)
+                    home.findViewById<View>(R.id.feed_retry).visibility = View.VISIBLE
                 }
-                home.findViewById<View>(R.id.feed_retry).visibility = View.VISIBLE
-                home.findViewById<View>(R.id.empty_create_challenge)?.visibility = View.GONE
                 showSnackbar(R.string.challenge_load_error)
             }
         }
     }
 
-    private class HomeHeaderAdapter(var user: User?) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-        override fun onCreateViewHolder(parent: ViewGroup, type: Int) = object : RecyclerView.ViewHolder(
-            LayoutInflater.from(parent.context).inflate(R.layout.item_home_header, parent, false)
-        ) { }
+    private class HomeHeaderAdapter(
+        var user: User?,
+        private val onCreateClick: () -> Unit
+    ) : RecyclerView.Adapter<HomeHeaderAdapter.ViewHolder>() {
 
-        override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
-            val currentUser = user ?: return
+        var isEmpty: Boolean = false
+            set(value) {
+                if (field != value) {
+                    field = value
+                    notifyItemChanged(0)
+                }
+            }
+
+        var errorMessage: String? = null
+            set(value) {
+                if (field != value) {
+                    field = value
+                    notifyItemChanged(0)
+                }
+            }
+
+        class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
+
+        override fun onCreateViewHolder(parent: ViewGroup, type: Int) = ViewHolder(
+            LayoutInflater.from(parent.context).inflate(R.layout.item_home_header, parent, false)
+        )
+
+        override fun onBindViewHolder(holder: ViewHolder, position: Int) {
+            val currentUser = user
             val root = holder.itemView
-            root.findViewById<TextView>(R.id.welcome_text).text =
-                root.context.getString(R.string.welcome_user, currentUser.name)
-            root.findViewById<TextView>(R.id.demo_balance_amount).text =
-                ChallengeDisplay.rupiah(root.context, currentUser.demoBalance)
+            if (currentUser != null) {
+                root.findViewById<TextView>(R.id.welcome_text).text =
+                    root.context.getString(R.string.welcome_user, currentUser.name)
+                root.findViewById<TextView>(R.id.demo_balance_amount).text =
+                    ChallengeDisplay.rupiah(root.context, currentUser.demoBalance)
+            }
+            val emptyContainer = root.findViewById<View>(R.id.home_empty_container)
+            val feedMsg = root.findViewById<TextView>(R.id.feed_message)
+            val createBtn = root.findViewById<View>(R.id.home_create_challenge)
+
+            if (errorMessage != null) {
+                emptyContainer.visibility = View.VISIBLE
+                feedMsg.text = errorMessage
+                createBtn.visibility = View.GONE
+            } else if (isEmpty) {
+                emptyContainer.visibility = View.VISIBLE
+                feedMsg.setText(R.string.no_available_challenges)
+                createBtn.visibility = View.VISIBLE
+                ViewMotion.applySpringPress(createBtn) { onCreateClick() }
+            } else {
+                emptyContainer.visibility = View.GONE
+            }
         }
 
         override fun getItemCount() = 1

@@ -59,4 +59,45 @@
             android:paddingHorizontal="10dp"
             android:paddingVertical="4dp" />
     </LinearLayout>
+
+    <!-- Sad Robot Empty State when no challenges are available (below section) -->
+    <LinearLayout
+        android:id="@+id/home_empty_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingVertical="28dp"
+        android:paddingHorizontal="20dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_sad_robot"
+            android:contentDescription="@null"
+            android:importantForAccessibility="no" />
+
+        <TextView
+            android:id="@+id/feed_message"
+            android:accessibilityLiveRegion="polite"
+            style="@style/BountyBody"
+            android:layout_marginTop="14dp"
+            android:gravity="center"
+            android:textSize="14sp"
+            android:textColor="@color/bounty_text_secondary"
+            android:lineSpacingExtra="2dp"
+            android:text="@string/no_available_challenges" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/home_create_challenge"
+            style="@style/BountyButton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:minHeight="48dp"
+            android:paddingHorizontal="24dp"
+            android:textSize="14sp"
+            android:text="+ Buat Challenge Pertama" />
+    </LinearLayout>
 </LinearLayout>
