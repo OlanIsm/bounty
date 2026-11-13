@@ -30,6 +30,7 @@ import id.ac.binus.bounty.models.Proof
 import id.ac.binus.bounty.models.User
 import id.ac.binus.bounty.utils.ScreenInsets
 import id.ac.binus.bounty.utils.SessionManager
+import id.ac.binus.bounty.utils.ViewMotion
 import java.io.IOException
 import java.io.ByteArrayOutputStream
 
@@ -58,9 +59,12 @@ class SubmitProofActivity : AppCompatActivity() {
         model = ViewModelProvider(this)[ProofModel::class.java]
         savedInstanceState?.getString("proof_image")?.let { imageUri = Uri.parse(it) }
         findViewById<MaterialToolbar>(R.id.proof_toolbar).setNavigationOnClickListener { finish() }
-        findViewById<View>(R.id.choose_proof_photo).setOnClickListener { picker.launch(arrayOf("image/*")) }
-        findViewById<View>(R.id.proof_submit).setOnClickListener { submit() }
-        findViewById<View>(R.id.proof_retry).setOnClickListener { loadChallenge() }
+        val chooseBtn = findViewById<View>(R.id.choose_proof_photo)
+        ViewMotion.applySpringPress(chooseBtn) { picker.launch(arrayOf("image/*")) }
+        val submitBtn = findViewById<View>(R.id.proof_submit)
+        ViewMotion.applySpringPress(submitBtn) { submit() }
+        val retryBtn = findViewById<View>(R.id.proof_retry)
+        ViewMotion.applySpringPress(retryBtn) { loadChallenge() }
         showPhoto()
     }
 
@@ -140,7 +144,9 @@ class SubmitProofActivity : AppCompatActivity() {
                 }
                 findViewById<TextView>(R.id.proof_challenge_title).text = challenge.title
                 findViewById<View>(R.id.proof_loading).visibility = View.GONE
-                findViewById<View>(R.id.proof_form).visibility = View.VISIBLE
+                val form = findViewById<View>(R.id.proof_form)
+                form.visibility = View.VISIBLE
+                ViewMotion.animateEntrance(form)
                 updateSaving()
             }.onFailure { error ->
                 Log.e("BountyProof", "Unable to load challenge", error)

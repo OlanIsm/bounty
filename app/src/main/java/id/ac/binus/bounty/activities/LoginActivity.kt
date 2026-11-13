@@ -9,6 +9,7 @@ import id.ac.binus.bounty.R
 import id.ac.binus.bounty.data.FirebaseAccountRepository
 import id.ac.binus.bounty.utils.ScreenInsets
 import id.ac.binus.bounty.utils.SessionManager
+import id.ac.binus.bounty.utils.ViewMotion
 
 class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -24,7 +25,8 @@ class LoginActivity : AppCompatActivity() {
         val emailLayout = findViewById<TextInputLayout>(R.id.email_layout)
         val passwordLayout = findViewById<TextInputLayout>(R.id.password_layout)
         if (savedInstanceState == null) intent.getStringExtra("registered_email")?.let { email.setText(it) }
-        findViewById<android.view.View>(R.id.login_button).setOnClickListener {
+        val loginBtn = findViewById<android.view.View>(R.id.login_button)
+        ViewMotion.applySpringPress(loginBtn) {
             emailLayout.error = null
             passwordLayout.error = null
             val emailValue = SessionManager.normalizeEmail(email.text?.toString())
@@ -48,7 +50,8 @@ class LoginActivity : AppCompatActivity() {
                 }
             }
         }
-        findViewById<android.view.View>(R.id.register_link).setOnClickListener {
+        val regLink = findViewById<android.view.View>(R.id.register_link)
+        ViewMotion.applySpringPress(regLink) {
             startActivity(Intent(this, RegisterActivity::class.java))
         }
     }

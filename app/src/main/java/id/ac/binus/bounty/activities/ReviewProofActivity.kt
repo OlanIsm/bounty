@@ -29,6 +29,7 @@ import id.ac.binus.bounty.utils.ActionConfirmation
 import id.ac.binus.bounty.utils.ChallengeDisplay
 import id.ac.binus.bounty.utils.ScreenInsets
 import id.ac.binus.bounty.utils.SessionManager
+import id.ac.binus.bounty.utils.ViewMotion
 
 class ReviewProofActivity : AppCompatActivity() {
     private lateinit var model: ReviewModel
@@ -43,8 +44,10 @@ class ReviewProofActivity : AppCompatActivity() {
         ScreenInsets.apply(this)
         model = ViewModelProvider(this)[ReviewModel::class.java]
         findViewById<MaterialToolbar>(R.id.review_toolbar).setNavigationOnClickListener { finish() }
-        findViewById<View>(R.id.review_retry).setOnClickListener { loadReview() }
-        findViewById<View>(R.id.review_photo_retry).setOnClickListener { loadReview() }
+        val retryBtn = findViewById<View>(R.id.review_retry)
+        ViewMotion.applySpringPress(retryBtn) { loadReview() }
+        val photoRetryBtn = findViewById<View>(R.id.review_photo_retry)
+        ViewMotion.applySpringPress(photoRetryBtn) { loadReview() }
         supportFragmentManager.setFragmentResultListener("confirm_approve", this) { _, data ->
             val session = SessionManager(applicationContext)
             val user = session.getCurrentUser()
@@ -56,8 +59,10 @@ class ReviewProofActivity : AppCompatActivity() {
             }
             model.review(proof, user.id, true)
         }
-        findViewById<View>(R.id.review_approve).setOnClickListener { confirmApproval() }
-        findViewById<View>(R.id.review_reject).setOnClickListener { review(false) }
+        val approveBtn = findViewById<View>(R.id.review_approve)
+        ViewMotion.applySpringPress(approveBtn) { confirmApproval() }
+        val rejectBtn = findViewById<View>(R.id.review_reject)
+        ViewMotion.applySpringPress(rejectBtn) { review(false) }
     }
 
     override fun onPostCreate(state: Bundle?) {
@@ -137,7 +142,9 @@ class ReviewProofActivity : AppCompatActivity() {
                             findViewById<TextView>(R.id.review_description).text = proof.description
                             ChallengeDisplay.bindStatus(findViewById(R.id.review_status), proof.status)
                             findViewById<View>(R.id.review_loading).visibility = View.GONE
-                            findViewById<View>(R.id.review_content).visibility = View.VISIBLE
+                            val content = findViewById<View>(R.id.review_content)
+                            content.visibility = View.VISIBLE
+                            ViewMotion.animateEntrance(content)
                             showImage(proof, current)
                             updateControls()
                         }.onFailure { error ->

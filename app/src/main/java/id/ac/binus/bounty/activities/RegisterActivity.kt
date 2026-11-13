@@ -9,6 +9,7 @@ import id.ac.binus.bounty.R
 import id.ac.binus.bounty.data.FirebaseAccountRepository
 import id.ac.binus.bounty.utils.ScreenInsets
 import id.ac.binus.bounty.utils.SessionManager
+import id.ac.binus.bounty.utils.ViewMotion
 
 class RegisterActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -25,7 +26,8 @@ class RegisterActivity : AppCompatActivity() {
         val nameLayout = findViewById<TextInputLayout>(R.id.name_layout)
         val emailLayout = findViewById<TextInputLayout>(R.id.email_layout)
         val passwordLayout = findViewById<TextInputLayout>(R.id.password_layout)
-        findViewById<android.view.View>(R.id.register_button).setOnClickListener {
+        val registerBtn = findViewById<android.view.View>(R.id.register_button)
+        ViewMotion.applySpringPress(registerBtn) {
             nameLayout.error = null
             emailLayout.error = null
             passwordLayout.error = null
@@ -45,7 +47,7 @@ class RegisterActivity : AppCompatActivity() {
                 passwordLayout.error = getString(R.string.weak_password)
                 valid = false
             }
-            if (!valid) return@setOnClickListener
+            if (!valid) return@applySpringPress
             setBusy(true)
             FirebaseAccountRepository.register(nameValue, emailValue, passwordValue) { result ->
                 runOnUiThread {
@@ -59,7 +61,8 @@ class RegisterActivity : AppCompatActivity() {
                 }
             }
         }
-        findViewById<android.view.View>(R.id.login_link).setOnClickListener { finish() }
+        val loginLink = findViewById<android.view.View>(R.id.login_link)
+        ViewMotion.applySpringPress(loginLink) { finish() }
     }
 
     private fun setBusy(busy: Boolean) {

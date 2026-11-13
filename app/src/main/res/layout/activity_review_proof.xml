@@ -1,51 +1,198 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/main" android:layout_width="match_parent" android:layout_height="match_parent"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/bounty_background"
     android:orientation="vertical">
-    <com.google.android.material.appbar.MaterialToolbar android:id="@+id/review_toolbar"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize" app:title="@string/review_proof_action"
-        app:navigationIcon="@drawable/ic_back" app:navigationContentDescription="@string/back_action" />
-    <com.google.android.material.progressindicator.LinearProgressIndicator android:id="@+id/review_loading"
-        android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:indeterminate="true" android:contentDescription="@string/loading_challenges" />
-    <ScrollView android:layout_width="match_parent" android:layout_height="0dp"
-        android:layout_weight="1" android:fillViewport="true" android:padding="16dp">
+
+    <com.google.android.material.appbar.MaterialToolbar
+        android:id="@+id/review_toolbar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:background="@color/bounty_surface"
+        android:elevation="1dp"
+        android:minHeight="?attr/actionBarSize"
+        app:title="@string/review_proof_action"
+        app:navigationIcon="@drawable/ic_back"
+        app:navigationContentDescription="@string/back_action" />
+
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/review_loading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:indeterminate="true"
+        android:contentDescription="@string/loading_challenges" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:fillViewport="true"
+        android:padding="16dp">
+
         <LinearLayout style="@style/BountyScreenContent">
-            <com.google.android.material.textview.MaterialTextView android:id="@+id/review_message"
-                android:accessibilityLiveRegion="polite" style="@style/BountyBody" android:visibility="gone" />
-            <com.google.android.material.button.MaterialButton android:id="@+id/review_retry"
-                style="@style/BountyButton" android:text="@string/retry_action" android:visibility="gone" />
-            <LinearLayout android:id="@+id/review_content" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:orientation="vertical" android:visibility="gone">
-                <com.google.android.material.textview.MaterialTextView android:id="@+id/review_title" style="@style/BountyHeading" />
-                <com.google.android.material.textview.MaterialTextView android:id="@+id/review_hunter"
-                    style="@style/BountyBody" android:layout_marginTop="16dp" />
-                <ImageView android:id="@+id/review_photo" android:layout_width="match_parent"
-                    android:layout_height="240dp" android:layout_marginTop="24dp"
-                    android:scaleType="fitCenter" android:contentDescription="@string/proof_photo_preview" />
-                <com.google.android.material.textview.MaterialTextView android:id="@+id/review_photo_error"
-                    style="@style/BountyBody" android:layout_marginTop="16dp" android:visibility="gone"
-                    android:text="@string/review_image_error" android:accessibilityLiveRegion="polite" />
-                <com.google.android.material.button.MaterialButton android:id="@+id/review_photo_retry"
-                    style="@style/BountyButton" android:text="@string/retry_action" android:visibility="gone" />
-                <com.google.android.material.textview.MaterialTextView style="@style/BountySection"
-                    android:text="@string/proof_description_label" android:layout_marginTop="24dp" />
-                <com.google.android.material.textview.MaterialTextView android:id="@+id/review_description"
-                    style="@style/BountyBody" android:layout_marginTop="8dp" />
-                <com.google.android.material.textview.MaterialTextView android:id="@+id/review_status"
-                    style="@style/BountyStatus" android:layout_marginTop="16dp" />
-                <com.google.android.material.progressindicator.LinearProgressIndicator android:id="@+id/review_saving"
-                    android:layout_width="match_parent" android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp" android:indeterminate="true" android:visibility="gone"
+
+            <TextView
+                android:id="@+id/review_message"
+                android:accessibilityLiveRegion="polite"
+                style="@style/BountyBody"
+                android:visibility="gone" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/review_retry"
+                style="@style/BountyButton"
+                android:text="@string/retry_action"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/review_content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:visibility="gone">
+
+                <!-- Challenge Context Banner (Stitch style) -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="@color/bounty_surface_container"
+                    app:cardBackgroundColor="@color/bounty_surface">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            style="@style/BountyCaption"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:textColor="@color/bounty_secondary"
+                            android:text="SUBMITTED — MENUNGGU PERSETUJUAN" />
+
+                        <TextView
+                            android:id="@+id/review_title"
+                            style="@style/BountyHeading"
+                            android:textSize="20sp"
+                            android:layout_marginTop="6dp" />
+
+                        <TextView
+                            android:id="@+id/review_hunter"
+                            style="@style/BountyBody"
+                            android:textSize="14sp"
+                            android:textColor="@color/bounty_text_secondary"
+                            android:layout_marginTop="8dp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <!-- Proof Preview Showcase Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="2dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="@color/bounty_surface_container"
+                    app:cardBackgroundColor="@color/bounty_surface">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="16dp">
+
+                        <TextView
+                            style="@style/BountySection"
+                            android:textSize="16sp"
+                            android:text="Foto Bukti Pelaksanaan" />
+
+                        <ImageView
+                            android:id="@+id/review_photo"
+                            android:layout_width="match_parent"
+                            android:layout_height="240dp"
+                            android:layout_marginTop="12dp"
+                            android:scaleType="centerCrop"
+                            android:background="@color/bounty_surface_container_low"
+                            android:contentDescription="@string/proof_photo_preview" />
+
+                        <TextView
+                            android:id="@+id/review_photo_error"
+                            style="@style/BountyCaption"
+                            android:layout_marginTop="12dp"
+                            android:visibility="gone"
+                            android:textColor="@color/bounty_error"
+                            android:text="@string/review_image_error"
+                            android:accessibilityLiveRegion="polite" />
+
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/review_photo_retry"
+                            style="@style/BountySecondaryButton"
+                            android:layout_marginTop="8dp"
+                            android:text="@string/retry_action"
+                            android:visibility="gone" />
+
+                        <!-- Hunter Note Bubble -->
+                        <TextView
+                            style="@style/BountySection"
+                            android:textSize="14sp"
+                            android:textColor="@color/bounty_text_secondary"
+                            android:text="Catatan Hunter:"
+                            android:layout_marginTop="16dp" />
+
+                        <TextView
+                            android:id="@+id/review_description"
+                            style="@style/BountyBody"
+                            android:layout_marginTop="6dp"
+                            android:background="@color/bounty_surface_container_low"
+                            android:padding="12dp" />
+
+                        <TextView
+                            android:id="@+id/review_status"
+                            style="@style/BountyStatus"
+                            android:textSize="11sp"
+                            android:layout_marginTop="16dp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.progressindicator.LinearProgressIndicator
+                    android:id="@+id/review_saving"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:indeterminate="true"
+                    android:visibility="gone"
                     android:contentDescription="@string/review_saving" />
-                <com.google.android.material.button.MaterialButton android:id="@+id/review_approve"
-                    style="@style/BountyButton" android:layout_marginTop="24dp"
-                    android:text="@string/approve_proof_action" android:enabled="false" />
-                <com.google.android.material.button.MaterialButton android:id="@+id/review_reject"
-                    style="@style/BountySecondaryButton" android:layout_marginTop="8dp"
-                    android:text="@string/reject_proof_action" android:enabled="false" />
+
+                <!-- Decision Action Dock -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:layout_marginTop="20dp">
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/review_approve"
+                        style="@style/BountyButton"
+                        android:backgroundTint="@color/bounty_tertiary"
+                        android:text="@string/approve_proof_action"
+                        android:enabled="false" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/review_reject"
+                        style="@style/BountySecondaryButton"
+                        android:strokeColor="@color/bounty_error"
+                        android:textColor="@color/bounty_error"
+                        android:layout_marginTop="10dp"
+                        android:text="@string/reject_proof_action"
+                        android:enabled="false" />
+                </LinearLayout>
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

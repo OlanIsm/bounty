@@ -20,6 +20,7 @@ import id.ac.binus.bounty.utils.ActionConfirmation
 import id.ac.binus.bounty.utils.ChallengeDisplay
 import id.ac.binus.bounty.utils.ScreenInsets
 import id.ac.binus.bounty.utils.SessionManager
+import id.ac.binus.bounty.utils.ViewMotion
 
 class ChallengeDetailActivity : AppCompatActivity() {
     private var request = 0
@@ -39,10 +40,11 @@ class ChallengeDetailActivity : AppCompatActivity() {
                 Snackbar.make(findViewById(R.id.main), R.string.accept_unavailable, Snackbar.LENGTH_LONG).show()
             }
         }
-        findViewById<View>(R.id.accept_button).setOnClickListener { view ->
+        val acceptBtn = findViewById<View>(R.id.accept_button)
+        ViewMotion.applySpringPress(acceptBtn) {
             val user = SessionManager(this).getCurrentUser()
-            val challenge = currentChallenge ?: return@setOnClickListener
-            if (!view.isEnabled || user == null) return@setOnClickListener
+            val challenge = currentChallenge ?: return@applySpringPress
+            if (!acceptBtn.isEnabled || user == null) return@applySpringPress
             val data = Bundle().apply {
                 putString("challenge", challenge.cloudId)
                 putString("actor", user.id)
@@ -53,12 +55,14 @@ class ChallengeDetailActivity : AppCompatActivity() {
                 getString(R.string.accept_action), data
             )
         }
-        findViewById<View>(R.id.submit_proof_button).setOnClickListener {
-            val id = currentChallenge?.cloudId ?: return@setOnClickListener
+        val submitProofBtn = findViewById<View>(R.id.submit_proof_button)
+        ViewMotion.applySpringPress(submitProofBtn) {
+            val id = currentChallenge?.cloudId ?: return@applySpringPress
             startActivity(Intent(this, SubmitProofActivity::class.java).putExtra(EXTRA_CLOUD_CHALLENGE_ID, id))
         }
-        findViewById<View>(R.id.review_proof_button).setOnClickListener {
-            val id = currentChallenge?.cloudId ?: return@setOnClickListener
+        val reviewProofBtn = findViewById<View>(R.id.review_proof_button)
+        ViewMotion.applySpringPress(reviewProofBtn) {
+            val id = currentChallenge?.cloudId ?: return@applySpringPress
             startActivity(Intent(this, ReviewProofActivity::class.java).putExtra(EXTRA_CLOUD_CHALLENGE_ID, id))
         }
         acceptModel.state.observe(this) { state ->
@@ -75,7 +79,8 @@ class ChallengeDetailActivity : AppCompatActivity() {
             }
         }
         findViewById<MaterialToolbar>(R.id.detail_toolbar).setNavigationOnClickListener { finish() }
-        findViewById<View>(R.id.detail_retry).setOnClickListener { loadChallenge() }
+        val retryBtn = findViewById<View>(R.id.detail_retry)
+        ViewMotion.applySpringPress(retryBtn) { loadChallenge() }
     }
 
     override fun onStart() {
@@ -114,6 +119,7 @@ class ChallengeDetailActivity : AppCompatActivity() {
                 content.findViewById<TextView>(R.id.challenge_description).text = challenge.description
                 findViewById<View>(R.id.detail_loading).visibility = View.GONE
                 content.visibility = View.VISIBLE
+                ViewMotion.animateEntrance(content)
             }.onFailure { error ->
                 Log.e("BountyDetail", "Unable to load challenge $id", error)
                 showMessage(R.string.challenge_load_error, true)

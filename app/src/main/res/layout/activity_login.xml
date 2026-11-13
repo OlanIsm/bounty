@@ -1,45 +1,115 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:id="@+id/main" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:fillViewport="true" android:padding="16dp">
-    <LinearLayout android:layout_width="match_parent" android:layout_height="wrap_content"
-        android:orientation="vertical" android:paddingTop="32dp" android:paddingBottom="24dp">
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/app_title" style="@style/BountyHeading" android:text="@string/login_title" />
-        <com.google.android.material.textview.MaterialTextView
-            style="@style/BountyBody" android:layout_marginTop="16dp" android:text="@string/firebase_auth_note" />
-        <com.google.android.material.textview.MaterialTextView
-            style="@style/BountyBody" android:layout_marginTop="16dp"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/bounty_background"
+    android:padding="20dp">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_vertical"
+        android:paddingTop="24dp"
+        android:paddingBottom="24dp">
+
+        <TextView
+            android:id="@+id/app_title"
+            style="@style/BountyHeading"
+            android:textSize="32sp"
+            android:textStyle="bold"
+            android:textColor="@color/bounty_primary"
+            android:letterSpacing="-0.02"
+            android:text="@string/login_title" />
+
+        <TextView
+            style="@style/BountyBody"
+            android:layout_marginTop="8dp"
+            android:textSize="14sp"
+            android:textColor="@color/bounty_text_secondary"
+            android:text="@string/firebase_auth_note" />
+
+        <TextView
+            style="@style/BountyCaption"
+            android:layout_marginTop="4dp"
+            android:textSize="12sp"
+            android:textColor="@color/bounty_text_secondary"
             android:text="@string/login_account_note" />
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/email_layout" style="@style/BountyTextInput"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="24dp" android:hint="@string/email_label">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/email_input" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:autofillHints="emailAddress"
-                android:imeOptions="actionDone" android:inputType="textEmailAddress"
-                android:maxLength="254" android:singleLine="true" />
-        </com.google.android.material.textfield.TextInputLayout>
-        <com.google.android.material.textfield.TextInputLayout
-            android:id="@+id/password_layout" style="@style/BountyTextInput"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="16dp" android:hint="@string/password_label"
-            app:endIconMode="password_toggle">
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/password_input" android:layout_width="match_parent"
-                android:layout_height="wrap_content" android:autofillHints="password"
-                android:imeOptions="actionDone" android:inputType="textPassword"
-                android:maxLength="128" android:singleLine="true" />
-        </com.google.android.material.textfield.TextInputLayout>
+
+        <!-- Login Card Form -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/bounty_surface_container"
+            app:cardBackgroundColor="@color/bounty_surface">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/email_layout"
+                    style="@style/BountyTextInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="@string/email_label">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/email_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:autofillHints="emailAddress"
+                        android:imeOptions="actionNext"
+                        android:inputType="textEmailAddress"
+                        android:maxLength="254"
+                        android:singleLine="true" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/password_layout"
+                    style="@style/BountyTextInput"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:hint="@string/password_label"
+                    app:endIconMode="password_toggle">
+
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/password_input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:autofillHints="password"
+                        android:imeOptions="actionDone"
+                        android:inputType="textPassword"
+                        android:maxLength="128"
+                        android:singleLine="true" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/login_button"
+                    style="@style/BountyButton"
+                    android:layout_marginTop="24dp"
+                    android:text="@string/login_action" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/login_button" style="@style/BountyButton"
-            android:layout_marginTop="24dp" android:text="@string/login_action" />
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/register_link" style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="match_parent" android:layout_height="wrap_content"
-            android:layout_marginTop="8dp" android:minHeight="48dp"
-            android:text="@string/register_link" android:textColor="?attr/colorOnSurface" />
+            android:id="@+id/register_link"
+            style="@style/Widget.Material3.Button.TextButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:minHeight="48dp"
+            android:text="@string/register_link"
+            android:textColor="@color/bounty_primary" />
     </LinearLayout>
 </ScrollView>
