@@ -11,6 +11,7 @@ import java.util.function.Consumer
 import id.ac.binus.bounty.R
 import id.ac.binus.bounty.models.Challenge
 import id.ac.binus.bounty.utils.ChallengeDisplay
+import id.ac.binus.bounty.utils.ViewMotion
 
 class ChallengeAdapter(private val onOpen: Consumer<Challenge>) :
     ListAdapter<Challenge, ChallengeAdapter.Holder>(DIFF_CALLBACK) {
@@ -23,8 +24,18 @@ class ChallengeAdapter(private val onOpen: Consumer<Challenge>) :
         val challenge = getItem(position)
         ChallengeDisplay.bind(holder.itemView, challenge)
         holder.itemView.findViewById<TextView>(R.id.challenge_description).text = challenge.description
-        holder.itemView.setOnClickListener { onOpen.accept(challenge) }
-        holder.itemView.findViewById<View>(R.id.view_challenge).setOnClickListener { onOpen.accept(challenge) }
+
+        // Apple & Emil Kowalski tactile touch interactions
+        ViewMotion.applySpringPress(holder.itemView) {
+            onOpen.accept(challenge)
+        }
+        val btn = holder.itemView.findViewById<View>(R.id.view_challenge)
+        ViewMotion.applySpringPress(btn) {
+            onOpen.accept(challenge)
+        }
+
+        // Fluid entrance animation
+        ViewMotion.animateEntrance(holder.itemView, (position.coerceAtMost(5) * 35).toLong())
     }
 
     class Holder(view: View) : RecyclerView.ViewHolder(view)

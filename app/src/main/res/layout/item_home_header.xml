@@ -1,13 +1,62 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:layout_width="match_parent" android:layout_height="wrap_content" android:orientation="vertical">
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/welcome_text" style="@style/BountyHeading" />
-        <com.google.android.material.textview.MaterialTextView
-            style="@style/BountyBody" android:layout_marginTop="8dp"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:paddingBottom="8dp">
+
+    <!-- Greeting Section -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingTop="8dp">
+
+        <TextView
+            android:id="@+id/welcome_text"
+            style="@style/BountyHeading"
+            android:textSize="26sp"
+            android:textStyle="bold"
+            android:letterSpacing="-0.02" />
+
+        <TextView
+            style="@style/BountyBody"
+            android:layout_marginTop="6dp"
+            android:textSize="14sp"
+            android:textColor="@color/bounty_text_secondary"
             android:text="@string/home_description" />
-        <include layout="@layout/component_demo_balance" />
-        <com.google.android.material.textview.MaterialTextView
-            style="@style/BountySection" android:layout_marginTop="24dp" android:layout_marginBottom="12dp"
+    </LinearLayout>
+
+    <!-- Demo Balance Highlight Banner -->
+    <include layout="@layout/component_demo_balance" />
+
+    <!-- Section Title: Available Challenges -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical"
+        android:layout_marginTop="28dp"
+        android:layout_marginBottom="12dp">
+
+        <TextView
+            style="@style/BountySection"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:textSize="20sp"
+            android:textStyle="bold"
             android:text="@string/available_challenges" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:background="@drawable/bg_reward"
+            android:backgroundTint="@color/bounty_primary_fixed"
+            android:textColor="@color/bounty_on_primary_fixed"
+            android:text="Feed Aktif"
+            android:textSize="11sp"
+            android:textStyle="bold"
+            android:paddingHorizontal="10dp"
+            android:paddingVertical="4dp" />
+    </LinearLayout>
 </LinearLayout>

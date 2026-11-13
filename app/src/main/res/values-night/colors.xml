@@ -1,17 +1,30 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="bounty_background">#181818</color>
-    <color name="bounty_surface">#202020</color>
-    <color name="bounty_text">#F7F7F7</color>
-    <color name="status_open_bg">#49321B</color>
-    <color name="status_open_fg">#FFD18A</color>
-    <color name="status_accepted_bg">#1C3252</color>
-    <color name="status_accepted_fg">#B3D1FF</color>
-    <color name="status_submitted_bg">#392344</color>
-    <color name="status_submitted_fg">#EDBFFF</color>
-    <color name="status_completed_bg">#1C3829</color>
-    <color name="status_completed_fg">#A6E9BD</color>
-    <color name="status_rejected_bg">#482525</color>
-    <color name="status_rejected_fg">#FFBABA</color>
-    <color name="status_neutral_bg">#32383B</color>
-    <color name="status_neutral_fg">#DFE5E8</color>
+    <!-- Stitch Vibrant Kinetic M3 Dark Palette -->
+    <color name="bounty_background">#131B2E</color>
+    <color name="bounty_surface">#283044</color>
+    <color name="bounty_surface_container_lowest">#1A2238</color>
+    <color name="bounty_surface_container_low">#202940</color>
+    <color name="bounty_surface_container">#283044</color>
+    <color name="bounty_surface_container_high">#323B52</color>
+    <color name="bounty_surface_container_highest">#3D4660</color>
+
+    <color name="bounty_text">#FAF8FF</color>
+    <color name="bounty_text_secondary">#C7C4D7</color>
+    <color name="bounty_outline">#767586</color>
+    <color name="bounty_outline_variant">#464554</color>
+
+    <!-- Status Badges Dark -->
+    <color name="status_open_bg">#00452E</color>
+    <color name="status_open_fg">#6FFBBE</color>
+    <color name="status_accepted_bg">#2F2EBE</color>
+    <color name="status_accepted_fg">#E1E0FF</color>
+    <color name="status_submitted_bg">#4E2E00</color>
+    <color name="status_submitted_fg">#FFDDB8</color>
+    <color name="status_completed_bg">#00452E</color>
+    <color name="status_completed_fg">#6FFBBE</color>
+    <color name="status_rejected_bg">#601414</color>
+    <color name="status_rejected_fg">#FFDAD6</color>
+    <color name="status_neutral_bg">#323B52</color>
+    <color name="status_neutral_fg">#C7C4D7</color>
 </resources>

@@ -1,28 +1,63 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/my_challenges_screen" android:layout_width="match_parent"
-    android:layout_height="match_parent" android:orientation="vertical"
-    android:paddingHorizontal="16dp" android:paddingTop="16dp">
-        <com.google.android.material.textview.MaterialTextView
-            style="@style/BountyHeading" android:text="@string/my_challenges_title" />
-        <com.google.android.material.textview.MaterialTextView
-            style="@style/BountyBody" android:layout_marginTop="8dp"
-            android:text="@string/my_challenges_description" />
+    android:id="@+id/my_challenges_screen"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bounty_background"
+    android:paddingHorizontal="16dp"
+    android:paddingTop="16dp">
+
+    <TextView
+        style="@style/BountyHeading"
+        android:textSize="26sp"
+        android:textStyle="bold"
+        android:letterSpacing="-0.02"
+        android:text="@string/my_challenges_title" />
+
+    <TextView
+        style="@style/BountyBody"
+        android:layout_marginTop="6dp"
+        android:textSize="14sp"
+        android:textColor="@color/bounty_text_secondary"
+        android:text="@string/my_challenges_description" />
+
     <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/feed_loading" android:layout_width="match_parent"
-        android:layout_height="wrap_content" android:indeterminate="true"
+        android:id="@+id/feed_loading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:indeterminate="true"
         android:contentDescription="@string/loading_challenges" />
-    <com.google.android.material.textview.MaterialTextView
-        android:id="@+id/feed_message" android:accessibilityLiveRegion="polite" style="@style/BountyBody"
-        android:layout_marginTop="16dp" android:visibility="gone" />
+
+    <TextView
+        android:id="@+id/feed_message"
+        android:accessibilityLiveRegion="polite"
+        style="@style/BountyBody"
+        android:layout_marginTop="20dp"
+        android:gravity="center"
+        android:visibility="gone" />
+
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/feed_retry" style="@style/BountyButton"
-        android:text="@string/retry_action" android:visibility="gone" />
+        android:id="@+id/feed_retry"
+        style="@style/BountyButton"
+        android:layout_marginTop="16dp"
+        android:text="@string/retry_action"
+        android:visibility="gone" />
+
     <com.google.android.material.button.MaterialButton
-        android:id="@+id/empty_create_challenge" style="@style/BountyButton"
-        android:text="@string/create_first_challenge" android:visibility="gone" />
+        android:id="@+id/empty_create_challenge"
+        style="@style/BountyButton"
+        android:layout_marginTop="20dp"
+        android:text="@string/create_first_challenge"
+        android:visibility="gone" />
+
     <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/challenge_list" android:layout_width="match_parent"
-        android:layout_height="0dp" android:layout_weight="1"
-        android:clipToPadding="false" android:paddingBottom="16dp" />
+        android:id="@+id/challenge_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="16dp"
+        android:clipToPadding="false"
+        android:paddingBottom="24dp" />
 </LinearLayout>

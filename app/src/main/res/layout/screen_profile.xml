@@ -1,33 +1,162 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/profile_screen" style="@style/BountyScreen">
-    <LinearLayout style="@style/BountyScreenContent">
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/profile_name" style="@style/BountyHeading" />
-        <com.google.android.material.textview.MaterialTextView
-            android:id="@+id/user_email" style="@style/BountyBody"
-            android:layout_marginTop="8dp" android:textIsSelectable="true" />
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/profile_screen"
+    style="@style/BountyScreen"
+    android:background="@color/bounty_background">
+
+    <LinearLayout
+        style="@style/BountyScreenContent"
+        android:paddingBottom="48dp">
+
+        <!-- Profile Header Card (Stitch style) -->
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="24dp"
+            app:cardElevation="2dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/bounty_surface_container"
+            app:cardBackgroundColor="@color/bounty_surface">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <!-- Avatar Ring -->
+                    <ImageView
+                        android:id="@+id/profile_avatar_view"
+                        android:layout_width="64dp"
+                        android:layout_height="64dp"
+                        android:src="@drawable/ic_avatar"
+                        android:contentDescription="@null"
+                        android:importantForAccessibility="no" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="16dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/profile_name"
+                            style="@style/BountyHeading"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:letterSpacing="-0.01" />
+
+                        <TextView
+                            android:id="@+id/user_email"
+                            style="@style/BountyBody"
+                            android:textSize="13sp"
+                            android:textColor="@color/bounty_text_secondary"
+                            android:layout_marginTop="2dp"
+                            android:textIsSelectable="true" />
+
+                        <!-- Role / Level Tag -->
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="6dp"
+                            android:background="@drawable/bg_reward"
+                            android:backgroundTint="@color/bounty_primary_fixed"
+                            android:textColor="@color/bounty_on_primary_fixed"
+                            android:text="Hunter &amp; Creator"
+                            android:textSize="11sp"
+                            android:textStyle="bold"
+                            android:paddingHorizontal="10dp"
+                            android:paddingVertical="3dp" />
+                    </LinearLayout>
+                </LinearLayout>
+
+                <!-- Credentials Info Container -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:background="@color/bounty_surface_container_low"
+                    android:paddingHorizontal="14dp"
+                    android:paddingVertical="10dp"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        style="@style/BountyCaption"
+                        android:layout_width="0dp"
+                        android:layout_weight="1"
+                        android:textSize="12sp"
+                        android:textColor="@color/bounty_text_secondary"
+                        android:text="@string/signed_in_note" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- Big Demo Balance Highlight -->
         <include layout="@layout/component_demo_balance" />
-        <com.google.android.material.textview.MaterialTextView
-            style="@style/BountyBody" android:layout_marginTop="24dp"
-            android:text="@string/signed_in_note" />
+
+        <!-- External Demo Users Section -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:layout_marginTop="28dp">
+
+            <TextView
+                style="@style/BountySection"
+                android:text="@string/demo_users_title" />
+
+            <TextView
+                style="@style/BountyCaption"
+                android:layout_marginTop="4dp"
+                android:text="@string/demo_users_note" />
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/demo_users_loading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:indeterminate="true"
+                android:contentDescription="@string/demo_users_loading" />
+
+            <TextView
+                android:id="@+id/demo_users_error"
+                android:accessibilityLiveRegion="polite"
+                style="@style/BountyBody"
+                android:layout_marginTop="16dp"
+                android:text="@string/demo_users_error"
+                android:visibility="gone" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/demo_users_retry"
+                style="@style/BountyButton"
+                android:layout_marginTop="12dp"
+                android:text="@string/retry_action"
+                android:visibility="gone" />
+
+            <LinearLayout
+                android:id="@+id/demo_users_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:layout_marginTop="8dp" />
+        </LinearLayout>
+
+        <!-- Logout Action Button -->
         <com.google.android.material.button.MaterialButton
-            android:id="@+id/logout_button" style="@style/BountyButton"
-            android:layout_marginTop="32dp" android:text="@string/logout_action" />
-        <com.google.android.material.textview.MaterialTextView style="@style/BountySection"
-            android:layout_marginTop="32dp" android:text="@string/demo_users_title" />
-        <com.google.android.material.textview.MaterialTextView style="@style/BountyCaption"
-            android:layout_marginTop="8dp" android:text="@string/demo_users_note" />
-        <com.google.android.material.progressindicator.LinearProgressIndicator
-            android:id="@+id/demo_users_loading" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:layout_marginTop="16dp"
-            android:indeterminate="true" android:contentDescription="@string/demo_users_loading" />
-        <com.google.android.material.textview.MaterialTextView android:id="@+id/demo_users_error"
-            android:accessibilityLiveRegion="polite" style="@style/BountyBody" android:layout_marginTop="16dp"
-            android:text="@string/demo_users_error" android:visibility="gone" />
-        <com.google.android.material.button.MaterialButton android:id="@+id/demo_users_retry"
-            style="@style/BountyButton" android:text="@string/retry_action" android:visibility="gone" />
-        <LinearLayout android:id="@+id/demo_users_list" android:layout_width="match_parent"
-            android:layout_height="wrap_content" android:orientation="vertical" />
+            android:id="@+id/logout_button"
+            style="@style/BountyButton"
+            android:backgroundTint="@color/bounty_error_container"
+            android:textColor="@color/bounty_on_error_container"
+            android:layout_marginTop="32dp"
+            android:text="@string/logout_action" />
     </LinearLayout>
 </ScrollView>

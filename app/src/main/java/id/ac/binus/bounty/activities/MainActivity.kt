@@ -43,6 +43,7 @@ import id.ac.binus.bounty.network.RandomUserResponse
 import id.ac.binus.bounty.utils.ChallengeDisplay
 import id.ac.binus.bounty.utils.ScreenInsets
 import id.ac.binus.bounty.utils.SessionManager
+import id.ac.binus.bounty.utils.ViewMotion
 import retrofit2.Call
 import retrofit2.Callback
 import retrofit2.Response
@@ -156,25 +157,30 @@ class MainActivity : AppCompatActivity() {
             if (createScreen == null) {
                 createScreen = layoutInflater.inflate(layout, content, false).also { screen ->
                     createState?.let(screen::restoreHierarchyState)
-                    screen.findViewById<View>(R.id.publish_button).setOnClickListener { publishChallenge() }
+                    val pubBtn = screen.findViewById<View>(R.id.publish_button)
+                    ViewMotion.applySpringPress(pubBtn) { publishChallenge() }
                     screen.findViewById<TextInputLayout>(R.id.create_deadline_layout)
                         .setEndIconOnClickListener { chooseDeadline() }
                 }
             }
             content.addView(createScreen)
+            ViewMotion.animateEntrance(createScreen!!)
             updatePublishState()
         } else {
-            layoutInflater.inflate(layout, content, true)
+            val inflated = layoutInflater.inflate(layout, content, true)
+            ViewMotion.animateEntrance(inflated)
         }
         findViewById<MaterialToolbar>(R.id.main_toolbar).setTitle(title)
         selectedDestination = destination
         backToHome.isEnabled = destination != R.id.nav_home
         val user = SessionManager(this).getCurrentUser()
         if (destination == R.id.nav_profile) {
-            findViewById<View>(R.id.demo_users_retry).setOnClickListener { demoUsersModel.load(ApiClient.getApi()) }
+            val retryUsers = findViewById<View>(R.id.demo_users_retry)
+            ViewMotion.applySpringPress(retryUsers) { demoUsersModel.load(ApiClient.getApi()) }
             if (demoUsersModel.state.value == null) demoUsersModel.load(ApiClient.getApi())
             bindDemoUsers()
-            findViewById<View>(R.id.logout_button).setOnClickListener {
+            val logoutBtn = findViewById<View>(R.id.logout_button)
+            ViewMotion.applySpringPress(logoutBtn) {
                 SessionManager(this).logout()
                 openLogin()
             }
@@ -190,9 +196,11 @@ class MainActivity : AppCompatActivity() {
                 homeHeaderAdapter = HomeHeaderAdapter(user)
                 list.adapter = ConcatAdapter(homeHeaderAdapter!!, feedAdapter!!)
             } else list.adapter = feedAdapter
-            findViewById<View>(R.id.feed_retry).setOnClickListener { loadFeed() }
+            val retryFeed = findViewById<View>(R.id.feed_retry)
+            ViewMotion.applySpringPress(retryFeed) { loadFeed() }
             if (destination == R.id.nav_my_challenges) {
-                findViewById<View>(R.id.empty_create_challenge).setOnClickListener {
+                val createFirst = findViewById<View>(R.id.empty_create_challenge)
+                ViewMotion.applySpringPress(createFirst) {
                     navigation?.selectedItemId = R.id.nav_create
                 }
             }

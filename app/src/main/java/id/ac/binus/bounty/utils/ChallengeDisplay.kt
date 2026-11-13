@@ -32,7 +32,7 @@ object ChallengeDisplay {
             else -> R.color.status_neutral_bg to R.color.status_neutral_fg
         }
         badge.background = GradientDrawable().apply {
-            cornerRadius = 8 * badge.resources.displayMetrics.density
+            cornerRadius = 50 * badge.resources.displayMetrics.density
             setColor(ContextCompat.getColor(badge.context, colors.first))
         }
         badge.setTextColor(ContextCompat.getColor(badge.context, colors.second))
