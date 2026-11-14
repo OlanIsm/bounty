@@ -27,6 +27,11 @@
     <string name="challenge_not_found">Challenge tidak ditemukan atau sudah dihapus.</string>
     <string name="back_action">Kembali</string>
     <string name="no_my_challenges">Belum ada challenge kamu. Jadilah yang pertama membuat challenge!</string>
+    <string name="no_other_challenges">Belum ada tantangan dari orang lain.</string>
+    <string name="no_search_results">Tidak ada tantangan yang cocok dengan kata kunci.</string>
+    <string name="tab_own_challenges">Tantangan Saya</string>
+    <string name="tab_other_challenges">Orang Lain</string>
+    <string name="search_challenges_hint">Cari tantangan...</string>
     <string name="create_first_challenge">Buat challenge pertama</string>
     <string name="my_challenges_description">Challenge yang kamu buat atau terima akan tampil di sini.</string>
     <string name="create_challenge_title">Buat challenge baru</string>

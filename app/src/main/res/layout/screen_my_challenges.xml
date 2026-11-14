@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/my_challenges_screen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -21,6 +22,85 @@
         android:textSize="14sp"
         android:textColor="@color/bounty_text_secondary"
         android:text="@string/my_challenges_description" />
+
+    <!-- Own vs Other Segmented Filter -->
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/challenge_toggle_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_marginTop="14dp"
+        app:singleSelection="true"
+        app:selectionRequired="true"
+        app:checkedButton="@id/toggle_own">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/toggle_own"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:text="@string/tab_own_challenges"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:backgroundTint="@color/toggle_button_bg"
+            android:textColor="@color/toggle_button_text"
+            app:strokeColor="@color/toggle_button_stroke"
+            app:strokeWidth="1dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/toggle_other"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:text="@string/tab_other_challenges"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:backgroundTint="@color/toggle_button_bg"
+            android:textColor="@color/toggle_button_text"
+            app:strokeColor="@color/toggle_button_stroke"
+            app:strokeWidth="1dp" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <!-- Full-width Search Bar -->
+    <com.google.android.material.textfield.TextInputLayout
+        android:id="@+id/challenge_search_layout"
+        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        android:layout_marginTop="10dp"
+        app:boxCornerRadiusTopStart="14dp"
+        app:boxCornerRadiusTopEnd="14dp"
+        app:boxCornerRadiusBottomStart="14dp"
+        app:boxCornerRadiusBottomEnd="14dp"
+        app:boxStrokeColor="@color/bounty_primary"
+        app:boxStrokeWidth="1dp"
+        app:boxStrokeWidthFocused="1.5dp"
+        app:startIconDrawable="@drawable/ic_search"
+        app:startIconTint="@color/bounty_text_secondary"
+        app:endIconMode="clear_text"
+        app:hintEnabled="false">
+
+        <com.google.android.material.textfield.TextInputEditText
+            android:id="@+id/challenge_search_input"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:paddingVertical="10dp"
+            android:paddingHorizontal="12dp"
+            android:hint="@string/search_challenges_hint"
+            android:imeOptions="actionSearch"
+            android:inputType="text"
+            android:maxLines="1"
+            android:textColor="?attr/colorOnSurface"
+            android:textColorHint="@color/bounty_text_secondary"
+            android:textSize="14sp" />
+    </com.google.android.material.textfield.TextInputLayout>
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/feed_loading"

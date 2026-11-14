@@ -26,9 +26,11 @@ import androidx.recyclerview.widget.ConcatAdapter
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
+import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
 import com.google.android.material.button.MaterialButton
+import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
@@ -58,6 +60,9 @@ class MainActivity : AppCompatActivity() {
     private var feedAdapter: ChallengeAdapter? = null
     private var homeHeaderAdapter: HomeHeaderAdapter? = null
     private var balanceRequest = 0
+    private var myChallengesRawList: List<Challenge> = emptyList()
+    private var isMyChallengesOwnSelected: Boolean = true
+    private var myChallengesSearchQuery: String = ""
     private var createScreen: View? = null
     private var createState: SparseArray<Parcelable>? = null
     private lateinit var publishModel: PublishModel
@@ -217,6 +222,20 @@ class MainActivity : AppCompatActivity() {
                 ViewMotion.applySpringPress(createFirst) {
                     navigation?.selectedItemId = R.id.nav_create
                 }
+                val toggleGroup = findViewById<MaterialButtonToggleGroup>(R.id.challenge_toggle_group)
+                toggleGroup?.check(if (isMyChallengesOwnSelected) R.id.toggle_own else R.id.toggle_other)
+                toggleGroup?.addOnButtonCheckedListener { _, checkedId, isChecked ->
+                    if (isChecked) {
+                        isMyChallengesOwnSelected = (checkedId == R.id.toggle_own)
+                        applyMyChallengesFilter()
+                    }
+                }
+                val searchInput = findViewById<TextInputEditText>(R.id.challenge_search_input)
+                searchInput?.setText(myChallengesSearchQuery)
+                searchInput?.doAfterTextChanged { text ->
+                    myChallengesSearchQuery = text?.toString().orEmpty()
+                    applyMyChallengesFilter()
+                }
             }
             if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) loadFeed()
         }
@@ -301,7 +320,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun loadFeed() {
         val screenId = if (selectedDestination == R.id.nav_my_challenges) R.id.my_challenges_screen else R.id.home_screen
-        val mine = selectedDestination == R.id.nav_my_challenges
+        val isMyChallenges = selectedDestination == R.id.nav_my_challenges
         val user = SessionManager(this).getCurrentUser() ?: return
         val home = findViewById<View>(screenId) ?: return
         val request = ++feedRequest
@@ -309,46 +328,85 @@ class MainActivity : AppCompatActivity() {
         home.findViewById<View>(R.id.feed_message)?.visibility = View.GONE
         home.findViewById<View>(R.id.feed_retry).visibility = View.GONE
         home.findViewById<View>(R.id.empty_create_challenge)?.visibility = View.GONE
-        if (!mine) {
+        if (!isMyChallenges) {
             homeHeaderAdapter?.isEmpty = false
             homeHeaderAdapter?.errorMessage = null
         }
-        FirebaseBountyRepository.loadChallenges(user.id, mine) { result ->
+        FirebaseBountyRepository.loadChallenges(user.id, false) { result ->
             if (isDestroyed || isFinishing || request != feedRequest || findViewById<View>(screenId) !== home) return@loadChallenges
             val list = home.findViewById<RecyclerView>(R.id.challenge_list)
             home.findViewById<View>(R.id.feed_loading).visibility = View.GONE
             if (result.isSuccess) {
                 val challenges = result.getOrThrow()
-                feedAdapter?.submitList(challenges)
-                if (mine) {
-                    list.visibility = if (challenges.isEmpty()) View.GONE else View.VISIBLE
-                    home.findViewById<TextView>(R.id.feed_message)?.apply {
-                        setText(R.string.no_my_challenges)
-                        visibility = if (challenges.isEmpty()) View.VISIBLE else View.GONE
-                    }
-                    home.findViewById<View>(R.id.empty_create_challenge)?.visibility =
-                        if (challenges.isEmpty()) View.VISIBLE else View.GONE
+                if (isMyChallenges) {
+                    myChallengesRawList = challenges
+                    applyMyChallengesFilter()
                 } else {
+                    feedAdapter?.submitList(challenges)
                     list.visibility = View.VISIBLE
                     homeHeaderAdapter?.isEmpty = challenges.isEmpty()
                 }
             } else {
                 Log.e("BountyFeed", "Unable to load challenges", result.exceptionOrNull())
+                myChallengesRawList = emptyList()
                 feedAdapter?.submitList(emptyList())
-                if (mine) {
-                    list.visibility = View.GONE
-                    home.findViewById<TextView>(R.id.feed_message)?.apply {
-                        setText(R.string.challenge_load_error)
-                        visibility = View.VISIBLE
-                    }
-                    home.findViewById<View>(R.id.feed_retry).visibility = View.VISIBLE
-                } else {
-                    list.visibility = View.VISIBLE
+                list.visibility = View.GONE
+                home.findViewById<TextView>(R.id.feed_message)?.apply {
+                    setText(R.string.challenge_load_error)
+                    visibility = View.VISIBLE
+                }
+                home.findViewById<View>(R.id.feed_retry).visibility = View.VISIBLE
+                if (!isMyChallenges) {
                     homeHeaderAdapter?.errorMessage = getString(R.string.challenge_load_error)
-                    home.findViewById<View>(R.id.feed_retry).visibility = View.VISIBLE
                 }
                 showSnackbar(R.string.challenge_load_error)
             }
+        }
+    }
+
+    private fun applyMyChallengesFilter() {
+        if (selectedDestination != R.id.nav_my_challenges) return
+        val screen = findViewById<View>(R.id.my_challenges_screen) ?: return
+        val user = SessionManager(this).getCurrentUser() ?: return
+        val list = screen.findViewById<RecyclerView>(R.id.challenge_list)
+        val feedMessage = screen.findViewById<TextView>(R.id.feed_message)
+        val emptyCreate = screen.findViewById<View>(R.id.empty_create_challenge)
+
+        val baseList = if (isMyChallengesOwnSelected) {
+            myChallengesRawList.filter { it.creatorId == user.id || it.participantId == user.id }
+        } else {
+            myChallengesRawList.filter { it.creatorId != user.id }
+        }
+
+        val query = myChallengesSearchQuery.trim()
+        val filtered = if (query.isEmpty()) {
+            baseList
+        } else {
+            baseList.filter { challenge ->
+                challenge.title.contains(query, ignoreCase = true) ||
+                challenge.description.contains(query, ignoreCase = true)
+            }
+        }
+
+        feedAdapter?.submitList(filtered)
+
+        if (filtered.isEmpty()) {
+            list.visibility = View.GONE
+            feedMessage?.visibility = View.VISIBLE
+            if (query.isNotEmpty()) {
+                feedMessage?.text = getString(R.string.no_search_results)
+                emptyCreate?.visibility = View.GONE
+            } else if (isMyChallengesOwnSelected) {
+                feedMessage?.text = getString(R.string.no_my_challenges)
+                emptyCreate?.visibility = View.VISIBLE
+            } else {
+                feedMessage?.text = getString(R.string.no_other_challenges)
+                emptyCreate?.visibility = View.GONE
+            }
+        } else {
+            list.visibility = View.VISIBLE
+            feedMessage?.visibility = View.GONE
+            emptyCreate?.visibility = View.GONE
         }
     }
 
