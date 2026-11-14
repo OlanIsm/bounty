@@ -1,12 +1,12 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
     <item
         android:id="@+id/nav_home"
-        android:icon="@drawable/ic_nav_feed"
-        android:title="Feed" />
+        android:icon="@drawable/ic_nav_home"
+        android:title="Home" />
     <item
         android:id="@+id/nav_my_challenges"
         android:icon="@drawable/ic_nav_challenges"
-        android:title="Tantangan" />
+        android:title="Challenge" />
     <item
         android:id="@+id/nav_create"
         android:icon="@drawable/ic_nav_create_fab"
@@ -14,9 +14,9 @@
     <item
         android:id="@+id/nav_leaderboard"
         android:icon="@drawable/ic_nav_leaderboard"
-        android:title="Peringkat" />
+        android:title="Leaderboard" />
     <item
         android:id="@+id/nav_profile"
         android:icon="@drawable/ic_nav_profile"
-        android:title="Profil" />
+        android:title="Profile" />
 </menu>

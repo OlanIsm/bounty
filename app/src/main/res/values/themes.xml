@@ -108,6 +108,18 @@
         <item name="android:color">@android:color/transparent</item>
     </style>
 
+    <style name="BountyNavigationLabelActive" parent="TextAppearance.Material3.LabelSmall">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
+    <style name="BountyNavigationLabelInactive" parent="TextAppearance.Material3.LabelSmall">
+        <item name="android:textSize">11sp</item>
+        <item name="android:textStyle">normal</item>
+        <item name="android:includeFontPadding">false</item>
+    </style>
+
     <style name="BountyCaption" parent="BountyBody">
         <item name="android:textSize">13sp</item>
         <item name="android:textColor">@color/bounty_text_secondary</item>

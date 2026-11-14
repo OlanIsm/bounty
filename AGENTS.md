@@ -1,6 +1,11 @@
 USE PONYTAIL, CAVEMAN skills before executing anything or even talk
+USE emilkowalski design skill before making any layout or design changes
 always push to github with detailed commit messages
 if the task took longer than usual, divide the task and push to github first then push the 2nd one
+
+
+READ BELOW IF AND ONLY IF DOING CRUCIAL CODE CHANGES (SUCH AS REFACTORING, ADDING FEATURE ,ETC)
+U CAN SKIP BELOW INSTRUCTION WHEN ONLY MAKING LAYOUT CHANGES OR DESIGN (u dont need to read all docs,nor test check just edit layout or the code)
 
 # Bounty Agent Instructions
 

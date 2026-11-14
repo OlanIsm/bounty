@@ -84,27 +84,22 @@ class MainActivity : AppCompatActivity() {
         }
         onBackPressedDispatcher.addCallback(this, backToHome)
         val nav = navigation ?: return
-        nav.itemIconTintList = null
+        setupStitchNavigation(nav)
         nav.setOnItemSelectedListener { item ->
             if (item.itemId == R.id.nav_leaderboard) {
                 showSnackbar(R.string.leaderboard_soon)
                 false
             } else {
-                showScreen(item.itemId)
+                val handled = showScreen(item.itemId)
+                if (handled) {
+                    applyNavSelectionEffect(nav, item.itemId)
+                }
+                handled
             }
         }
         val destination = savedInstanceState?.getInt("selected_destination", R.id.nav_home) ?: R.id.nav_home
         nav.selectedItemId = if (nav.menu.findItem(destination) == null) R.id.nav_home else destination
         nav.setOnItemReselectedListener { }
-        nav.post {
-            val createView = nav.findViewById<View>(R.id.nav_create)
-            createView?.let { view ->
-                view.scaleX = 1.35f
-                view.scaleY = 1.35f
-                view.translationY = -6f
-                ViewMotion.applySpringPress(view)
-            }
-        }
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -501,6 +496,60 @@ class MainActivity : AppCompatActivity() {
 
         override fun onCleared() {
             request?.cancel()
+        }
+    }
+
+    private fun setupStitchNavigation(nav: BottomNavigationView) {
+        nav.itemIconTintList = null
+        nav.post {
+            val menuView = nav.getChildAt(0) as? ViewGroup ?: return@post
+            val density = resources.displayMetrics.density
+            val createSize = (52 * density).toInt()
+
+            for (i in 0 until menuView.childCount) {
+                val itemView = menuView.getChildAt(i) as? ViewGroup ?: continue
+                if (itemView.id == R.id.nav_create) {
+                    val iconView = itemView.findViewById<ImageView>(com.google.android.material.R.id.navigation_bar_item_icon_view)
+                    val iconContainer = itemView.findViewById<View>(com.google.android.material.R.id.navigation_bar_item_icon_container)
+                    iconView?.layoutParams = iconView?.layoutParams?.apply {
+                        width = createSize
+                        height = createSize
+                    }
+                    iconContainer?.layoutParams = iconContainer?.layoutParams?.apply {
+                        width = createSize
+                        height = createSize
+                    }
+                    itemView.findViewById<View>(com.google.android.material.R.id.navigation_bar_item_labels_group)?.visibility = View.GONE
+                    ViewMotion.applySpringPress(itemView)
+                }
+            }
+            applyNavSelectionEffect(nav, nav.selectedItemId)
+        }
+    }
+
+    private fun applyNavSelectionEffect(nav: BottomNavigationView, selectedId: Int) {
+        nav.post {
+            val menuView = nav.getChildAt(0) as? ViewGroup ?: return@post
+            for (i in 0 until menuView.childCount) {
+                val itemView = menuView.getChildAt(i) as? ViewGroup ?: continue
+                val isSelected = itemView.id == selectedId
+                val isCreate = itemView.id == R.id.nav_create
+
+                if (isCreate) {
+                    itemView.findViewById<View>(com.google.android.material.R.id.navigation_bar_item_labels_group)?.visibility = View.GONE
+                    continue
+                }
+
+                val iconContainer = itemView.findViewById<View>(com.google.android.material.R.id.navigation_bar_item_icon_container)
+                    ?: itemView.findViewById<View>(com.google.android.material.R.id.navigation_bar_item_icon_view)
+                val targetScale = if (isSelected) 1.10f else 1.0f
+                iconContainer?.animate()
+                    ?.scaleX(targetScale)
+                    ?.scaleY(targetScale)
+                    ?.setDuration(200)
+                    ?.setInterpolator(android.view.animation.OvershootInterpolator(1.2f))
+                    ?.start()
+            }
         }
     }
 
