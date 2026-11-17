@@ -233,7 +233,8 @@ class MainActivity : AppCompatActivity() {
                     user = user,
                     onCreateClick = { navigation?.selectedItemId = R.id.nav_create },
                     onSeeAllClick = { navigation?.selectedItemId = R.id.nav_leaderboard },
-                    onFollowToggle = { hunter -> toggleFollowUser(hunter) }
+                    onFollowToggle = { hunter -> toggleFollowUser(hunter) },
+                    onLoadHuntersClick = { demoUsersModel.load(ApiClient.getApi()) }
                 ).apply {
                     followedUserIds = getFollowedUserIds()
                     demoUsersModel.state.value?.let { demoUsers = it.users }
@@ -473,7 +474,8 @@ class MainActivity : AppCompatActivity() {
         var user: User?,
         private val onCreateClick: () -> Unit,
         private val onSeeAllClick: () -> Unit,
-        private val onFollowToggle: (User) -> Unit
+        private val onFollowToggle: (User) -> Unit,
+        private val onLoadHuntersClick: () -> Unit
     ) : RecyclerView.Adapter<HomeHeaderAdapter.ViewHolder>() {
 
         var isEmpty: Boolean = false
@@ -530,6 +532,25 @@ class MainActivity : AppCompatActivity() {
             }
             root.findViewById<View>(R.id.btn_see_all_hunters)?.let {
                 ViewMotion.applySpringPress(it) { onSeeAllClick() }
+            }
+
+            val huntersEmptyCard = root.findViewById<View>(R.id.home_hunters_empty_card)
+            val huntersScroll = root.findViewById<View>(R.id.home_hunters_scroll)
+            val seeAllBtn = root.findViewById<View>(R.id.btn_see_all_hunters)
+            val loadHuntersBtn = root.findViewById<View>(R.id.home_hunters_load_btn)
+
+            loadHuntersBtn?.let {
+                ViewMotion.applySpringPress(it) { onLoadHuntersClick() }
+            }
+
+            if (demoUsers.isEmpty()) {
+                huntersEmptyCard?.visibility = View.VISIBLE
+                huntersScroll?.visibility = View.GONE
+                seeAllBtn?.visibility = View.GONE
+            } else {
+                huntersEmptyCard?.visibility = View.GONE
+                huntersScroll?.visibility = View.VISIBLE
+                seeAllBtn?.visibility = View.VISIBLE
             }
 
             // Followed users container

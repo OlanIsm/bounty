@@ -243,36 +243,110 @@
             </com.google.android.material.card.MaterialCardView>
         </LinearLayout>
 
-        <!-- Followed Hunters / Teman Aktif Section -->
+        <!-- Followed Hunters / Teman Aktif Section Header -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginTop="22dp">
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="8dp">
 
             <TextView
-                style="@style/BountySection"
+                android:id="@+id/home_hunters_section_title"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
+                android:fontFamily="@font/nunito"
                 android:textSize="17sp"
+                android:textStyle="bold"
+                android:textColor="@color/bounty_text"
                 android:text="Hunter &amp; Teman Aktif 👥" />
 
             <TextView
                 android:id="@+id/btn_see_all_hunters"
-                style="@style/BountyCaption"
-                android:textSize="12sp"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/nunito"
+                android:textSize="13sp"
                 android:textStyle="bold"
                 android:textColor="@color/bounty_primary"
-                android:text="Lihat Semua" />
+                android:paddingHorizontal="8dp"
+                android:paddingVertical="4dp"
+                android:text="Lihat Semua &gt;" />
         </LinearLayout>
+
+        <!-- Empty Hunters Card when not loaded / no hunters -->
+        <com.google.android.material.card.MaterialCardView
+            android:id="@+id/home_hunters_empty_card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="1dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/bounty_surface_container"
+            app:cardBackgroundColor="@color/bounty_surface"
+            android:visibility="gone">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="16dp">
+
+                <ImageView
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:src="@drawable/ic_avatar"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="12dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/nunito"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/bounty_text"
+                        android:text="Belum ada hunter tampil" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/nunito"
+                        android:textSize="12sp"
+                        android:textColor="@color/bounty_text_secondary"
+                        android:text="Muat daftar untuk temukan teman baru!" />
+                </LinearLayout>
+
+                <TextView
+                    android:id="@+id/home_hunters_load_btn"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_btn_duolingo_3d_primary"
+                    android:textColor="@color/white"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    android:paddingHorizontal="14dp"
+                    android:paddingTop="8dp"
+                    android:paddingBottom="12dp"
+                    android:text="Muat Teman" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
 
         <!-- Horizontal Scroll of Active Hunters to Follow -->
         <HorizontalScrollView
+            android:id="@+id/home_hunters_scroll"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
             android:scrollbars="none"
             android:clipToPadding="false">
 
@@ -288,7 +362,7 @@
             android:id="@+id/home_banner_create"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="16dp"
             app:cardCornerRadius="20dp"
             app:cardElevation="2dp"
             app:strokeWidth="1dp"
@@ -309,12 +383,18 @@
                     android:orientation="vertical">
 
                     <TextView
-                        style="@style/BountySection"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/nunito"
                         android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/bounty_text"
                         android:text="Punya Ide Tantangan? 🚀" />
 
                     <TextView
-                        style="@style/BountyBody"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/nunito"
                         android:textSize="12sp"
                         android:textColor="@color/bounty_text_secondary"
                         android:layout_marginTop="2dp"
@@ -344,56 +424,72 @@
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             android:gravity="center_vertical"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="20dp"
             android:layout_marginBottom="12dp">
 
             <TextView
-                style="@style/BountySection"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:fontFamily="@font/nunito"
                 android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/bounty_text"
                 android:text="Misi Tersedia Untukmu 🎯" />
         </LinearLayout>
 
         <!-- Empty State Container when no challenges -->
-        <LinearLayout
+        <com.google.android.material.card.MaterialCardView
             android:id="@+id/home_empty_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:gravity="center"
-            android:paddingVertical="28dp"
-            android:paddingHorizontal="20dp"
+            android:layout_marginBottom="24dp"
+            app:cardCornerRadius="20dp"
+            app:cardElevation="1dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/bounty_surface_container"
+            app:cardBackgroundColor="@color/bounty_surface"
             android:visibility="gone">
 
-            <ImageView
-                android:layout_width="80dp"
-                android:layout_height="80dp"
-                android:src="@drawable/ic_sad_robot"
-                android:contentDescription="@null"
-                android:importantForAccessibility="no" />
-
-            <TextView
-                android:id="@+id/feed_message"
-                android:accessibilityLiveRegion="polite"
-                style="@style/BountyBody"
-                android:layout_marginTop="14dp"
-                android:gravity="center"
-                android:textSize="14sp"
-                android:textColor="@color/bounty_text_secondary"
-                android:lineSpacingExtra="2dp"
-                android:text="@string/no_available_challenges" />
-
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/home_create_challenge"
-                style="@style/BountyButton"
-                android:layout_width="wrap_content"
+            <LinearLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                android:minHeight="48dp"
-                android:paddingHorizontal="24dp"
-                android:textSize="14sp"
-                android:text="+ Buat Challenge Pertama" />
-        </LinearLayout>
+                android:orientation="vertical"
+                android:gravity="center"
+                android:paddingVertical="24dp"
+                android:paddingHorizontal="20dp">
+
+                <ImageView
+                    android:layout_width="64dp"
+                    android:layout_height="64dp"
+                    android:src="@drawable/ic_sad_robot"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no" />
+
+                <TextView
+                    android:id="@+id/feed_message"
+                    android:accessibilityLiveRegion="polite"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="12dp"
+                    android:gravity="center"
+                    android:fontFamily="@font/nunito"
+                    android:textSize="14sp"
+                    android:textColor="@color/bounty_text_secondary"
+                    android:text="@string/no_available_challenges" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/home_create_challenge"
+                    style="@style/BountyButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:minHeight="44dp"
+                    app:backgroundTint="@null"
+                    android:background="@drawable/bg_btn_duolingo_3d_green"
+                    android:paddingHorizontal="24dp"
+                    android:textSize="14sp"
+                    android:text="+ Buat Challenge Pertama" />
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
     </LinearLayout>
 </LinearLayout>

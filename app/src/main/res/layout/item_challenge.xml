@@ -133,6 +133,8 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:minHeight="44dp"
+                app:backgroundTint="@null"
+                android:background="@drawable/bg_btn_duolingo_3d_green"
                 android:paddingHorizontal="18dp"
                 android:textSize="13sp"
                 android:text="@string/view_challenge" />
