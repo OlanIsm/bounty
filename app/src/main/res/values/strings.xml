@@ -1,4 +1,4 @@
-<resources>
+﻿<resources>
     <string name="app_name">Bounty</string>
     <string name="login_title">Masuk ke Bounty</string>
     <string name="register_title">Buat akun demo</string>
@@ -109,4 +109,32 @@
     <string name="confirm_approve_title">Setujui bukti?</string>
     <string name="confirm_approve_message">%1$s\n\nChallenge akan selesai dan reward demo %2$s masuk ke saldo %3$s. Reward ini bukan uang asli.</string>
     <string name="leaderboard_soon">Fitur Peringkat segera hadir!</string>
+    <string name="leaderboard_title">Leaderboard</string>
+    <string name="leaderboard_subtitle">Peringkat hunter &amp; creator teraktif di Bounty</string>
+    <string name="tab_creators">Pemberi Challenge</string>
+    <string name="tab_hunters">Penerima Challenge</string>
+    <string name="stat_challenges_created">%1$d Challenge Dibuat</string>
+    <string name="stat_challenges_received">%1$d Challenge Diterima</string>
+    <string name="no_leaderboard_data">Belum ada aktivitas untuk kategori peringkat ini.</string>
+    <string name="leaderboard_load_error">Peringkat gagal dimuat. Coba lagi.</string>
+    <string name="profile_section_account">Data Diri &amp; Akun</string>
+    <string name="profile_edit">Edit Profil</string>
+    <string name="profile_edit_desc">Ubah nama dan foto profil akun kamu</string>
+    <string name="profile_history">Riwayat Aktivitas</string>
+    <string name="profile_history_desc">Lihat rekap challenge yang pernah diikuti</string>
+    <string name="profile_section_preferences">Preferensi</string>
+    <string name="profile_pref_notifications">Notifikasi Tantangan</string>
+    <string name="profile_pref_notifications_desc">Dapatkan pemberitahuan challenge baru</string>
+    <string name="profile_pref_theme">Tema Tampilan</string>
+    <string name="profile_pref_theme_desc">Ikuti pengaturan tema sistem</string>
+    <string name="profile_pref_language">Bahasa Aplikasi</string>
+    <string name="profile_pref_language_desc">Bahasa Indonesia</string>
+    <string name="profile_section_settings">Pengaturan &amp; Bantuan</string>
+    <string name="profile_setting_security">Keamanan &amp; Kata Sandi</string>
+    <string name="profile_setting_security_desc">Kelola keamanan kredensial akun</string>
+    <string name="profile_setting_help">Bantuan &amp; FAQ</string>
+    <string name="profile_setting_help_desc">Pertanyaan umum dan panduan penggunaan</string>
+    <string name="profile_setting_about">Tentang Bounty</string>
+    <string name="profile_setting_about_desc">Bounty v1.0.0 MVP • Kursus Android</string>
+    <string name="profile_action_saved">Pengaturan berhasil diperbarui.</string>
 </resources>

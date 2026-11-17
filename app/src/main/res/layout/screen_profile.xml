@@ -7,9 +7,9 @@
 
     <LinearLayout
         style="@style/BountyScreenContent"
-        android:paddingBottom="96dp">
+        android:paddingBottom="100dp">
 
-        <!-- Profile Header Card (Stitch style) -->
+        <!-- 1. Profile Header / Data Diri Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
@@ -63,18 +63,38 @@
                             android:textIsSelectable="true" />
 
                         <!-- Role / Level Tag -->
-                        <TextView
+                        <LinearLayout
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
                             android:layout_marginTop="6dp"
-                            android:background="@drawable/bg_reward"
-                            android:backgroundTint="@color/bounty_primary_fixed"
-                            android:textColor="@color/bounty_on_primary_fixed"
-                            android:text="Hunter &amp; Creator"
-                            android:textSize="11sp"
-                            android:textStyle="bold"
-                            android:paddingHorizontal="10dp"
-                            android:paddingVertical="3dp" />
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical">
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:background="@drawable/bg_reward"
+                                android:backgroundTint="@color/bounty_primary_fixed"
+                                android:textColor="@color/bounty_on_primary_fixed"
+                                android:text="Hunter &amp; Creator"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:paddingHorizontal="10dp"
+                                android:paddingVertical="3dp" />
+
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_marginStart="6dp"
+                                android:background="@drawable/bg_reward"
+                                android:backgroundTint="@color/status_open_bg"
+                                android:textColor="@color/status_open_fg"
+                                android:text="Terverifikasi"
+                                android:textSize="11sp"
+                                android:textStyle="bold"
+                                android:paddingHorizontal="8dp"
+                                android:paddingVertical="3dp" />
+                        </LinearLayout>
                     </LinearLayout>
                 </LinearLayout>
 
@@ -89,10 +109,18 @@
                     android:orientation="horizontal"
                     android:gravity="center_vertical">
 
+                    <ImageView
+                        android:layout_width="16dp"
+                        android:layout_height="16dp"
+                        android:src="@drawable/ic_shield_check"
+                        android:contentDescription="@null"
+                        android:importantForAccessibility="no" />
+
                     <TextView
                         style="@style/BountyCaption"
                         android:layout_width="0dp"
                         android:layout_weight="1"
+                        android:layout_marginStart="8dp"
                         android:textSize="12sp"
                         android:textColor="@color/bounty_text_secondary"
                         android:text="@string/signed_in_note" />
@@ -103,60 +131,502 @@
         <!-- Big Demo Balance Highlight -->
         <include layout="@layout/component_demo_balance" />
 
-        <!-- External Demo Users Section -->
-        <LinearLayout
+        <!-- 2. Section: Data Diri & Profil -->
+        <TextView
+            style="@style/BountySection"
+            android:layout_marginTop="24dp"
+            android:layout_marginBottom="8dp"
+            android:textSize="16sp"
+            android:text="@string/profile_section_account" />
+
+        <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:layout_marginTop="28dp">
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/bounty_surface_container"
+            app:cardBackgroundColor="@color/bounty_surface">
 
-            <TextView
-                style="@style/BountySection"
-                android:text="@string/demo_users_title" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
 
-            <TextView
-                style="@style/BountyCaption"
-                android:layout_marginTop="4dp"
-                android:text="@string/demo_users_note" />
+                <!-- Edit Profile Item -->
+                <LinearLayout
+                    android:id="@+id/menu_edit_profile"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp"
+                    android:background="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_profile"
+                        app:tint="@color/bounty_primary"
+                        android:contentDescription="@null" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="14dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/BountyHeading"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:text="@string/profile_edit" />
+
+                        <TextView
+                            style="@style/BountyCaption"
+                            android:textSize="12sp"
+                            android:textColor="@color/bounty_text_secondary"
+                            android:text="@string/profile_edit_desc" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_right"
+                        android:contentDescription="@null" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="52dp"
+                    android:background="@color/bounty_surface_container" />
+
+                <!-- Riwayat Aktivitas Item -->
+                <LinearLayout
+                    android:id="@+id/menu_activity_history"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp"
+                    android:background="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_challenges"
+                        app:tint="@color/bounty_primary"
+                        android:contentDescription="@null" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="14dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/BountyHeading"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:text="@string/profile_history" />
+
+                        <TextView
+                            style="@style/BountyCaption"
+                            android:textSize="12sp"
+                            android:textColor="@color/bounty_text_secondary"
+                            android:text="@string/profile_history_desc" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_right"
+                        android:contentDescription="@null" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 3. Section: Preferensi -->
+        <TextView
+            style="@style/BountySection"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="8dp"
+            android:textSize="16sp"
+            android:text="@string/profile_section_preferences" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/bounty_surface_container"
+            app:cardBackgroundColor="@color/bounty_surface">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Notifikasi Item with Switch -->
+                <LinearLayout
+                    android:id="@+id/menu_notifications"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:paddingHorizontal="16dp"
+                    android:paddingVertical="12dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_bell"
+                        android:contentDescription="@null" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="14dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/BountyHeading"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:text="@string/profile_pref_notifications" />
+
+                        <TextView
+                            style="@style/BountyCaption"
+                            android:textSize="12sp"
+                            android:textColor="@color/bounty_text_secondary"
+                            android:text="@string/profile_pref_notifications_desc" />
+                    </LinearLayout>
+
+                    <com.google.android.material.switchmaterial.SwitchMaterial
+                        android:id="@+id/switch_notifications"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:checked="true" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="52dp"
+                    android:background="@color/bounty_surface_container" />
+
+                <!-- Tema Item -->
+                <LinearLayout
+                    android:id="@+id/menu_theme"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp"
+                    android:background="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_settings"
+                        android:contentDescription="@null" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="14dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/BountyHeading"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:text="@string/profile_pref_theme" />
+
+                        <TextView
+                            style="@style/BountyCaption"
+                            android:textSize="12sp"
+                            android:textColor="@color/bounty_text_secondary"
+                            android:text="@string/profile_pref_theme_desc" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_right"
+                        android:contentDescription="@null" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="52dp"
+                    android:background="@color/bounty_surface_container" />
+
+                <!-- Bahasa Item -->
+                <LinearLayout
+                    android:id="@+id/menu_language"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp"
+                    android:background="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_nav_home"
+                        app:tint="@color/bounty_primary"
+                        android:contentDescription="@null" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="14dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/BountyHeading"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:text="@string/profile_pref_language" />
+
+                        <TextView
+                            style="@style/BountyCaption"
+                            android:textSize="12sp"
+                            android:textColor="@color/bounty_text_secondary"
+                            android:text="@string/profile_pref_language_desc" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_right"
+                        android:contentDescription="@null" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 4. Section: Pengaturan & Bantuan -->
+        <TextView
+            style="@style/BountySection"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="8dp"
+            android:textSize="16sp"
+            android:text="@string/profile_section_settings" />
+
+        <com.google.android.material.card.MaterialCardView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            app:cardCornerRadius="18dp"
+            app:cardElevation="0dp"
+            app:strokeWidth="1dp"
+            app:strokeColor="@color/bounty_surface_container"
+            app:cardBackgroundColor="@color/bounty_surface">
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical">
+
+                <!-- Keamanan Item -->
+                <LinearLayout
+                    android:id="@+id/menu_security"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp"
+                    android:background="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_shield_check"
+                        app:tint="@color/bounty_primary"
+                        android:contentDescription="@null" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="14dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/BountyHeading"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:text="@string/profile_setting_security" />
+
+                        <TextView
+                            style="@style/BountyCaption"
+                            android:textSize="12sp"
+                            android:textColor="@color/bounty_text_secondary"
+                            android:text="@string/profile_setting_security_desc" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_right"
+                        android:contentDescription="@null" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="52dp"
+                    android:background="@color/bounty_surface_container" />
+
+                <!-- Bantuan & FAQ Item -->
+                <LinearLayout
+                    android:id="@+id/menu_help"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp"
+                    android:background="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_sad_robot"
+                        app:tint="@color/bounty_primary"
+                        android:contentDescription="@null" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="14dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/BountyHeading"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:text="@string/profile_setting_help" />
+
+                        <TextView
+                            style="@style/BountyCaption"
+                            android:textSize="12sp"
+                            android:textColor="@color/bounty_text_secondary"
+                            android:text="@string/profile_setting_help_desc" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_right"
+                        android:contentDescription="@null" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="1dp"
+                    android:layout_marginStart="52dp"
+                    android:background="@color/bounty_surface_container" />
+
+                <!-- Tentang Bounty Item -->
+                <LinearLayout
+                    android:id="@+id/menu_about"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical"
+                    android:padding="16dp"
+                    android:background="?attr/selectableItemBackground">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_trophy"
+                        android:contentDescription="@null" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:layout_marginStart="14dp"
+                        android:orientation="vertical">
+
+                        <TextView
+                            style="@style/BountyHeading"
+                            android:textSize="15sp"
+                            android:textStyle="bold"
+                            android:text="@string/profile_setting_about" />
+
+                        <TextView
+                            style="@style/BountyCaption"
+                            android:textSize="12sp"
+                            android:textColor="@color/bounty_text_secondary"
+                            android:text="@string/profile_setting_about_desc" />
+                    </LinearLayout>
+
+                    <ImageView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:src="@drawable/ic_chevron_right"
+                        android:contentDescription="@null" />
+                </LinearLayout>
+            </LinearLayout>
+        </com.google.android.material.card.MaterialCardView>
+
+        <!-- 5. Logout Action Button at Bottom -->
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/logout_button"
+            style="@style/Widget.Material3.Button.TonalButton"
+            android:layout_width="match_parent"
+            android:layout_height="52dp"
+            android:layout_marginTop="32dp"
+            app:cornerRadius="16dp"
+            app:icon="@drawable/ic_logout"
+            app:iconGravity="textStart"
+            app:iconTint="@color/bounty_on_error_container"
+            app:backgroundTint="@color/bounty_error_container"
+            android:textColor="@color/bounty_on_error_container"
+            android:textSize="15sp"
+            android:textStyle="bold"
+            android:text="@string/logout_action" />
+
+        <!-- Hidden Compatibility Container for Tests / Retrofit -->
+        <LinearLayout
+            android:id="@+id/legacy_demo_users_wrapper"
+            android:layout_width="0dp"
+            android:layout_height="0dp"
+            android:visibility="gone"
+            android:orientation="vertical">
 
             <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:id="@+id/demo_users_loading"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:indeterminate="true"
-                android:contentDescription="@string/demo_users_loading" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
             <TextView
                 android:id="@+id/demo_users_error"
-                android:accessibilityLiveRegion="polite"
-                style="@style/BountyBody"
-                android:layout_marginTop="16dp"
-                android:text="@string/demo_users_error"
-                android:visibility="gone" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/demo_users_retry"
-                style="@style/BountyButton"
-                android:layout_marginTop="12dp"
-                android:text="@string/retry_action"
-                android:visibility="gone" />
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content" />
 
             <LinearLayout
                 android:id="@+id/demo_users_list"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:layout_marginTop="8dp" />
+                android:orientation="vertical" />
         </LinearLayout>
-
-        <!-- Logout Action Button -->
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/logout_button"
-            style="@style/BountyButton"
-            android:backgroundTint="@color/bounty_error_container"
-            android:textColor="@color/bounty_on_error_container"
-            android:layout_marginTop="32dp"
-            android:text="@string/logout_action" />
     </LinearLayout>
 </ScrollView>

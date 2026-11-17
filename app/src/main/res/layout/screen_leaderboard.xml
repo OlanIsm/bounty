@@ -1,0 +1,161 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/leaderboard_screen"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bounty_background"
+    android:paddingHorizontal="16dp"
+    android:paddingTop="16dp">
+
+    <!-- Screen Title Header -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:gravity="center_vertical">
+
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <TextView
+                style="@style/BountyHeading"
+                android:textSize="26sp"
+                android:textStyle="bold"
+                android:letterSpacing="-0.02"
+                android:text="@string/leaderboard_title" />
+
+            <TextView
+                style="@style/BountyBody"
+                android:layout_marginTop="4dp"
+                android:textSize="14sp"
+                android:textColor="@color/bounty_text_secondary"
+                android:text="@string/leaderboard_subtitle" />
+        </LinearLayout>
+
+        <ImageView
+            android:layout_width="38dp"
+            android:layout_height="38dp"
+            android:src="@drawable/ic_trophy"
+            android:contentDescription="@null"
+            android:importantForAccessibility="no" />
+    </LinearLayout>
+
+    <!-- Two-category Segmented Toggle Group -->
+    <com.google.android.material.button.MaterialButtonToggleGroup
+        android:id="@+id/leaderboard_toggle_group"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        app:singleSelection="true"
+        app:selectionRequired="true"
+        app:checkedButton="@id/toggle_creators">
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/toggle_creators"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:text="@string/tab_creators"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:backgroundTint="@color/toggle_button_bg"
+            android:textColor="@color/toggle_button_text"
+            app:strokeColor="@color/toggle_button_stroke"
+            app:strokeWidth="1dp" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/toggle_hunters"
+            style="@style/Widget.Material3.Button.OutlinedButton"
+            android:layout_width="0dp"
+            android:layout_height="44dp"
+            android:layout_weight="1"
+            android:text="@string/tab_hunters"
+            android:textSize="13sp"
+            android:textStyle="bold"
+            android:insetTop="0dp"
+            android:insetBottom="0dp"
+            app:backgroundTint="@color/toggle_button_bg"
+            android:textColor="@color/toggle_button_text"
+            app:strokeColor="@color/toggle_button_stroke"
+            app:strokeWidth="1dp" />
+    </com.google.android.material.button.MaterialButtonToggleGroup>
+
+    <!-- Loading Indicator -->
+    <com.google.android.material.progressindicator.LinearProgressIndicator
+        android:id="@+id/leaderboard_loading"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:indeterminate="true"
+        android:visibility="gone" />
+
+    <!-- Error State -->
+    <LinearLayout
+        android:id="@+id/leaderboard_error_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:layout_marginTop="32dp"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/leaderboard_error_message"
+            style="@style/BountyBody"
+            android:textColor="@color/bounty_error"
+            android:gravity="center"
+            android:text="@string/leaderboard_load_error" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/leaderboard_retry"
+            style="@style/BountyButton"
+            android:layout_marginTop="12dp"
+            android:text="@string/retry_action" />
+    </LinearLayout>
+
+    <!-- Empty State -->
+    <LinearLayout
+        android:id="@+id/leaderboard_empty_container"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center"
+        android:paddingVertical="40dp"
+        android:paddingHorizontal="24dp"
+        android:visibility="gone">
+
+        <ImageView
+            android:layout_width="80dp"
+            android:layout_height="80dp"
+            android:src="@drawable/ic_sad_robot"
+            android:contentDescription="@null"
+            android:importantForAccessibility="no" />
+
+        <TextView
+            android:id="@+id/leaderboard_empty_message"
+            style="@style/BountyBody"
+            android:layout_marginTop="14dp"
+            android:gravity="center"
+            android:textSize="14sp"
+            android:textColor="@color/bounty_text_secondary"
+            android:text="@string/no_leaderboard_data" />
+    </LinearLayout>
+
+    <!-- Leaderboard Recycler View -->
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/leaderboard_list"
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:layout_marginTop="14dp"
+        android:clipToPadding="false"
+        android:paddingBottom="96dp" />
+</LinearLayout>

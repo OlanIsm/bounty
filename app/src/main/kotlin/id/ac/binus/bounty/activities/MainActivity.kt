@@ -35,7 +35,10 @@ import com.google.android.material.snackbar.Snackbar
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import id.ac.binus.bounty.R
+import android.widget.Toast
 import id.ac.binus.bounty.adapters.ChallengeAdapter
+import id.ac.binus.bounty.adapters.LeaderboardAdapter
+import id.ac.binus.bounty.adapters.LeaderboardItem
 import id.ac.binus.bounty.data.FirebaseBountyRepository
 import id.ac.binus.bounty.models.Challenge
 import id.ac.binus.bounty.models.User
@@ -67,6 +70,10 @@ class MainActivity : AppCompatActivity() {
     private var createState: SparseArray<Parcelable>? = null
     private lateinit var publishModel: PublishModel
     private lateinit var demoUsersModel: DemoUsersModel
+    private var leaderboardAdapter: LeaderboardAdapter? = null
+    private var leaderboardRawChallenges: List<Challenge> = emptyList()
+    private var isLeaderboardCreatorsSelected: Boolean = true
+    private var leaderboardRequest = 0
     private val backToHome = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
             navigation?.setSelectedItemId(R.id.nav_home)
@@ -91,16 +98,11 @@ class MainActivity : AppCompatActivity() {
         val nav = navigation ?: return
         setupStitchNavigation(nav)
         nav.setOnItemSelectedListener { item ->
-            if (item.itemId == R.id.nav_leaderboard) {
-                showSnackbar(R.string.leaderboard_soon)
-                false
-            } else {
-                val handled = showScreen(item.itemId)
-                if (handled) {
-                    applyNavSelectionEffect(nav, item.itemId)
-                }
-                handled
+            val handled = showScreen(item.itemId)
+            if (handled) {
+                applyNavSelectionEffect(nav, item.itemId)
             }
+            handled
         }
         val destination = savedInstanceState?.getInt("selected_destination", R.id.nav_home) ?: R.id.nav_home
         nav.selectedItemId = if (nav.menu.findItem(destination) == null) R.id.nav_home else destination
@@ -154,6 +156,7 @@ class MainActivity : AppCompatActivity() {
         super.onResume()
         refreshBalance()
         if (navigation != null && (selectedDestination == R.id.nav_home || selectedDestination == R.id.nav_my_challenges)) loadFeed()
+        else if (navigation != null && selectedDestination == R.id.nav_leaderboard) loadLeaderboardData()
     }
 
     private fun showScreen(destination: Int): Boolean {
@@ -161,6 +164,7 @@ class MainActivity : AppCompatActivity() {
             R.id.nav_home -> R.layout.screen_home to R.string.home_title
             R.id.nav_my_challenges -> R.layout.screen_my_challenges to R.string.my_challenges_title
             R.id.nav_create -> R.layout.screen_create to R.string.create_title
+            R.id.nav_leaderboard -> R.layout.screen_leaderboard to R.string.leaderboard_title
             R.id.nav_profile -> R.layout.screen_profile to R.string.profile_title
             else -> return false
         }
@@ -192,15 +196,9 @@ class MainActivity : AppCompatActivity() {
         backToHome.isEnabled = destination != R.id.nav_home
         val user = SessionManager(this).getCurrentUser()
         if (destination == R.id.nav_profile) {
-            val retryUsers = findViewById<View>(R.id.demo_users_retry)
-            ViewMotion.applySpringPress(retryUsers) { demoUsersModel.load(ApiClient.getApi()) }
-            if (demoUsersModel.state.value == null) demoUsersModel.load(ApiClient.getApi())
-            bindDemoUsers()
-            val logoutBtn = findViewById<View>(R.id.logout_button)
-            ViewMotion.applySpringPress(logoutBtn) {
-                SessionManager(this).logout()
-                openLogin()
-            }
+            setupProfileScreen(user)
+        } else if (destination == R.id.nav_leaderboard) {
+            setupLeaderboardScreen()
         } else if (destination == R.id.nav_home || destination == R.id.nav_my_challenges) {
             val list = findViewById<RecyclerView>(R.id.challenge_list)
             list.layoutManager = LinearLayoutManager(this)
@@ -492,8 +490,15 @@ class MainActivity : AppCompatActivity() {
                 it.notifyItemChanged(0)
             }
         } else if (selectedDestination == R.id.nav_profile) {
-            findViewById<TextView>(R.id.profile_name).text = user.name
-            findViewById<TextView>(R.id.user_email).text = user.email
+            findViewById<TextView?>(R.id.profile_name)?.text = user.name
+            findViewById<TextView?>(R.id.user_email)?.text = user.email
+            findViewById<ImageView?>(R.id.profile_avatar_view)?.let { img ->
+                Glide.with(img).load(user.avatarUrl)
+                    .placeholder(R.drawable.ic_avatar)
+                    .error(R.drawable.ic_avatar)
+                    .circleCrop()
+                    .into(img)
+            }
         }
     }
 
@@ -641,6 +646,187 @@ class MainActivity : AppCompatActivity() {
             const val SAVING = 1
             const val SAVED = 2
             const val ERROR = 3
+        }
+    }
+
+    private fun setupProfileScreen(user: User?) {
+        val retryUsers = findViewById<View?>(R.id.demo_users_retry)
+        if (retryUsers != null) {
+            ViewMotion.applySpringPress(retryUsers) { demoUsersModel.load(ApiClient.getApi()) }
+        }
+        if (demoUsersModel.state.value == null) demoUsersModel.load(ApiClient.getApi())
+        bindDemoUsers()
+
+        findViewById<View?>(R.id.logout_button)?.let { logoutBtn ->
+            ViewMotion.applySpringPress(logoutBtn) {
+                SessionManager(this).logout()
+                openLogin()
+            }
+        }
+
+        findViewById<View?>(R.id.menu_edit_profile)?.let { btn ->
+            ViewMotion.applySpringPress(btn) {
+                showToast("Profil tersinkronisasi dengan akun login.")
+            }
+        }
+
+        findViewById<View?>(R.id.menu_activity_history)?.let { btn ->
+            ViewMotion.applySpringPress(btn) {
+                navigation?.selectedItemId = R.id.nav_my_challenges
+            }
+        }
+
+        findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switch_notifications)
+            ?.setOnCheckedChangeListener { _, isChecked ->
+                showToast(if (isChecked) "Notifikasi tantangan diaktifkan." else "Notifikasi tantangan dinonaktifkan.")
+            }
+
+        findViewById<View?>(R.id.menu_theme)?.let { btn ->
+            ViewMotion.applySpringPress(btn) {
+                showToast("Tema mengikuti preferensi sistem perangkat.")
+            }
+        }
+
+        findViewById<View?>(R.id.menu_language)?.let { btn ->
+            ViewMotion.applySpringPress(btn) {
+                showToast("Bahasa saat ini: Bahasa Indonesia.")
+            }
+        }
+
+        findViewById<View?>(R.id.menu_security)?.let { btn ->
+            ViewMotion.applySpringPress(btn) {
+                showToast("Akun terlindungi oleh autentikasi Firebase.")
+            }
+        }
+
+        findViewById<View?>(R.id.menu_help)?.let { btn ->
+            ViewMotion.applySpringPress(btn) {
+                showToast("Bounty MVP: Aplikasi tantangan dan reward seru.")
+            }
+        }
+
+        findViewById<View?>(R.id.menu_about)?.let { btn ->
+            ViewMotion.applySpringPress(btn) {
+                showToast("Bounty v1.0.0 • Dibuat untuk Coursework Android.")
+            }
+        }
+    }
+
+    private fun showToast(message: String) {
+        Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
+    }
+
+    private fun setupLeaderboardScreen() {
+        val screen = findViewById<View>(R.id.leaderboard_screen) ?: return
+        val list = screen.findViewById<RecyclerView>(R.id.leaderboard_list)
+        list.layoutManager = LinearLayoutManager(this)
+        leaderboardAdapter = LeaderboardAdapter()
+        list.adapter = leaderboardAdapter
+        list.itemAnimator = null
+
+        val toggleGroup = screen.findViewById<MaterialButtonToggleGroup>(R.id.leaderboard_toggle_group)
+        toggleGroup?.check(if (isLeaderboardCreatorsSelected) R.id.toggle_creators else R.id.toggle_hunters)
+        toggleGroup?.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (isChecked) {
+                isLeaderboardCreatorsSelected = (checkedId == R.id.toggle_creators)
+                applyLeaderboardData()
+            }
+        }
+
+        val retryBtn = screen.findViewById<View>(R.id.leaderboard_retry)
+        if (retryBtn != null) {
+            ViewMotion.applySpringPress(retryBtn) { loadLeaderboardData() }
+        }
+
+        loadLeaderboardData()
+    }
+
+    private fun loadLeaderboardData() {
+        val screen = findViewById<View>(R.id.leaderboard_screen) ?: return
+        val loading = screen.findViewById<View>(R.id.leaderboard_loading)
+        val errorContainer = screen.findViewById<View>(R.id.leaderboard_error_container)
+        val emptyContainer = screen.findViewById<View>(R.id.leaderboard_empty_container)
+        val list = screen.findViewById<RecyclerView>(R.id.leaderboard_list)
+
+        loading?.visibility = View.VISIBLE
+        errorContainer?.visibility = View.GONE
+        emptyContainer?.visibility = View.GONE
+
+        val request = ++leaderboardRequest
+        val user = SessionManager(this).getCurrentUser() ?: return
+        FirebaseBountyRepository.loadChallenges(user.id, false) { result ->
+            if (isDestroyed || isFinishing || request != leaderboardRequest || selectedDestination != R.id.nav_leaderboard) return@loadChallenges
+            loading?.visibility = View.GONE
+            if (result.isSuccess) {
+                leaderboardRawChallenges = result.getOrThrow()
+                applyLeaderboardData()
+            } else {
+                Log.e("BountyLeaderboard", "Unable to load leaderboard data", result.exceptionOrNull())
+                errorContainer?.visibility = View.VISIBLE
+                list?.visibility = View.GONE
+                emptyContainer?.visibility = View.GONE
+            }
+        }
+    }
+
+    private fun applyLeaderboardData() {
+        val screen = findViewById<View>(R.id.leaderboard_screen) ?: return
+        val user = SessionManager(this).getCurrentUser() ?: return
+        val list = screen.findViewById<RecyclerView>(R.id.leaderboard_list)
+        val emptyContainer = screen.findViewById<View>(R.id.leaderboard_empty_container)
+        val emptyMsg = screen.findViewById<TextView>(R.id.leaderboard_empty_message)
+
+        val items = if (isLeaderboardCreatorsSelected) {
+            val grouped = leaderboardRawChallenges
+                .filter { it.creatorId.isNotEmpty() }
+                .groupBy { it.creatorId }
+            grouped.map { (creatorId, challenges) ->
+                val sample = challenges.first()
+                val name = sample.creatorName.ifEmpty { if (creatorId == user.id) user.name else "Creator" }
+                val avatar = sample.creatorAvatar.ifEmpty { if (creatorId == user.id) user.avatarUrl else "" }
+                LeaderboardItem(
+                    rank = 0,
+                    userId = creatorId,
+                    name = name,
+                    avatarUrl = avatar,
+                    count = challenges.size,
+                    isCreatorCategory = true,
+                    isCurrentUser = (creatorId == user.id)
+                )
+            }.sortedByDescending { it.count }
+        } else {
+            val grouped = leaderboardRawChallenges
+                .filter { !it.participantId.isNullOrEmpty() }
+                .groupBy { it.participantId!! }
+            grouped.map { (hunterId, challenges) ->
+                val sample = challenges.first()
+                val name = sample.participantName?.takeIf { it.isNotEmpty() } ?: if (hunterId == user.id) user.name else "Hunter"
+                val avatar = if (hunterId == user.id) user.avatarUrl else ""
+                LeaderboardItem(
+                    rank = 0,
+                    userId = hunterId,
+                    name = name,
+                    avatarUrl = avatar,
+                    count = challenges.size,
+                    isCreatorCategory = false,
+                    isCurrentUser = (hunterId == user.id)
+                )
+            }.sortedByDescending { it.count }
+        }
+
+        val rankedItems = items.mapIndexed { index, item ->
+            item.copy(rank = index + 1)
+        }
+
+        leaderboardAdapter?.submitList(rankedItems)
+
+        if (rankedItems.isEmpty()) {
+            list?.visibility = View.GONE
+            emptyContainer?.visibility = View.VISIBLE
+            emptyMsg?.text = getString(R.string.no_leaderboard_data)
+        } else {
+            list?.visibility = View.VISIBLE
+            emptyContainer?.visibility = View.GONE
         }
     }
 }
