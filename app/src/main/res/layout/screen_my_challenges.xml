@@ -5,139 +5,174 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/bounty_background"
-    android:paddingHorizontal="16dp"
-    android:paddingTop="16dp">
+    android:background="@color/bounty_background">
 
-    <TextView
-        style="@style/BountyHeading"
-        android:textSize="26sp"
-        android:textStyle="bold"
-        android:letterSpacing="-0.02"
-        android:text="@string/my_challenges_title" />
-
-    <TextView
-        style="@style/BountyBody"
-        android:layout_marginTop="6dp"
-        android:textSize="14sp"
-        android:textColor="@color/bounty_text_secondary"
-        android:text="@string/my_challenges_description" />
-
-    <!-- Own vs Other Segmented Filter -->
-    <com.google.android.material.button.MaterialButtonToggleGroup
-        android:id="@+id/challenge_toggle_group"
+    <!-- Top Purple Section (mentok ke atas sampai bawah search bar) -->
+    <LinearLayout
+        android:id="@+id/challenge_header_container"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_marginTop="14dp"
-        app:singleSelection="true"
-        app:selectionRequired="true"
-        app:checkedButton="@id/toggle_own">
+        android:background="@color/bounty_primary"
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="10dp">
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/toggle_own"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="44dp"
-            android:layout_weight="1"
-            android:text="@string/tab_own_challenges"
-            android:textSize="13sp"
+        <TextView
+            android:id="@+id/my_challenges_header_title"
+            style="@style/BountyHeading"
+            android:textSize="26sp"
             android:textStyle="bold"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            app:backgroundTint="@color/toggle_button_bg"
-            android:textColor="@color/toggle_button_text"
-            app:strokeColor="@color/toggle_button_stroke"
-            app:strokeWidth="1dp" />
+            android:textColor="@color/white"
+            android:gravity="center_horizontal"
+            android:textAlignment="center"
+            android:letterSpacing="-0.02"
+            android:text="@string/my_challenges_title" />
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/toggle_other"
-            style="@style/Widget.Material3.Button.OutlinedButton"
-            android:layout_width="0dp"
-            android:layout_height="44dp"
-            android:layout_weight="1"
-            android:text="@string/tab_other_challenges"
+        <TextView
+            android:id="@+id/my_challenges_header_subtitle"
+            style="@style/BountyBody"
+            android:layout_marginTop="4dp"
             android:textSize="13sp"
-            android:textStyle="bold"
-            android:insetTop="0dp"
-            android:insetBottom="0dp"
-            app:backgroundTint="@color/toggle_button_bg"
-            android:textColor="@color/toggle_button_text"
-            app:strokeColor="@color/toggle_button_stroke"
-            app:strokeWidth="1dp" />
-    </com.google.android.material.button.MaterialButtonToggleGroup>
+            android:textColor="#D5D7FF"
+            android:gravity="center_horizontal"
+            android:textAlignment="center"
+            android:text="@string/my_challenges_description" />
 
-    <!-- Full-width Search Bar -->
-    <com.google.android.material.textfield.TextInputLayout
-        android:id="@+id/challenge_search_layout"
-        style="@style/Widget.Material3.TextInputLayout.OutlinedBox"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        android:layout_marginTop="10dp"
-        app:boxCornerRadiusTopStart="14dp"
-        app:boxCornerRadiusTopEnd="14dp"
-        app:boxCornerRadiusBottomStart="14dp"
-        app:boxCornerRadiusBottomEnd="14dp"
-        app:boxStrokeColor="@color/bounty_primary"
-        app:boxStrokeWidth="1dp"
-        app:boxStrokeWidthFocused="1.5dp"
-        app:startIconDrawable="@drawable/ic_search"
-        app:startIconTint="@color/bounty_text_secondary"
-        app:endIconMode="clear_text"
-        app:hintEnabled="false">
-
-        <com.google.android.material.textfield.TextInputEditText
-            android:id="@+id/challenge_search_input"
+        <!-- Segmented Filter: Mine vs Others -->
+        <com.google.android.material.button.MaterialButtonToggleGroup
+            android:id="@+id/challenge_toggle_group"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:paddingVertical="10dp"
-            android:paddingHorizontal="12dp"
-            android:hint="@string/search_challenges_hint"
-            android:imeOptions="actionSearch"
-            android:inputType="text"
-            android:maxLines="1"
-            android:textColor="?attr/colorOnSurface"
-            android:textColorHint="@color/bounty_text_secondary"
-            android:textSize="14sp" />
-    </com.google.android.material.textfield.TextInputLayout>
+            android:layout_marginTop="14dp"
+            app:singleSelection="true"
+            app:selectionRequired="true"
+            app:checkedButton="@id/toggle_own">
 
-    <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/feed_loading"
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/toggle_own"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="@string/tab_own_challenges"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:backgroundTint="@color/toggle_challenge_bg"
+                android:textColor="@color/toggle_challenge_text"
+                app:strokeColor="@color/toggle_challenge_stroke"
+                app:strokeWidth="1dp" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/toggle_other"
+                style="@style/Widget.Material3.Button.OutlinedButton"
+                android:layout_width="0dp"
+                android:layout_height="44dp"
+                android:layout_weight="1"
+                android:text="@string/tab_other_challenges"
+                android:textSize="13sp"
+                android:textStyle="bold"
+                android:insetTop="0dp"
+                android:insetBottom="0dp"
+                app:backgroundTint="@color/toggle_challenge_bg"
+                android:textColor="@color/toggle_challenge_text"
+                app:strokeColor="@color/toggle_challenge_stroke"
+                app:strokeWidth="1dp" />
+        </com.google.android.material.button.MaterialButtonToggleGroup>
+
+        <!-- Full-width Search Bar with Soft Rounded Corners -->
+        <com.google.android.material.textfield.TextInputLayout
+            android:id="@+id/challenge_search_layout"
+            style="@style/Widget.Material3.TextInputLayout.FilledBox"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            app:boxCornerRadiusTopStart="22dp"
+            app:boxCornerRadiusTopEnd="22dp"
+            app:boxCornerRadiusBottomStart="22dp"
+            app:boxCornerRadiusBottomEnd="22dp"
+            app:boxBackgroundColor="@color/white"
+            app:boxStrokeColor="@android:color/transparent"
+            app:boxStrokeWidth="0dp"
+            app:boxStrokeWidthFocused="0dp"
+            app:startIconDrawable="@drawable/ic_search"
+            app:startIconTint="@color/bounty_outline"
+            app:endIconMode="clear_text"
+            app:endIconTint="@color/bounty_outline"
+            app:hintEnabled="false">
+
+            <com.google.android.material.textfield.TextInputEditText
+                android:id="@+id/challenge_search_input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:paddingVertical="10dp"
+                android:paddingHorizontal="14dp"
+                android:hint="@string/search_challenges_hint"
+                android:imeOptions="actionSearch"
+                android:inputType="text"
+                android:maxLines="1"
+                android:textColor="@color/bounty_text"
+                android:textColorHint="@color/bounty_outline"
+                android:textSize="14sp" />
+        </com.google.android.material.textfield.TextInputLayout>
+    </LinearLayout>
+
+    <!-- Rounded Transition Graphic (Image 1) -->
+    <ImageView
+        android:id="@+id/header_curve_divider"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
-        android:indeterminate="true"
-        android:contentDescription="@string/loading_challenges" />
+        android:layout_height="24dp"
+        android:scaleType="fitXY"
+        android:src="@drawable/bg_header_curve_transition"
+        android:importantForAccessibility="no" />
 
-    <TextView
-        android:id="@+id/feed_message"
-        android:accessibilityLiveRegion="polite"
-        style="@style/BountyBody"
-        android:layout_marginTop="20dp"
-        android:gravity="center"
-        android:visibility="gone" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/feed_retry"
-        style="@style/BountyButton"
-        android:layout_marginTop="16dp"
-        android:text="@string/retry_action"
-        android:visibility="gone" />
-
-    <com.google.android.material.button.MaterialButton
-        android:id="@+id/empty_create_challenge"
-        style="@style/BountyButton"
-        android:layout_marginTop="20dp"
-        android:text="@string/create_first_challenge"
-        android:visibility="gone" />
-
-    <androidx.recyclerview.widget.RecyclerView
-        android:id="@+id/challenge_list"
+    <!-- Content Area below Transition -->
+    <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:layout_marginTop="16dp"
-        android:clipToPadding="false"
-        android:paddingBottom="88dp" />
+        android:orientation="vertical"
+        android:paddingHorizontal="16dp">
+
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/feed_loading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:indeterminate="true"
+            android:contentDescription="@string/loading_challenges" />
+
+        <TextView
+            android:id="@+id/feed_message"
+            android:accessibilityLiveRegion="polite"
+            style="@style/BountyBody"
+            android:layout_marginTop="20dp"
+            android:gravity="center"
+            android:visibility="gone" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/feed_retry"
+            style="@style/BountyButton"
+            android:layout_marginTop="16dp"
+            android:text="@string/retry_action"
+            android:visibility="gone" />
+
+        <com.google.android.material.button.MaterialButton
+            android:id="@+id/empty_create_challenge"
+            style="@style/BountyButton"
+            android:layout_marginTop="20dp"
+            android:text="@string/create_first_challenge"
+            android:visibility="gone" />
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/challenge_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:layout_marginTop="8dp"
+            android:clipToPadding="false"
+            android:paddingBottom="88dp" />
+    </LinearLayout>
 </LinearLayout>

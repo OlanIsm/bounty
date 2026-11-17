@@ -191,7 +191,19 @@ class MainActivity : AppCompatActivity() {
             val inflated = layoutInflater.inflate(layout, content, true)
             ViewMotion.animateEntrance(inflated)
         }
-        findViewById<MaterialToolbar>(R.id.main_toolbar).setTitle(title)
+        val toolbar = findViewById<MaterialToolbar>(R.id.main_toolbar)
+        val insetsController = WindowInsetsControllerCompat(window, window.decorView)
+        val rootLayout = findViewById<View>(R.id.main)
+        if (destination == R.id.nav_my_challenges) {
+            toolbar.visibility = View.GONE
+            rootLayout?.setBackgroundResource(R.color.bounty_primary)
+            insetsController.isAppearanceLightStatusBars = false
+        } else {
+            toolbar.visibility = View.VISIBLE
+            toolbar.setTitle(title)
+            rootLayout?.setBackgroundResource(R.color.bounty_background)
+            insetsController.isAppearanceLightStatusBars = true
+        }
         selectedDestination = destination
         backToHome.isEnabled = destination != R.id.nav_home
         val user = SessionManager(this).getCurrentUser()

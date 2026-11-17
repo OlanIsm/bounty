@@ -1,6 +1,8 @@
 <resources xmlns:tools="http://schemas.android.com/tools">
     <!-- Base application theme. -->
     <style name="Base.Theme.Bounty" parent="Theme.Material3.DayNight.NoActionBar">
+        <item name="fontFamily">@font/nunito</item>
+        <item name="android:fontFamily">@font/nunito</item>
         <item name="colorPrimary">@color/bounty_primary</item>
         <item name="colorOnPrimary">@color/white</item>
         <item name="colorPrimaryContainer">@color/bounty_primary_container</item>
@@ -25,6 +27,8 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">28sp</item>
+        <item name="android:fontFamily">@font/nunito</item>
+        <item name="fontFamily">@font/nunito</item>
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">-0.01</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
@@ -34,6 +38,8 @@
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
         <item name="android:textSize">15sp</item>
+        <item name="android:fontFamily">@font/nunito</item>
+        <item name="fontFamily">@font/nunito</item>
         <item name="android:textColor">?attr/colorOnSurface</item>
     </style>
 
@@ -42,6 +48,8 @@
         <item name="android:layout_height">wrap_content</item>
         <item name="android:minHeight">54dp</item>
         <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">@font/nunito</item>
+        <item name="fontFamily">@font/nunito</item>
         <item name="android:textStyle">bold</item>
         <item name="cornerRadius">28dp</item>
         <item name="backgroundTint">@color/bounty_primary</item>
@@ -100,6 +108,8 @@
 
     <style name="BountySection" parent="BountyBody">
         <item name="android:textSize">20sp</item>
+        <item name="android:fontFamily">@font/nunito</item>
+        <item name="fontFamily">@font/nunito</item>
         <item name="android:textStyle">bold</item>
         <item name="android:letterSpacing">-0.01</item>
     </style>
@@ -110,18 +120,24 @@
 
     <style name="BountyNavigationLabelActive" parent="TextAppearance.Material3.LabelSmall">
         <item name="android:textSize">11sp</item>
+        <item name="android:fontFamily">@font/nunito</item>
+        <item name="fontFamily">@font/nunito</item>
         <item name="android:textStyle">bold</item>
         <item name="android:includeFontPadding">false</item>
     </style>
 
     <style name="BountyNavigationLabelInactive" parent="TextAppearance.Material3.LabelSmall">
         <item name="android:textSize">11sp</item>
+        <item name="android:fontFamily">@font/nunito</item>
+        <item name="fontFamily">@font/nunito</item>
         <item name="android:textStyle">normal</item>
         <item name="android:includeFontPadding">false</item>
     </style>
 
     <style name="BountyCaption" parent="BountyBody">
         <item name="android:textSize">13sp</item>
+        <item name="android:fontFamily">@font/nunito</item>
+        <item name="fontFamily">@font/nunito</item>
         <item name="android:textColor">@color/bounty_text_secondary</item>
     </style>
 
@@ -132,11 +148,15 @@
         <item name="android:paddingHorizontal">14dp</item>
         <item name="android:paddingVertical">6dp</item>
         <item name="android:textSize">16sp</item>
+        <item name="android:fontFamily">@font/nunito</item>
+        <item name="fontFamily">@font/nunito</item>
         <item name="android:textStyle">bold</item>
     </style>
 
     <style name="BountyStatus" parent="BountyCaption">
         <item name="android:layout_width">wrap_content</item>
+        <item name="android:fontFamily">@font/nunito</item>
+        <item name="fontFamily">@font/nunito</item>
         <item name="android:textStyle">bold</item>
         <item name="android:paddingHorizontal">14dp</item>
         <item name="android:paddingVertical">5dp</item>
