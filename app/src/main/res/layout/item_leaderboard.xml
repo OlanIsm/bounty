@@ -11,106 +11,121 @@
     app:strokeColor="@color/bounty_surface_container"
     app:cardBackgroundColor="@color/bounty_surface">
 
-    <LinearLayout
+    <FrameLayout
+        android:id="@+id/leaderboard_item_container"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:paddingVertical="12dp"
-        android:paddingHorizontal="14dp">
+        android:layout_height="wrap_content">
 
-        <!-- Rank Indicator -->
-        <FrameLayout
-            android:id="@+id/rank_badge_container"
-            android:layout_width="34dp"
-            android:layout_height="34dp"
-            android:background="@drawable/bg_reward"
-            android:backgroundTint="@color/bounty_surface_container">
-
-            <TextView
-                android:id="@+id/rank_number"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:textColor="@color/bounty_text"
-                android:text="1" />
-        </FrameLayout>
-
-        <!-- User Avatar -->
-        <ImageView
-            android:id="@+id/leaderboard_avatar"
-            android:layout_width="42dp"
-            android:layout_height="42dp"
-            android:layout_marginStart="12dp"
-            android:src="@drawable/ic_avatar"
-            android:contentDescription="@null"
-            android:importantForAccessibility="no" />
-
-        <!-- User Info -->
         <LinearLayout
-            android:layout_width="0dp"
+            android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="12dp"
-            android:layout_marginEnd="8dp"
-            android:orientation="vertical">
+            android:orientation="horizontal"
+            android:gravity="center_vertical"
+            android:paddingVertical="12dp"
+            android:paddingHorizontal="14dp">
 
+            <!-- Rank Indicator -->
+            <FrameLayout
+                android:id="@+id/rank_badge_container"
+                android:layout_width="34dp"
+                android:layout_height="34dp"
+                android:background="@drawable/bg_reward"
+                android:backgroundTint="@color/bounty_surface_container">
+
+                <TextView
+                    android:id="@+id/rank_number"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/bounty_text"
+                    android:text="1" />
+            </FrameLayout>
+
+            <!-- User Avatar -->
+            <ImageView
+                android:id="@+id/leaderboard_avatar"
+                android:layout_width="42dp"
+                android:layout_height="42dp"
+                android:layout_marginStart="12dp"
+                android:src="@drawable/ic_avatar"
+                android:contentDescription="@null"
+                android:importantForAccessibility="no" />
+
+            <!-- User Info -->
             <LinearLayout
-                android:layout_width="wrap_content"
+                android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:orientation="horizontal"
-                android:gravity="center_vertical">
+                android:layout_weight="1"
+                android:layout_marginStart="12dp"
+                android:layout_marginEnd="8dp"
+                android:orientation="vertical">
 
-                <TextView
-                    android:id="@+id/leaderboard_user_name"
-                    style="@style/BountyHeading"
+                <LinearLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:textSize="15sp"
-                    android:textStyle="bold"
-                    android:singleLine="true"
-                    android:ellipsize="end"
-                    android:text="User Name" />
+                    android:orientation="horizontal"
+                    android:gravity="center_vertical">
+
+                    <TextView
+                        android:id="@+id/leaderboard_user_name"
+                        style="@style/BountyHeading"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textSize="15sp"
+                        android:textStyle="bold"
+                        android:singleLine="true"
+                        android:ellipsize="end"
+                        android:text="User Name" />
+
+                    <TextView
+                        android:id="@+id/badge_you"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="6dp"
+                        android:background="@drawable/bg_reward"
+                        android:backgroundTint="@color/bounty_primary_fixed"
+                        android:textColor="@color/bounty_on_primary_fixed"
+                        android:text="Kamu"
+                        android:textSize="10sp"
+                        android:textStyle="bold"
+                        android:paddingHorizontal="6dp"
+                        android:paddingVertical="2dp"
+                        android:visibility="gone" />
+                </LinearLayout>
 
                 <TextView
-                    android:id="@+id/badge_you"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="6dp"
-                    android:background="@drawable/bg_reward"
-                    android:backgroundTint="@color/bounty_primary_fixed"
-                    android:textColor="@color/bounty_on_primary_fixed"
-                    android:text="Kamu"
-                    android:textSize="10sp"
-                    android:textStyle="bold"
-                    android:paddingHorizontal="6dp"
-                    android:paddingVertical="2dp"
-                    android:visibility="gone" />
+                    android:id="@+id/leaderboard_role_subtitle"
+                    style="@style/BountyCaption"
+                    android:layout_marginTop="2dp"
+                    android:textSize="12sp"
+                    android:textColor="@color/bounty_text_secondary"
+                    android:text="Aktif di Bounty" />
             </LinearLayout>
 
+            <!-- Score / Count Pill -->
             <TextView
-                android:id="@+id/leaderboard_role_subtitle"
-                style="@style/BountyCaption"
-                android:layout_marginTop="2dp"
+                android:id="@+id/leaderboard_score_badge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:background="@drawable/bg_reward"
+                android:backgroundTint="@color/bounty_surface_container_low"
+                android:textColor="@color/bounty_primary"
                 android:textSize="12sp"
-                android:textColor="@color/bounty_text_secondary"
-                android:text="Aktif di Bounty" />
+                android:textStyle="bold"
+                android:paddingHorizontal="10dp"
+                android:paddingVertical="6dp"
+                android:text="0 Challenge" />
         </LinearLayout>
 
-        <!-- Score / Count Pill -->
-        <TextView
-            android:id="@+id/leaderboard_score_badge"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_reward"
-            android:backgroundTint="@color/bounty_surface_container_low"
-            android:textColor="@color/bounty_primary"
-            android:textSize="12sp"
-            android:textStyle="bold"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="6dp"
-            android:text="0 Challenge" />
-    </LinearLayout>
+        <!-- Shiny Highlight Overlay View for Top 1, 2, 3 Ranks -->
+        <View
+            android:id="@+id/leaderboard_card_shine"
+            android:layout_width="80dp"
+            android:layout_height="match_parent"
+            android:background="@drawable/bg_shine_sweep"
+            android:alpha="0.0"
+            android:visibility="gone" />
+    </FrameLayout>
 </com.google.android.material.card.MaterialCardView>

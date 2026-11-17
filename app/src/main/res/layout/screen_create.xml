@@ -3,41 +3,76 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/create_screen"
     style="@style/BountyScreen"
-    android:background="@color/bounty_background">
+    android:background="@drawable/bg_create_gradient">
 
     <LinearLayout
         style="@style/BountyScreenContent"
         android:paddingBottom="96dp">
 
-        <TextView
-            style="@style/BountyHeading"
-            android:textSize="26sp"
-            android:textStyle="bold"
-            android:letterSpacing="-0.02"
-            android:text="@string/create_challenge_title" />
+        <!-- Header Section with Title & Icon Accent -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:gravity="center_vertical">
 
-        <TextView
-            style="@style/BountyBody"
-            android:layout_marginTop="6dp"
-            android:textSize="14sp"
-            android:textColor="@color/bounty_text_secondary"
-            android:text="@string/create_description" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
+                <TextView
+                    style="@style/BountyHeading"
+                    android:textSize="26sp"
+                    android:textStyle="bold"
+                    android:letterSpacing="-0.02"
+                    android:textColor="@color/bounty_text"
+                    android:text="@string/create_challenge_title" />
+
+                <TextView
+                    style="@style/BountyBody"
+                    android:layout_marginTop="4dp"
+                    android:textSize="14sp"
+                    android:textColor="@color/bounty_text_secondary"
+                    android:text="@string/create_description" />
+            </LinearLayout>
+
+            <!-- Decorative Create Icon Badge -->
+            <FrameLayout
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_marginStart="12dp"
+                android:background="@drawable/bg_reward"
+                android:backgroundTint="@color/bounty_primary_fixed">
+
+                <ImageView
+                    android:layout_width="24dp"
+                    android:layout_height="24dp"
+                    android:layout_gravity="center"
+                    android:src="@drawable/ic_create"
+                    app:tint="@color/bounty_primary"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no" />
+            </FrameLayout>
+        </LinearLayout>
+
+        <!-- Main Form Card -->
         <com.google.android.material.card.MaterialCardView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp"
             app:cardCornerRadius="24dp"
             app:cardElevation="2dp"
-            app:strokeWidth="1dp"
-            app:strokeColor="@color/bounty_surface_container"
+            app:strokeWidth="1.2dp"
+            app:strokeColor="#204648D4"
             app:cardBackgroundColor="@color/bounty_surface">
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:padding="20dp">
+                android:padding="22dp">
 
                 <!-- Title Input -->
                 <com.google.android.material.textfield.TextInputLayout
@@ -45,6 +80,12 @@
                     style="@style/BountyTextInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
+                    app:startIconDrawable="@drawable/ic_target"
+                    app:startIconTint="@color/bounty_primary"
+                    app:boxCornerRadiusTopStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusBottomEnd="16dp"
                     android:hint="@string/challenge_title_label">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -54,6 +95,7 @@
                         android:inputType="textCapSentences"
                         android:singleLine="true"
                         android:maxLength="100"
+                        android:textSize="15sp"
                         android:imeOptions="actionNext" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -63,7 +105,11 @@
                     style="@style/BountyTextInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="18dp"
+                    app:boxCornerRadiusTopStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusBottomEnd="16dp"
                     android:hint="@string/challenge_description_label">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -71,8 +117,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:inputType="textMultiLine|textCapSentences"
-                        android:minLines="3"
+                        android:minLines="4"
                         android:maxLength="2000"
+                        android:textSize="14sp"
                         android:gravity="top|start" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -82,7 +129,14 @@
                     style="@style/BountyTextInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="18dp"
+                    app:boxCornerRadiusTopStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusBottomEnd="16dp"
+                    app:startIconDrawable="@drawable/ic_coin"
+                    app:startIconTint="@null"
+                    app:prefixText="Rp "
                     android:hint="@string/challenge_reward_label"
                     app:helperText="@string/reward_input_hint">
 
@@ -93,6 +147,7 @@
                         android:inputType="number"
                         android:maxLength="20"
                         android:singleLine="true"
+                        android:textSize="15sp"
                         android:imeOptions="actionNext" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -102,12 +157,17 @@
                     style="@style/BountyTextInput"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
+                    android:layout_marginTop="18dp"
+                    app:boxCornerRadiusTopStart="16dp"
+                    app:boxCornerRadiusTopEnd="16dp"
+                    app:boxCornerRadiusBottomStart="16dp"
+                    app:boxCornerRadiusBottomEnd="16dp"
                     android:hint="@string/challenge_deadline_label"
                     app:helperText="@string/deadline_input_hint"
                     app:endIconMode="custom"
                     app:errorIconDrawable="@null"
                     app:endIconDrawable="@drawable/ic_calendar"
+                    app:endIconTint="@color/bounty_primary"
                     app:endIconContentDescription="@string/choose_deadline">
 
                     <com.google.android.material.textfield.TextInputEditText
@@ -117,24 +177,30 @@
                         android:inputType="date"
                         android:maxLength="10"
                         android:singleLine="true"
+                        android:textSize="15sp"
                         android:imeOptions="actionDone" />
                 </com.google.android.material.textfield.TextInputLayout>
             </LinearLayout>
         </com.google.android.material.card.MaterialCardView>
 
+        <!-- Loading Indicator -->
         <com.google.android.material.progressindicator.LinearProgressIndicator
             android:id="@+id/publish_loading"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="20dp"
             android:indeterminate="true"
             android:visibility="gone"
             android:contentDescription="@string/publishing_challenge" />
 
+        <!-- High-Impact 3D Publish Button -->
         <com.google.android.material.button.MaterialButton
             android:id="@+id/publish_button"
             style="@style/BountyButton"
-            android:layout_marginTop="24dp"
+            android:layout_marginTop="20dp"
+            android:minHeight="54dp"
+            android:textSize="16sp"
+            android:textStyle="bold"
             android:text="@string/publish_action" />
     </LinearLayout>
 </ScrollView>

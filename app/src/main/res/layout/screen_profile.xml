@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/profile_screen"
     style="@style/BountyScreen"
-    android:background="@color/bounty_background">
+    android:background="@drawable/bg_profile_gradient">
 
     <LinearLayout
         style="@style/BountyScreenContent"
