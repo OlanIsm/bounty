@@ -2,11 +2,15 @@ package id.ac.binus.bounty.utils
 
 import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
+import android.animation.ValueAnimator
 import android.annotation.SuppressLint
 import android.view.MotionEvent
 import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.view.animation.DecelerateInterpolator
+import android.view.animation.LinearInterpolator
 import android.view.animation.OvershootInterpolator
+import id.ac.binus.bounty.R
 
 /**
  * Fluid, tactile motion utilities inspired by Apple Designing Fluid Interfaces (WWDC)
@@ -76,6 +80,80 @@ object ViewMotion {
             startDelay = delayMs
             interpolator = DecelerateInterpolator(1.6f)
             start()
+        }
+    }
+
+    /**
+     * Gentle, flowing coin animation:
+     * - Slow yaw rotation (-22 to +22 deg) facing left/right smoothly
+     * - Subtle floating translation (-4dp to +4dp)
+     * Calm pace so it does not stress the eye.
+     */
+    @JvmStatic
+    fun startGentleCoinAnimation(coinView: View) {
+        // Avoid stacking duplicate animators
+        if (coinView.getTag(R.id.tag_animating) == true) return
+        coinView.setTag(R.id.tag_animating, true)
+
+        val yawAnim = ObjectAnimator.ofFloat(coinView, View.ROTATION_Y, -22f, 22f).apply {
+            duration = 3200
+            repeatMode = ValueAnimator.REVERSE
+            repeatCount = ValueAnimator.INFINITE
+            interpolator = AccelerateDecelerateInterpolator()
+        }
+
+        val floatAnim = ObjectAnimator.ofFloat(coinView, View.TRANSLATION_Y, -4f, 4f).apply {
+            duration = 2600
+            repeatMode = ValueAnimator.REVERSE
+            repeatCount = ValueAnimator.INFINITE
+            interpolator = AccelerateDecelerateInterpolator()
+        }
+
+        AnimatorSet().apply {
+            playTogether(yawAnim, floatAnim)
+            start()
+        }
+    }
+
+    /**
+     * Subtle shiny sweep across a surface or card:
+     * Sweeps periodically with an elegant pause.
+     */
+    @JvmStatic
+    fun startShimmerSweep(shineView: View, container: View, intervalMs: Long = 4200) {
+        if (shineView.getTag(R.id.tag_animating) == true) return
+        shineView.setTag(R.id.tag_animating, true)
+
+        container.post {
+            val width = if (container.width > 0) container.width.toFloat() else 600f
+            shineView.translationX = -shineView.width.toFloat().coerceAtLeast(100f)
+            shineView.alpha = 0f
+
+            val sweepAnim = ValueAnimator.ofFloat(-120f, width + 120f).apply {
+                duration = 1600
+                startDelay = 600
+                interpolator = AccelerateDecelerateInterpolator()
+                addUpdateListener { anim ->
+                    val pos = anim.animatedValue as Float
+                    shineView.translationX = pos
+                    // Smooth bell-curve alpha for shine
+                    val progress = anim.animatedFraction
+                    shineView.alpha = if (progress < 0.2f) {
+                        progress / 0.2f * 0.7f
+                    } else if (progress > 0.8f) {
+                        (1f - progress) / 0.2f * 0.7f
+                    } else {
+                        0.7f
+                    }
+                }
+            }
+
+            fun loop() {
+                sweepAnim.start()
+                container.postDelayed({ loop() }, intervalMs)
+            }
+
+            loop()
         }
     }
 }

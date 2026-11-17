@@ -523,6 +523,15 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+            root.findViewById<ImageView>(R.id.demo_balance_coin_icon)?.let { coin ->
+                ViewMotion.startGentleCoinAnimation(coin)
+            }
+            val shine = root.findViewById<View>(R.id.demo_balance_shine)
+            val balanceContainer = root.findViewById<View>(R.id.demo_balance_container)
+            if (shine != null && balanceContainer != null) {
+                ViewMotion.startShimmerSweep(shine, balanceContainer)
+            }
+
             root.findViewById<TextView>(R.id.stat_attempted_count)?.text = attemptedCount.toString()
             root.findViewById<TextView>(R.id.stat_created_count)?.text = createdCount.toString()
             root.findViewById<TextView>(R.id.stat_leaderboard_rank)?.text = if (leaderboardRank > 0) "#$leaderboardRank" else "#1"
@@ -631,6 +640,14 @@ class MainActivity : AppCompatActivity() {
                     .error(R.drawable.ic_avatar)
                     .circleCrop()
                     .into(img)
+            }
+            findViewById<ImageView?>(R.id.demo_balance_coin_icon)?.let { coin ->
+                ViewMotion.startGentleCoinAnimation(coin)
+            }
+            val shine = findViewById<View?>(R.id.demo_balance_shine)
+            val balanceContainer = findViewById<View?>(R.id.demo_balance_container)
+            if (shine != null && balanceContainer != null) {
+                ViewMotion.startShimmerSweep(shine, balanceContainer)
             }
         }
     }
