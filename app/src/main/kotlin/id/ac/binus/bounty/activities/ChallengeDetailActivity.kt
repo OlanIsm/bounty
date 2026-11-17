@@ -40,20 +40,37 @@ class ChallengeDetailActivity : AppCompatActivity() {
                 Snackbar.make(findViewById(R.id.main), R.string.accept_unavailable, Snackbar.LENGTH_LONG).show()
             }
         }
-        val acceptBtn = findViewById<View>(R.id.accept_button)
+        supportFragmentManager.setFragmentResultListener("confirm_cancel", this) { _, data ->
+            val user = SessionManager(this).getCurrentUser()
+            if (user != null && user.id == data.getString("actor")) {
+                acceptModel.cancel(data.getString("challenge").orEmpty(), user)
+            } else {
+                Snackbar.make(findViewById(R.id.main), R.string.accept_unavailable, Snackbar.LENGTH_LONG).show()
+            }
+        }
+        val acceptBtn = findViewById<MaterialButton>(R.id.accept_button)
         ViewMotion.applySpringPress(acceptBtn) {
             val user = SessionManager(this).getCurrentUser()
             val challenge = currentChallenge ?: return@applySpringPress
             if (!acceptBtn.isEnabled || user == null) return@applySpringPress
+            val isHunter = challenge.status == Challenge.ACCEPTED && challenge.participantId == user.id
             val data = Bundle().apply {
                 putString("challenge", challenge.cloudId)
                 putString("actor", user.id)
             }
-            ActionConfirmation.show(
-                supportFragmentManager, "confirm_accept", getString(R.string.confirm_accept_title),
-                getString(R.string.confirm_accept_message, challenge.title, ChallengeDisplay.rupiah(this, challenge.reward)),
-                getString(R.string.accept_action), data
-            )
+            if (isHunter) {
+                ActionConfirmation.show(
+                    supportFragmentManager, "confirm_cancel", getString(R.string.confirm_cancel_title),
+                    getString(R.string.confirm_cancel_message),
+                    getString(R.string.cancel_challenge_action), data
+                )
+            } else {
+                ActionConfirmation.show(
+                    supportFragmentManager, "confirm_accept", getString(R.string.confirm_accept_title),
+                    getString(R.string.confirm_accept_message, challenge.title, ChallengeDisplay.rupiah(this, challenge.reward)),
+                    getString(R.string.accept_action), data
+                )
+            }
         }
         val submitProofBtn = findViewById<View>(R.id.submit_proof_button)
         ViewMotion.applySpringPress(submitProofBtn) {
@@ -67,9 +84,10 @@ class ChallengeDetailActivity : AppCompatActivity() {
         }
         acceptModel.state.observe(this) { state ->
             bindAccept()
-            if (state != AcceptModel.IDLE && state != AcceptModel.SAVING) {
+            if (state != AcceptModel.IDLE && state != AcceptModel.SAVING && state != AcceptModel.CANCELING) {
                 val message = when (state) {
                     AcceptModel.SAVED -> R.string.challenge_accepted
+                    AcceptModel.CANCELED -> R.string.challenge_canceled
                     AcceptModel.UNAVAILABLE -> R.string.accept_unavailable
                     else -> R.string.accept_error
                 }
@@ -133,12 +151,23 @@ class ChallengeDetailActivity : AppCompatActivity() {
         val challenge = currentChallenge
         val button = findViewById<MaterialButton>(R.id.accept_button)
         val saving = acceptModel.state.value == AcceptModel.SAVING
+        val canceling = acceptModel.state.value == AcceptModel.CANCELING
         val own = challenge != null && user != null && challenge.creatorId == user.id
         val available = challenge != null && challenge.status == Challenge.OPEN && challenge.participantId == null
-        button.isEnabled = user != null && available && !own && !saving
-        button.setText(if (saving) R.string.accepting_challenge else R.string.accept_action)
+        val isHunter = challenge != null && user != null && challenge.status == Challenge.ACCEPTED && user.id == challenge.participantId
+
+        if (isHunter) {
+            button.isEnabled = !canceling
+            button.setBackgroundResource(R.drawable.bg_btn_duolingo_3d_red)
+            button.setText(if (canceling) R.string.canceling_challenge else R.string.cancel_challenge_action)
+        } else {
+            button.setBackgroundResource(R.drawable.bg_btn_duolingo_3d_primary)
+            button.isEnabled = user != null && available && !own && !saving
+            button.setText(if (saving) R.string.accepting_challenge else R.string.accept_action)
+        }
+
         findViewById<View>(R.id.submit_proof_button).visibility =
-            if (challenge != null && user != null && challenge.status == Challenge.ACCEPTED && user.id == challenge.participantId) View.VISIBLE else View.GONE
+            if (isHunter) View.VISIBLE else View.GONE
         findViewById<View>(R.id.review_proof_button).visibility =
             if (own && challenge?.status == Challenge.SUBMITTED) View.VISIBLE else View.GONE
         val result = findViewById<TextView>(R.id.reward_result)
@@ -183,12 +212,26 @@ class ChallengeDetailActivity : AppCompatActivity() {
             }
         }
 
+        fun cancel(id: String, user: User) {
+            if (state.value != IDLE) return
+            state.value = CANCELING
+            FirebaseBountyRepository.cancelChallenge(id, user.id) { result ->
+                result.onSuccess { state.value = if (it) CANCELED else UNAVAILABLE }
+                    .onFailure { error ->
+                        Log.e("BountyAccept", "Unable to cancel challenge", error)
+                        state.value = ERROR
+                    }
+            }
+        }
+
         companion object {
             const val IDLE = 0
             const val SAVING = 1
             const val SAVED = 2
             const val UNAVAILABLE = 3
             const val ERROR = 4
+            const val CANCELING = 5
+            const val CANCELED = 6
         }
     }
 

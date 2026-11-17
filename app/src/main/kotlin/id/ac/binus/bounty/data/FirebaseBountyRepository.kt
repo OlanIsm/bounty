@@ -79,6 +79,23 @@ object FirebaseBountyRepository {
             .addOnFailureListener { callback(Result.failure(it)) }
     }
 
+    fun cancelChallenge(id: String, uid: String, callback: (Result<Boolean>) -> Unit) {
+        val reference = challenges.document(id)
+        firestore.runTransaction { transaction ->
+            val snapshot = transaction.get(reference)
+            if (!snapshot.exists() || snapshot.getString("status") != Challenge.ACCEPTED ||
+                snapshot.getString("participantId") != uid
+            ) return@runTransaction false
+            transaction.update(reference, mapOf(
+                "status" to Challenge.OPEN,
+                "participantId" to null,
+                "participantName" to null
+            ))
+            true
+        }.addOnSuccessListener { callback(Result.success(it)) }
+            .addOnFailureListener { callback(Result.failure(it)) }
+    }
+
     fun getLatestProof(challenge: Challenge, callback: (Result<Proof?>) -> Unit) {
         val challengeId = challenge.cloudId ?: return callback(Result.failure(IllegalArgumentException("Missing challenge ID")))
         val proofId = challenge.latestProofId ?: return callback(Result.success(null))

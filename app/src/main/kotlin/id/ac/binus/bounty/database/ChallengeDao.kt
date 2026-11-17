@@ -29,6 +29,9 @@ interface ChallengeDao {
     @Query("UPDATE challenges SET status = 'ACCEPTED', participantId = :hunterId, participantName = :hunterName WHERE id = :id AND status = 'OPEN' AND participantId IS NULL AND creatorId != :hunterId")
     fun acceptChallenge(id: Int, hunterId: String, hunterName: String): Int
 
+    @Query("UPDATE challenges SET status = 'OPEN', participantId = NULL, participantName = NULL WHERE id = :id AND status = 'ACCEPTED' AND participantId = :hunterId")
+    fun cancelChallenge(id: Int, hunterId: String): Int
+
     @Query("UPDATE challenges SET status = 'SUBMITTED' WHERE id = :id AND status = 'ACCEPTED' AND participantId = :hunterId")
     fun markSubmitted(id: Int, hunterId: String): Int
 

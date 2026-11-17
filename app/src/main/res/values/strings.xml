@@ -137,4 +137,9 @@
     <string name="profile_setting_about">Tentang Bounty</string>
     <string name="profile_setting_about_desc">Bounty v1.0.0 MVP • Kursus Android</string>
     <string name="profile_action_saved">Pengaturan berhasil diperbarui.</string>
+    <string name="cancel_challenge_action">Batal Terima Tantangan</string>
+    <string name="canceling_challenge">Membatalkan tantangan&#8230;</string>
+    <string name="challenge_canceled">Tantangan berhasil dibatalkan.</string>
+    <string name="confirm_cancel_title">Are you sure?</string>
+    <string name="confirm_cancel_message">Yakin ingin membatalkan tantangan ini? Status akan kembali terbuka untuk hunter lain.</string>
 </resources>

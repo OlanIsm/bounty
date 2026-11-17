@@ -44,6 +44,7 @@ class LeaderboardAdapter : RecyclerView.Adapter<LeaderboardAdapter.ViewHolder>()
         val subtitle: TextView = itemView.findViewById(R.id.leaderboard_role_subtitle)
         val scoreBadge: TextView = itemView.findViewById(R.id.leaderboard_score_badge)
         val cardShine: View = itemView.findViewById(R.id.leaderboard_card_shine)
+        val sparkle: ImageView = itemView.findViewById(R.id.rank_top1_sparkle)
     }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -83,10 +84,12 @@ class LeaderboardAdapter : RecyclerView.Adapter<LeaderboardAdapter.ViewHolder>()
                 holder.scoreBadge.backgroundTintList = ColorStateList.valueOf(Color.parseColor("#FDE047"))
                 holder.scoreBadge.setTextColor(Color.parseColor("#713F12"))
                 holder.cardShine.visibility = View.VISIBLE
+                holder.sparkle.visibility = View.VISIBLE
                 ViewMotion.startShimmerSweep(holder.cardShine, holder.card, 3600)
             }
             2 -> {
                 // Top 2: Full Green / Emerald Card
+                holder.sparkle.visibility = View.GONE
                 holder.card.setCardBackgroundColor(Color.parseColor("#DCFCE7"))
                 holder.card.strokeColor = if (item.isCurrentUser) context.getColor(R.color.bounty_primary) else Color.parseColor("#22C55E")
                 holder.card.strokeWidth = 2
@@ -101,6 +104,7 @@ class LeaderboardAdapter : RecyclerView.Adapter<LeaderboardAdapter.ViewHolder>()
             }
             3 -> {
                 // Top 3: Full Blue / Azure Card
+                holder.sparkle.visibility = View.GONE
                 holder.card.setCardBackgroundColor(Color.parseColor("#DBEAFE"))
                 holder.card.strokeColor = if (item.isCurrentUser) context.getColor(R.color.bounty_primary) else Color.parseColor("#3B82F6")
                 holder.card.strokeWidth = 2
@@ -125,6 +129,7 @@ class LeaderboardAdapter : RecyclerView.Adapter<LeaderboardAdapter.ViewHolder>()
                 holder.scoreBadge.backgroundTintList = ColorStateList.valueOf(context.getColor(R.color.bounty_surface_container_low))
                 holder.scoreBadge.setTextColor(context.getColor(R.color.bounty_primary))
                 holder.cardShine.visibility = View.GONE
+                holder.sparkle.visibility = View.GONE
             }
         }
 
