@@ -4,9 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@color/bounty_background"
-    android:paddingHorizontal="16dp"
-    android:paddingTop="8dp">
+    android:background="@color/bounty_background">
 
     <com.google.android.material.progressindicator.LinearProgressIndicator
         android:id="@+id/feed_loading"
@@ -20,6 +18,7 @@
         style="@style/BountyButton"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="8dp"
+        android:layout_marginHorizontal="16dp"
         android:text="@string/retry_action"
         android:visibility="gone" />
 

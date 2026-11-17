@@ -112,7 +112,16 @@ class MainActivity : AppCompatActivity() {
     override fun onPostCreate(savedInstanceState: Bundle?) {
         super.onPostCreate(savedInstanceState)
         if (navigation == null) return
-        demoUsersModel.state.observe(this) { bindDemoUsers() }
+        demoUsersModel.state.observe(this) { state ->
+            bindDemoUsers()
+            homeHeaderAdapter?.let {
+                it.demoUsers = state.users
+                it.notifyItemChanged(0)
+            }
+        }
+        if (demoUsersModel.state.value == null) {
+            demoUsersModel.load(ApiClient.getApi())
+        }
         publishModel.state.observe(this) { state ->
             updatePublishState()
             if (state == PublishModel.SAVED) {
@@ -194,13 +203,13 @@ class MainActivity : AppCompatActivity() {
         val toolbar = findViewById<MaterialToolbar>(R.id.main_toolbar)
         val insetsController = WindowInsetsControllerCompat(window, window.decorView)
         val rootLayout = findViewById<View>(R.id.main)
-        if (destination == R.id.nav_my_challenges) {
+        toolbar.setTitle(title)
+        if (destination == R.id.nav_my_challenges || destination == R.id.nav_home) {
             toolbar.visibility = View.GONE
             rootLayout?.setBackgroundResource(R.color.bounty_primary)
             insetsController.isAppearanceLightStatusBars = false
         } else {
             toolbar.visibility = View.VISIBLE
-            toolbar.setTitle(title)
             rootLayout?.setBackgroundResource(R.color.bounty_background)
             insetsController.isAppearanceLightStatusBars = true
         }
@@ -220,8 +229,14 @@ class MainActivity : AppCompatActivity() {
             }
             list.itemAnimator = null
             if (destination == R.id.nav_home) {
-                homeHeaderAdapter = HomeHeaderAdapter(user) {
-                    navigation?.selectedItemId = R.id.nav_create
+                homeHeaderAdapter = HomeHeaderAdapter(
+                    user = user,
+                    onCreateClick = { navigation?.selectedItemId = R.id.nav_create },
+                    onSeeAllClick = { navigation?.selectedItemId = R.id.nav_leaderboard },
+                    onFollowToggle = { hunter -> toggleFollowUser(hunter) }
+                ).apply {
+                    followedUserIds = getFollowedUserIds()
+                    demoUsersModel.state.value?.let { demoUsers = it.users }
                 }
                 list.adapter = ConcatAdapter(homeHeaderAdapter!!, feedAdapter!!)
             } else list.adapter = feedAdapter
@@ -355,6 +370,18 @@ class MainActivity : AppCompatActivity() {
                     feedAdapter?.submitList(challenges)
                     list.visibility = View.VISIBLE
                     homeHeaderAdapter?.isEmpty = challenges.isEmpty()
+                    val attempted = challenges.count { it.participantId == user.id }
+                    val created = challenges.count { it.creatorId == user.id }
+                    val creators = challenges.filter { it.creatorId.isNotEmpty() }
+                        .groupBy { it.creatorId }
+                        .mapValues { it.value.size }
+                    val rankIndex = creators.entries.sortedByDescending { it.value }.indexOfFirst { it.key == user.id }
+                    homeHeaderAdapter?.let {
+                        it.attemptedCount = attempted
+                        it.createdCount = created
+                        it.leaderboardRank = if (rankIndex >= 0) rankIndex + 1 else 1
+                        it.notifyItemChanged(0)
+                    }
                 }
             } else {
                 Log.e("BountyFeed", "Unable to load challenges", result.exceptionOrNull())
@@ -420,9 +447,33 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun getFollowedUserIds(): Set<String> {
+        val prefs = getSharedPreferences("bounty_follows", MODE_PRIVATE)
+        return prefs.getStringSet("followed_ids", emptySet()) ?: emptySet()
+    }
+
+    private fun toggleFollowUser(targetUser: User) {
+        val prefs = getSharedPreferences("bounty_follows", MODE_PRIVATE)
+        val ids = getFollowedUserIds().toMutableSet()
+        if (ids.contains(targetUser.id)) {
+            ids.remove(targetUser.id)
+            Toast.makeText(this, "Batal mengikuti ${targetUser.name}", Toast.LENGTH_SHORT).show()
+        } else {
+            ids.add(targetUser.id)
+            Toast.makeText(this, "Mengikuti ${targetUser.name}! 🎉", Toast.LENGTH_SHORT).show()
+        }
+        prefs.edit().putStringSet("followed_ids", ids).apply()
+        homeHeaderAdapter?.let {
+            it.followedUserIds = ids
+            it.notifyItemChanged(0)
+        }
+    }
+
     private class HomeHeaderAdapter(
         var user: User?,
-        private val onCreateClick: () -> Unit
+        private val onCreateClick: () -> Unit,
+        private val onSeeAllClick: () -> Unit,
+        private val onFollowToggle: (User) -> Unit
     ) : RecyclerView.Adapter<HomeHeaderAdapter.ViewHolder>() {
 
         var isEmpty: Boolean = false
@@ -441,6 +492,12 @@ class MainActivity : AppCompatActivity() {
                 }
             }
 
+        var attemptedCount: Int = 0
+        var createdCount: Int = 0
+        var leaderboardRank: Int = 0
+        var demoUsers: List<User> = emptyList()
+        var followedUserIds: Set<String> = emptySet()
+
         class ViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView)
 
         override fun onCreateViewHolder(parent: ViewGroup, type: Int) = ViewHolder(
@@ -451,26 +508,69 @@ class MainActivity : AppCompatActivity() {
             val currentUser = user
             val root = holder.itemView
             if (currentUser != null) {
-                root.findViewById<TextView>(R.id.welcome_text).text =
+                root.findViewById<TextView>(R.id.welcome_text)?.text =
                     root.context.getString(R.string.welcome_user, currentUser.name)
-                root.findViewById<TextView>(R.id.demo_balance_amount).text =
+                root.findViewById<TextView>(R.id.demo_balance_amount)?.text =
                     ChallengeDisplay.rupiah(root.context, currentUser.demoBalance)
+                root.findViewById<ImageView>(R.id.home_user_avatar)?.let { img ->
+                    Glide.with(img).load(currentUser.avatarUrl)
+                        .placeholder(R.drawable.ic_avatar)
+                        .error(R.drawable.ic_avatar)
+                        .circleCrop()
+                        .into(img)
+                }
             }
+
+            root.findViewById<TextView>(R.id.stat_attempted_count)?.text = attemptedCount.toString()
+            root.findViewById<TextView>(R.id.stat_created_count)?.text = createdCount.toString()
+            root.findViewById<TextView>(R.id.stat_leaderboard_rank)?.text = if (leaderboardRank > 0) "#$leaderboardRank" else "#1"
+
+            root.findViewById<View>(R.id.home_quick_create_btn)?.let {
+                ViewMotion.applySpringPress(it) { onCreateClick() }
+            }
+            root.findViewById<View>(R.id.btn_see_all_hunters)?.let {
+                ViewMotion.applySpringPress(it) { onSeeAllClick() }
+            }
+
+            // Followed users container
+            val container = root.findViewById<LinearLayout>(R.id.home_followed_users_container)
+            container?.removeAllViews()
+            val inflater = LayoutInflater.from(root.context)
+            demoUsers.take(8).forEach { hunter ->
+                val hunterView = inflater.inflate(R.layout.item_home_hunter, container, false)
+                hunterView.findViewById<TextView>(R.id.hunter_name).text = hunter.name
+                val img = hunterView.findViewById<ImageView>(R.id.hunter_avatar)
+                Glide.with(img).load(hunter.avatarUrl).placeholder(R.drawable.ic_avatar).error(R.drawable.ic_avatar).circleCrop().into(img)
+                val followBtn = hunterView.findViewById<TextView>(R.id.hunter_follow_btn)
+                val isFollowing = followedUserIds.contains(hunter.id)
+                if (isFollowing) {
+                    followBtn.text = "✓ Diikuti"
+                    followBtn.setBackgroundResource(R.drawable.bg_btn_duolingo_3d_green)
+                } else {
+                    followBtn.text = "+ Ikuti"
+                    followBtn.setBackgroundResource(R.drawable.bg_btn_duolingo_3d_primary)
+                }
+                ViewMotion.applySpringPress(followBtn) {
+                    onFollowToggle(hunter)
+                }
+                container?.addView(hunterView)
+            }
+
             val emptyContainer = root.findViewById<View>(R.id.home_empty_container)
             val feedMsg = root.findViewById<TextView>(R.id.feed_message)
             val createBtn = root.findViewById<View>(R.id.home_create_challenge)
 
             if (errorMessage != null) {
-                emptyContainer.visibility = View.VISIBLE
-                feedMsg.text = errorMessage
-                createBtn.visibility = View.GONE
+                emptyContainer?.visibility = View.VISIBLE
+                feedMsg?.text = errorMessage
+                createBtn?.visibility = View.GONE
             } else if (isEmpty) {
-                emptyContainer.visibility = View.VISIBLE
-                feedMsg.setText(R.string.no_available_challenges)
-                createBtn.visibility = View.VISIBLE
-                ViewMotion.applySpringPress(createBtn) { onCreateClick() }
+                emptyContainer?.visibility = View.VISIBLE
+                feedMsg?.setText(R.string.no_available_challenges)
+                createBtn?.visibility = View.VISIBLE
+                createBtn?.let { ViewMotion.applySpringPress(it) { onCreateClick() } }
             } else {
-                emptyContainer.visibility = View.GONE
+                emptyContainer?.visibility = View.GONE
             }
         }
 
