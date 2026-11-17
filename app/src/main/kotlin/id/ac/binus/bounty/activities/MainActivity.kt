@@ -208,6 +208,10 @@ class MainActivity : AppCompatActivity() {
             toolbar.visibility = View.GONE
             rootLayout?.setBackgroundResource(R.color.bounty_primary)
             insetsController.isAppearanceLightStatusBars = false
+        } else if (destination == R.id.nav_leaderboard) {
+            toolbar.visibility = View.GONE
+            rootLayout?.setBackgroundResource(R.color.bounty_orange_hero)
+            insetsController.isAppearanceLightStatusBars = false
         } else {
             toolbar.visibility = View.VISIBLE
             rootLayout?.setBackgroundResource(R.color.bounty_background)

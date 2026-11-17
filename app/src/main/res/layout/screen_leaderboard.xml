@@ -7,22 +7,7 @@
     android:orientation="vertical"
     android:background="@color/bounty_background">
 
-    <!-- Top Page Title (Black, exactly like Image 2) -->
-    <TextView
-        android:id="@+id/leaderboard_page_title"
-        style="@style/BountyHeading"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingHorizontal="16dp"
-        android:paddingTop="14dp"
-        android:paddingBottom="8dp"
-        android:textSize="26sp"
-        android:textStyle="bold"
-        android:letterSpacing="-0.02"
-        android:textColor="@color/bounty_text"
-        android:text="@string/leaderboard_title" />
-
-    <!-- Orange Hero Banner with Mascot (Exactly like Image 2) -->
+    <!-- Orange Hero Banner with Mascot (Edge-to-edge covering status bar) -->
     <LinearLayout
         android:id="@+id/leaderboard_header_container"
         android:layout_width="match_parent"
@@ -30,8 +15,8 @@
         android:background="@drawable/bg_leaderboard_header"
         android:orientation="vertical"
         android:paddingHorizontal="16dp"
-        android:paddingTop="14dp"
-        android:paddingBottom="12dp">
+        android:paddingTop="16dp"
+        android:paddingBottom="10dp">
 
         <!-- Banner Top Row: Info (Left) + Mascot Graphic (Right) -->
         <LinearLayout
@@ -81,13 +66,13 @@
                     android:text="See how you stack up against others!" />
             </LinearLayout>
 
-            <!-- Right Mascot Image (mascot_leaderboard.png) -->
+            <!-- Right Mascot Image (Enlarged to fill right section) -->
             <ImageView
                 android:id="@+id/leaderboard_mascot"
-                android:layout_width="128dp"
-                android:layout_height="124dp"
-                android:layout_marginStart="8dp"
-                android:layout_marginEnd="-4dp"
+                android:layout_width="165dp"
+                android:layout_height="160dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginEnd="-12dp"
                 android:scaleType="fitCenter"
                 android:src="@drawable/mascot_leaderboard"
                 android:contentDescription="@null"
