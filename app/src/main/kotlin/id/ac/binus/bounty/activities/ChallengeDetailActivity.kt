@@ -4,7 +4,10 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.View
+import android.view.animation.DecelerateInterpolator
+import android.view.animation.OvershootInterpolator
 import android.widget.TextView
+import androidx.activity.addCallback
 import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
@@ -91,14 +94,78 @@ class ChallengeDetailActivity : AppCompatActivity() {
                     AcceptModel.UNAVAILABLE -> R.string.accept_unavailable
                     else -> R.string.accept_error
                 }
+                if (state == AcceptModel.SAVED) {
+                    showAcceptSuccessPopup()
+                } else {
+                    Snackbar.make(findViewById(R.id.main), message, Snackbar.LENGTH_LONG).show()
+                }
                 acceptModel.state.value = AcceptModel.IDLE
                 loadChallenge()
-                Snackbar.make(findViewById(R.id.main), message, Snackbar.LENGTH_LONG).show()
             }
         }
         findViewById<MaterialToolbar>(R.id.detail_toolbar).setNavigationOnClickListener { finish() }
         val retryBtn = findViewById<View>(R.id.detail_retry)
         ViewMotion.applySpringPress(retryBtn) { loadChallenge() }
+
+        val letsGoBtn = findViewById<View>(R.id.success_lets_go_button)
+        if (letsGoBtn != null) {
+            ViewMotion.applySpringPress(letsGoBtn) { hideAcceptSuccessPopup() }
+        }
+        val overlay = findViewById<View>(R.id.accept_success_overlay)
+        val contentContainer = findViewById<View>(R.id.success_content_container)
+        overlay?.setOnClickListener { hideAcceptSuccessPopup() }
+        contentContainer?.setOnClickListener { /* prevent closing on modal content tap */ }
+
+        onBackPressedDispatcher.addCallback(this) {
+            if (overlay?.visibility == View.VISIBLE) {
+                hideAcceptSuccessPopup()
+            } else {
+                finish()
+            }
+        }
+    }
+
+    private fun showAcceptSuccessPopup() {
+        val overlay = findViewById<View>(R.id.accept_success_overlay) ?: return
+        val card = findViewById<View>(R.id.success_content_container) ?: overlay
+        val burst = findViewById<View>(R.id.success_burst_glow)
+        val mascot = findViewById<View>(R.id.success_mascot_view)
+
+        overlay.alpha = 0f
+        overlay.visibility = View.VISIBLE
+        overlay.animate().alpha(1f).setDuration(260).start()
+
+        card.scaleX = 0.8f
+        card.scaleY = 0.8f
+        card.animate()
+            .scaleX(1f)
+            .scaleY(1f)
+            .setDuration(360)
+            .setInterpolator(OvershootInterpolator(1.3f))
+            .start()
+
+        if (burst != null && mascot != null) {
+            ViewMotion.startSuccessBurstAnimation(burst, mascot)
+        }
+    }
+
+    private fun hideAcceptSuccessPopup() {
+        val overlay = findViewById<View>(R.id.accept_success_overlay) ?: return
+        val card = findViewById<View>(R.id.success_content_container) ?: overlay
+        card.animate()
+            .scaleX(0.85f)
+            .scaleY(0.85f)
+            .setDuration(180)
+            .setInterpolator(DecelerateInterpolator())
+            .start()
+
+        overlay.animate()
+            .alpha(0f)
+            .setDuration(200)
+            .withEndAction {
+                overlay.visibility = View.GONE
+            }
+            .start()
     }
 
     override fun onStart() {

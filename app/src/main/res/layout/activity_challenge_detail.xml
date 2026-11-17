@@ -1,276 +1,382 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/main"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/bounty_background"
-    android:orientation="vertical">
+    android:background="@color/bounty_background">
 
-    <com.google.android.material.appbar.MaterialToolbar
-        android:id="@+id/detail_toolbar"
+    <!-- Main Detail Screen Content -->
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="@color/bounty_surface"
-        android:elevation="1dp"
-        android:minHeight="?attr/actionBarSize"
-        app:title="@string/challenge_detail_title"
-        app:navigationIcon="@drawable/ic_back"
-        app:navigationContentDescription="@string/back_action" />
+        android:layout_height="match_parent"
+        android:orientation="vertical">
 
-    <com.google.android.material.progressindicator.LinearProgressIndicator
-        android:id="@+id/detail_loading"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:indeterminate="true"
-        android:contentDescription="@string/loading_challenges" />
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/detail_toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/bounty_surface"
+            android:elevation="1dp"
+            android:minHeight="?attr/actionBarSize"
+            app:title="@string/challenge_detail_title"
+            app:navigationIcon="@drawable/ic_back"
+            app:navigationContentDescription="@string/back_action" />
 
-    <ScrollView
-        android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_weight="1"
-        android:fillViewport="true"
-        android:padding="16dp">
+        <com.google.android.material.progressindicator.LinearProgressIndicator
+            android:id="@+id/detail_loading"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:indeterminate="true"
+            android:contentDescription="@string/loading_challenges" />
 
-        <LinearLayout style="@style/BountyScreenContent">
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:fillViewport="true"
+            android:padding="16dp">
 
-            <TextView
-                android:id="@+id/detail_message"
-                android:accessibilityLiveRegion="polite"
-                style="@style/BountyBody"
-                android:visibility="gone" />
+            <LinearLayout style="@style/BountyScreenContent">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/detail_retry"
-                style="@style/BountyButton"
-                android:text="@string/retry_action"
-                android:visibility="gone" />
+                <TextView
+                    android:id="@+id/detail_message"
+                    android:accessibilityLiveRegion="polite"
+                    style="@style/BountyBody"
+                    android:textColor="@color/bounty_error"
+                    android:visibility="gone" />
 
-            <LinearLayout
-                android:id="@+id/detail_content"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:visibility="gone">
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/detail_retry"
+                    style="@style/BountyButton"
+                    android:text="@string/retry_action"
+                    android:visibility="gone" />
 
-                <!-- Hero Header Card with Neon Electric Styling -->
-                <com.google.android.material.card.MaterialCardView
+                <LinearLayout
+                    android:id="@+id/detail_content"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    app:cardCornerRadius="24dp"
-                    app:cardElevation="4dp"
-                    app:strokeWidth="0dp"
-                    app:cardBackgroundColor="@android:color/transparent">
+                    android:orientation="vertical"
+                    android:visibility="gone">
 
-                    <LinearLayout
+                    <!-- Top Card: Gradient Hero Banner with Title & Deadline -->
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:background="@drawable/bg_detail_hero"
-                        android:orientation="vertical"
-                        android:padding="20dp">
+                        app:cardCornerRadius="24dp"
+                        app:cardElevation="3dp"
+                        app:strokeWidth="1.5dp"
+                        app:strokeColor="#33FFFFFF"
+                        app:cardBackgroundColor="@android:color/transparent">
 
-                        <!-- Status Badge Row -->
                         <LinearLayout
                             android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:orientation="horizontal"
-                            android:gravity="center_vertical">
+                            android:background="@drawable/bg_detail_hero"
+                            android:orientation="vertical"
+                            android:padding="20dp">
 
+                            <LinearLayout
+                                android:layout_width="match_parent"
+                                android:layout_height="wrap_content"
+                                android:orientation="horizontal"
+                                android:gravity="center_vertical">
+
+                                <!-- Creator Role / Hunter Pill -->
+                                <TextView
+                                    style="@style/BountyCaption"
+                                    android:textColor="#E0E7FF"
+                                    android:textStyle="bold"
+                                    android:textSize="12sp"
+                                    android:text="TANTANGAN PUBLIK" />
+
+                                <View
+                                    android:layout_width="0dp"
+                                    android:layout_height="1dp"
+                                    android:layout_weight="1" />
+
+                                <!-- Modern High-Contrast Status Pill -->
+                                <TextView
+                                    android:id="@+id/challenge_status"
+                                    style="@style/BountyStatus"
+                                    android:textSize="11sp"
+                                    android:textStyle="bold" />
+                            </LinearLayout>
+
+                            <!-- Main Title -->
                             <TextView
-                                android:id="@+id/challenge_status"
-                                style="@style/BountyStatus"
-                                android:textSize="11sp"
-                                android:textStyle="bold" />
+                                android:id="@+id/challenge_title"
+                                style="@style/BountyHeading"
+                                android:textColor="@color/white"
+                                android:textSize="24sp"
+                                android:layout_marginTop="12dp"
+                                android:letterSpacing="-0.01" />
+
+                            <!-- Deadline Pill within Hero -->
+                            <TextView
+                                android:id="@+id/challenge_deadline"
+                                style="@style/BountyCaption"
+                                android:textColor="#E0E7FF"
+                                android:textSize="13sp"
+                                android:layout_marginTop="8dp" />
                         </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
 
-                        <!-- Main Title -->
-                        <TextView
-                            android:id="@+id/challenge_title"
-                            style="@style/BountyHeading"
-                            android:textColor="@color/white"
-                            android:textSize="24sp"
-                            android:layout_marginTop="12dp"
-                            android:letterSpacing="-0.01" />
-
-                        <!-- Deadline Pill within Hero -->
-                        <TextView
-                            android:id="@+id/challenge_deadline"
-                            style="@style/BountyCaption"
-                            android:textColor="#E0E7FF"
-                            android:textSize="13sp"
-                            android:layout_marginTop="8dp" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Reward Coin Box (Arcade / Game Loot Style from Stitch) -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="2dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="@color/bounty_secondary_fixed_dim"
-                    app:cardBackgroundColor="@color/bounty_gold_bg">
-
-                    <LinearLayout
+                    <!-- Reward Coin Box (Arcade / Game Loot Style from Stitch) -->
+                    <com.google.android.material.card.MaterialCardView
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:orientation="vertical"
-                        android:padding="16dp">
-
-                        <TextView
-                            style="@style/BountyCaption"
-                            android:textSize="11sp"
-                            android:textStyle="bold"
-                            android:textColor="@color/bounty_secondary"
-                            android:text="HADIAH TANTANGAN (MOCK REWARD)" />
-
-                        <TextView
-                            android:id="@+id/challenge_reward"
-                            style="@style/BountyReward"
-                            android:textSize="26sp"
-                            android:layout_marginTop="6dp" />
-
-                        <TextView
-                            style="@style/BountyCaption"
-                            android:textSize="12sp"
-                            android:textColor="@color/bounty_gold_text"
-                            android:layout_marginTop="4dp"
-                            android:text="@string/demo_reward" />
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Creator Profile Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="1dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="@color/bounty_surface_container"
-                    app:cardBackgroundColor="@color/bounty_surface">
-
-                    <LinearLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:orientation="horizontal"
-                        android:gravity="center_vertical"
-                        android:padding="16dp">
-
-                        <ImageView
-                            android:id="@+id/challenge_avatar"
-                            android:layout_width="48dp"
-                            android:layout_height="48dp"
-                            android:src="@drawable/ic_avatar"
-                            android:contentDescription="@null"
-                            android:importantForAccessibility="no" />
+                        android:layout_marginTop="16dp"
+                        app:cardCornerRadius="20dp"
+                        app:cardElevation="2dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="@color/bounty_secondary_fixed_dim"
+                        app:cardBackgroundColor="@color/bounty_gold_bg">
 
                         <LinearLayout
-                            android:layout_width="0dp"
+                            android:layout_width="match_parent"
                             android:layout_height="wrap_content"
-                            android:layout_weight="1"
-                            android:layout_marginStart="14dp"
-                            android:orientation="vertical">
+                            android:orientation="vertical"
+                            android:padding="16dp">
 
                             <TextView
-                                android:id="@+id/challenge_creator"
-                                style="@style/BountyBody"
-                                android:textSize="16sp"
+                                style="@style/BountyCaption"
+                                android:textSize="11sp"
                                 android:textStyle="bold"
-                                android:textColor="?attr/colorOnSurface" />
+                                android:textColor="@color/bounty_secondary"
+                                android:text="HADIAH TANTANGAN (MOCK REWARD)" />
+
+                            <TextView
+                                android:id="@+id/challenge_reward"
+                                style="@style/BountyReward"
+                                android:textSize="26sp"
+                                android:layout_marginTop="6dp" />
 
                             <TextView
                                 style="@style/BountyCaption"
                                 android:textSize="12sp"
-                                android:textColor="@color/bounty_tertiary"
-                                android:text="Creator Terverifikasi (Firebase UID)" />
+                                android:textColor="@color/bounty_gold_text"
+                                android:layout_marginTop="4dp"
+                                android:text="@string/demo_reward" />
                         </LinearLayout>
-                    </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
+                    </com.google.android.material.card.MaterialCardView>
 
-                <!-- Mission Instructions & Criteria Card -->
-                <com.google.android.material.card.MaterialCardView
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    app:cardCornerRadius="20dp"
-                    app:cardElevation="1dp"
-                    app:strokeWidth="1dp"
-                    app:strokeColor="@color/bounty_surface_container"
-                    app:cardBackgroundColor="@color/bounty_surface">
+                    <!-- Creator Profile Card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        app:cardCornerRadius="20dp"
+                        app:cardElevation="1dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="@color/bounty_surface_container"
+                        app:cardBackgroundColor="@color/bounty_surface">
 
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="horizontal"
+                            android:gravity="center_vertical"
+                            android:padding="16dp">
+
+                            <ImageView
+                                android:id="@+id/challenge_avatar"
+                                android:layout_width="48dp"
+                                android:layout_height="48dp"
+                                android:src="@drawable/ic_avatar"
+                                android:contentDescription="@null"
+                                android:importantForAccessibility="no" />
+
+                            <LinearLayout
+                                android:layout_width="0dp"
+                                android:layout_height="wrap_content"
+                                android:layout_weight="1"
+                                android:layout_marginStart="14dp"
+                                android:orientation="vertical">
+
+                                <TextView
+                                    android:id="@+id/challenge_creator"
+                                    style="@style/BountyBody"
+                                    android:textSize="16sp"
+                                    android:textStyle="bold"
+                                    android:textColor="?attr/colorOnSurface" />
+
+                                <TextView
+                                    style="@style/BountyCaption"
+                                    android:textSize="12sp"
+                                    android:textColor="@color/bounty_tertiary"
+                                    android:text="Creator Terverifikasi (Firebase UID)" />
+                            </LinearLayout>
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Mission Instructions & Criteria Card -->
+                    <com.google.android.material.card.MaterialCardView
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="16dp"
+                        app:cardCornerRadius="20dp"
+                        app:cardElevation="1dp"
+                        app:strokeWidth="1dp"
+                        app:strokeColor="@color/bounty_surface_container"
+                        app:cardBackgroundColor="@color/bounty_surface">
+
+                        <LinearLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical"
+                            android:padding="20dp">
+
+                            <TextView
+                                style="@style/BountySection"
+                                android:textSize="17sp"
+                                android:text="Instruksi &amp; Syarat Bukti" />
+
+                            <TextView
+                                android:id="@+id/challenge_description"
+                                style="@style/BountyBody"
+                                android:textSize="15sp"
+                                android:lineSpacingExtra="3dp"
+                                android:layout_marginTop="10dp" />
+
+                            <!-- Completion Status / Receipt Box -->
+                            <TextView
+                                android:id="@+id/reward_result"
+                                style="@style/BountyBody"
+                                android:background="@drawable/bg_reward"
+                                android:backgroundTint="@color/bounty_tertiary_fixed"
+                                android:textColor="@color/bounty_tertiary"
+                                android:textStyle="bold"
+                                android:textSize="14sp"
+                                android:padding="12dp"
+                                android:layout_marginTop="16dp"
+                                android:visibility="gone" />
+
+                            <TextView
+                                android:id="@+id/accept_message"
+                                style="@style/BountyCaption"
+                                android:textSize="13sp"
+                                android:textColor="@color/bounty_text_secondary"
+                                android:layout_marginTop="14dp" />
+                        </LinearLayout>
+                    </com.google.android.material.card.MaterialCardView>
+
+                    <!-- Action Buttons Dock -->
                     <LinearLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:orientation="vertical"
-                        android:padding="20dp">
+                        android:layout_marginTop="24dp">
 
-                        <TextView
-                            style="@style/BountySection"
-                            android:textSize="17sp"
-                            android:text="Instruksi &amp; Syarat Bukti" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/accept_button"
+                            style="@style/BountyButton"
+                            android:text="@string/accept_action"
+                            android:enabled="false" />
 
-                        <TextView
-                            android:id="@+id/challenge_description"
-                            style="@style/BountyBody"
-                            android:textSize="15sp"
-                            android:lineSpacingExtra="3dp"
-                            android:layout_marginTop="10dp" />
-
-                        <!-- Completion Status / Receipt Box -->
-                        <TextView
-                            android:id="@+id/reward_result"
-                            style="@style/BountyBody"
-                            android:background="@drawable/bg_reward"
-                            android:backgroundTint="@color/bounty_tertiary_fixed"
-                            android:textColor="@color/bounty_tertiary"
-                            android:textStyle="bold"
-                            android:textSize="14sp"
-                            android:padding="12dp"
-                            android:layout_marginTop="16dp"
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/submit_proof_button"
+                            style="@style/BountyButton"
+                            android:backgroundTint="@color/bounty_primary_container"
+                            android:layout_marginTop="12dp"
+                            android:text="@string/submit_proof_action"
                             android:visibility="gone" />
 
-                        <TextView
-                            android:id="@+id/accept_message"
-                            style="@style/BountyCaption"
-                            android:textSize="13sp"
-                            android:textColor="@color/bounty_text_secondary"
-                            android:layout_marginTop="14dp" />
+                        <com.google.android.material.button.MaterialButton
+                            android:id="@+id/review_proof_button"
+                            style="@style/BountyButton"
+                            android:backgroundTint="@color/bounty_tertiary"
+                            android:layout_marginTop="12dp"
+                            android:text="@string/review_proof_action"
+                            android:visibility="gone" />
                     </LinearLayout>
-                </com.google.android.material.card.MaterialCardView>
-
-                <!-- Action Buttons Dock -->
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:layout_marginTop="24dp">
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/accept_button"
-                        style="@style/BountyButton"
-                        android:text="@string/accept_action"
-                        android:enabled="false" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/submit_proof_button"
-                        style="@style/BountyButton"
-                        android:backgroundTint="@color/bounty_primary_container"
-                        android:layout_marginTop="12dp"
-                        android:text="@string/submit_proof_action"
-                        android:visibility="gone" />
-
-                    <com.google.android.material.button.MaterialButton
-                        android:id="@+id/review_proof_button"
-                        style="@style/BountyButton"
-                        android:backgroundTint="@color/bounty_tertiary"
-                        android:layout_marginTop="12dp"
-                        android:text="@string/review_proof_action"
-                        android:visibility="gone" />
                 </LinearLayout>
             </LinearLayout>
+        </ScrollView>
+    </LinearLayout>
+
+    <!-- Full-screen Accepted Success Modal Overlay (Image 1 Style) -->
+    <FrameLayout
+        android:id="@+id/accept_success_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#E60A0E17"
+        android:clickable="true"
+        android:focusable="true"
+        android:elevation="30dp"
+        android:visibility="gone">
+
+        <LinearLayout
+            android:id="@+id/success_content_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:orientation="vertical"
+            android:gravity="center"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="32dp">
+
+            <!-- Title & Subtitle Above Mascot -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="u have accepted the challenge"
+                android:textSize="22sp"
+                android:fontFamily="@font/nunito"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:gravity="center"
+                android:letterSpacing="-0.01" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="6dp"
+                android:text="Buktikan kemampuanmu dan selesaikan misinya!"
+                android:textSize="14sp"
+                android:fontFamily="@font/nunito"
+                android:textColor="#CBD5E1"
+                android:gravity="center" />
+
+            <!-- Mascot + Animated Radiant Starburst Highlight -->
+            <FrameLayout
+                android:layout_width="290dp"
+                android:layout_height="290dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="24dp">
+
+                <!-- Rotating & Pulsing Shiny Burst Highlight -->
+                <ImageView
+                    android:id="@+id/success_burst_glow"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:layout_gravity="center"
+                    android:src="@drawable/bg_radiant_burst"
+                    android:importantForAccessibility="no" />
+
+                <!-- Thumbs-up Approved Mascot Graphic -->
+                <ImageView
+                    android:id="@+id/success_mascot_view"
+                    android:layout_width="190dp"
+                    android:layout_height="190dp"
+                    android:layout_gravity="center"
+                    android:scaleType="fitCenter"
+                    android:src="@drawable/mascot_confirmed"
+                    android:importantForAccessibility="no" />
+            </FrameLayout>
+
+            <!-- Lets Go Action Button -->
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/success_lets_go_button"
+                style="@style/BountyButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="16dp"
+                android:background="@drawable/bg_btn_duolingo_3d_green"
+                android:minHeight="54dp"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:text="Lets Go" />
         </LinearLayout>
-    </ScrollView>
-</LinearLayout>
+    </FrameLayout>
+</FrameLayout>

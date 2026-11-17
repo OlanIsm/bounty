@@ -156,4 +156,54 @@ object ViewMotion {
             loop()
         }
     }
+
+    /**
+     * Animated radiant burst and floating thumbs-up mascot for challenge accepted modal.
+     */
+    @JvmStatic
+    fun startSuccessBurstAnimation(burstView: View, mascotView: View) {
+        val rotateAnim = ObjectAnimator.ofFloat(burstView, View.ROTATION, 0f, 360f).apply {
+            duration = 14000
+            interpolator = LinearInterpolator()
+            repeatCount = ValueAnimator.INFINITE
+        }
+
+        val scaleXBurst = ObjectAnimator.ofFloat(burstView, View.SCALE_X, 0.92f, 1.12f).apply {
+            duration = 2200
+            repeatMode = ValueAnimator.REVERSE
+            repeatCount = ValueAnimator.INFINITE
+            interpolator = AccelerateDecelerateInterpolator()
+        }
+        val scaleYBurst = ObjectAnimator.ofFloat(burstView, View.SCALE_Y, 0.92f, 1.12f).apply {
+            duration = 2200
+            repeatMode = ValueAnimator.REVERSE
+            repeatCount = ValueAnimator.INFINITE
+            interpolator = AccelerateDecelerateInterpolator()
+        }
+
+        val mascotFloat = ObjectAnimator.ofFloat(mascotView, View.TRANSLATION_Y, -8f, 8f).apply {
+            duration = 1800
+            repeatMode = ValueAnimator.REVERSE
+            repeatCount = ValueAnimator.INFINITE
+            interpolator = AccelerateDecelerateInterpolator()
+        }
+
+        val mascotScaleX = ObjectAnimator.ofFloat(mascotView, View.SCALE_X, 0.97f, 1.03f).apply {
+            duration = 1800
+            repeatMode = ValueAnimator.REVERSE
+            repeatCount = ValueAnimator.INFINITE
+            interpolator = AccelerateDecelerateInterpolator()
+        }
+        val mascotScaleY = ObjectAnimator.ofFloat(mascotView, View.SCALE_Y, 0.97f, 1.03f).apply {
+            duration = 1800
+            repeatMode = ValueAnimator.REVERSE
+            repeatCount = ValueAnimator.INFINITE
+            interpolator = AccelerateDecelerateInterpolator()
+        }
+
+        AnimatorSet().apply {
+            playTogether(rotateAnim, scaleXBurst, scaleYBurst, mascotFloat, mascotScaleX, mascotScaleY)
+            start()
+        }
+    }
 }

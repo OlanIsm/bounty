@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp"
+    android:height="320dp"
+    android:viewportWidth="300"
+    android:viewportHeight="300">
+    <group
+        android:pivotX="150"
+        android:pivotY="150">
+        <!-- Central Glow Circles -->
+        <path
+            android:fillColor="#33FFD54F"
+            android:pathData="M150,150 m-95,0 a95,95 0 1,0 190,0 a95,95 0 1,0 -190,0" />
+        <path
+            android:fillColor="#4DFFE082"
+            android:pathData="M150,150 m-68,0 a68,68 0 1,0 136,0 a68,68 0 1,0 -136,0" />
+
+        <!-- Radiant Starburst Rays matching user drawing -->
+        <path android:fillColor="#80FFA000" android:pathData="M146,8 L154,8 L152,72 L148,72 Z" />
+        <path android:fillColor="#99FFD54F" android:pathData="M147,228 L153,228 L152,292 L148,292 Z" />
+        <path android:fillColor="#99FFD54F" android:pathData="M8,146 L8,154 L72,152 L72,148 Z" />
+        <path android:fillColor="#80FFA000" android:pathData="M228,147 L228,153 L292,152 L292,148 Z" />
+
+        <!-- Diagonal Rays -->
+        <path android:fillColor="#80FFE082" android:pathData="M46,46 L55,39 L96,91 L88,97 Z" />
+        <path android:fillColor="#99FFD54F" android:pathData="M245,39 L254,46 L212,97 L204,91 Z" />
+        <path android:fillColor="#80FFA000" android:pathData="M46,254 L39,245 L91,204 L97,212 Z" />
+        <path android:fillColor="#99FFD54F" android:pathData="M254,254 L245,261 L204,209 L212,203 Z" />
+
+        <!-- Intermediate Angular Rays -->
+        <path android:fillColor="#66FFD54F" android:pathData="M97,18 L105,14 L125,76 L118,79 Z" />
+        <path android:fillColor="#80FFE082" android:pathData="M195,14 L203,18 L182,79 L175,76 Z" />
+        <path android:fillColor="#66FFD54F" android:pathData="M18,97 L14,105 L76,125 L79,118 Z" />
+        <path android:fillColor="#80FFE082" android:pathData="M14,195 L18,203 L79,182 L76,175 Z" />
+        <path android:fillColor="#66FFD54F" android:pathData="M282,97 L286,105 L224,125 L221,118 Z" />
+        <path android:fillColor="#80FFE082" android:pathData="M286,195 L282,203 L221,182 L224,175 Z" />
+        <path android:fillColor="#66FFD54F" android:pathData="M97,282 L105,286 L125,224 L118,221 Z" />
+        <path android:fillColor="#80FFE082" android:pathData="M195,286 L203,282 L182,221 L175,224 Z" />
+    </group>
+</vector>
