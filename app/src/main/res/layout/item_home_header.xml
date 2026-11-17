@@ -41,23 +41,11 @@
 
         <TextView
             style="@style/BountySection"
-            android:layout_width="0dp"
-            android:layout_weight="1"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
             android:textSize="20sp"
             android:textStyle="bold"
             android:text="@string/available_challenges" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:background="@drawable/bg_reward"
-            android:backgroundTint="@color/bounty_primary_fixed"
-            android:textColor="@color/bounty_on_primary_fixed"
-            android:text="Feed Aktif"
-            android:textSize="11sp"
-            android:textStyle="bold"
-            android:paddingHorizontal="10dp"
-            android:paddingVertical="4dp" />
     </LinearLayout>
 
     <!-- Sad Robot Empty State when no challenges are available (below section) -->
