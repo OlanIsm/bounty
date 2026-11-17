@@ -514,13 +514,6 @@ class MainActivity : AppCompatActivity() {
                     root.context.getString(R.string.welcome_user, currentUser.name)
                 root.findViewById<TextView>(R.id.demo_balance_amount)?.text =
                     ChallengeDisplay.rupiah(root.context, currentUser.demoBalance)
-                root.findViewById<ImageView>(R.id.home_user_avatar)?.let { img ->
-                    Glide.with(img).load(currentUser.avatarUrl)
-                        .placeholder(R.drawable.ic_avatar)
-                        .error(R.drawable.ic_avatar)
-                        .circleCrop()
-                        .into(img)
-                }
             }
 
             root.findViewById<ImageView>(R.id.demo_balance_coin_icon)?.let { coin ->

@@ -16,43 +16,26 @@
         android:paddingTop="16dp"
         android:paddingBottom="12dp">
 
-        <!-- Top Greeting + Quick Gamification Badges (Duolingo Style) -->
+        <!-- Top Greeting (Clean typography, no avatar icon) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:gravity="center_vertical">
+            android:orientation="vertical">
 
-            <ImageView
-                android:id="@+id/home_user_avatar"
-                android:layout_width="44dp"
-                android:layout_height="44dp"
-                android:src="@drawable/ic_avatar"
-                android:contentDescription="@null"
-                android:importantForAccessibility="no" />
+            <TextView
+                android:id="@+id/welcome_text"
+                style="@style/BountyHeading"
+                android:textSize="22sp"
+                android:textColor="@color/white"
+                android:textStyle="bold"
+                android:letterSpacing="-0.02" />
 
-            <LinearLayout
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_marginStart="12dp"
-                android:orientation="vertical">
-
-                <TextView
-                    android:id="@+id/welcome_text"
-                    style="@style/BountyHeading"
-                    android:textSize="20sp"
-                    android:textColor="@color/white"
-                    android:textStyle="bold"
-                    android:letterSpacing="-0.02" />
-
-                <TextView
-                    android:id="@+id/home_user_subtitle"
-                    style="@style/BountyCaption"
-                    android:textSize="12sp"
-                    android:textColor="#D5D7FF"
-                    android:text="Bounty Hunter • Siap berburu!" />
-            </LinearLayout>
+            <TextView
+                android:id="@+id/home_user_subtitle"
+                style="@style/BountyCaption"
+                android:textSize="12sp"
+                android:textColor="#D5D7FF"
+                android:text="Bounty Hunter • Siap berburu!" />
         </LinearLayout>
 
         <!-- Balance Card -->
