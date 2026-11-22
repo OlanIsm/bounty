@@ -39,7 +39,7 @@ class FindFriendsActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_find_friends)
-        ScreenInsets.apply(this)
+        ScreenInsets.applyHeroEdgeToEdge(this, findViewById(R.id.find_friends_sheet))
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = false
 
         val currentUser = SessionManager(this).getCurrentUser()

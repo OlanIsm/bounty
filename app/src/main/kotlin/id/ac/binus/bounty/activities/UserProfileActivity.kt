@@ -32,7 +32,7 @@ class UserProfileActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_user_profile)
-        ScreenInsets.apply(this)
+        ScreenInsets.applyHeroEdgeToEdge(this, findViewById(R.id.user_profile_content))
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = false
 
         val uid = intent.getStringExtra(EXTRA_USER_ID).orEmpty()

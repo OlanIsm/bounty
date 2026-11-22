@@ -96,7 +96,7 @@ class MainActivity : AppCompatActivity() {
             return
         }
         setContentView(R.layout.activity_main)
-        ScreenInsets.apply(this)
+        ScreenInsets.applyMain(this, findViewById(R.id.nav_card), findViewById(R.id.screen_content))
         navigation = findViewById(R.id.bottom_navigation)
         publishModel = ViewModelProvider(this)[PublishModel::class.java]
         demoUsersModel = ViewModelProvider(this)[DemoUsersModel::class.java]

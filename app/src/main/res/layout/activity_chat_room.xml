@@ -113,6 +113,7 @@
 
         <!-- Bottom Composer Bar (Reference 1 Pill Input + Circular Primary Send Button) -->
         <LinearLayout
+            android:id="@+id/chat_composer_bar"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:background="@color/bounty_surface"

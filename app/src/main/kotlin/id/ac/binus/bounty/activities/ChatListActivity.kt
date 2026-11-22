@@ -31,7 +31,7 @@ class ChatListActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat_list)
-        ScreenInsets.apply(this)
+        ScreenInsets.applyHeroEdgeToEdge(this, findViewById(R.id.chat_list_sheet))
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = false
 
         val user = SessionManager(this).getCurrentUser()

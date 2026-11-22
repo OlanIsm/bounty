@@ -37,7 +37,7 @@ class ChatRoomActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_chat_room)
-        ScreenInsets.apply(this)
+        ScreenInsets.applyHeroEdgeToEdge(this, findViewById(R.id.chat_composer_bar))
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = false
 
         val me = SessionManager(this).getCurrentUser()
