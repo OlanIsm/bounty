@@ -5,122 +5,213 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fillViewport="true"
-    android:background="@color/bounty_background"
-    android:padding="20dp">
+    android:background="@color/bounty_primary">
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:gravity="center_vertical"
-        android:paddingTop="24dp"
-        android:paddingBottom="24dp">
+        android:orientation="vertical">
 
-        <TextView
-            style="@style/BountyHeading"
-            android:textSize="32sp"
-            android:textStyle="bold"
-            android:textColor="@color/bounty_primary"
-            android:letterSpacing="-0.02"
-            android:text="@string/register_title" />
-
-        <TextView
-            style="@style/BountyBody"
-            android:layout_marginTop="8dp"
-            android:textSize="14sp"
-            android:textColor="@color/bounty_text_secondary"
-            android:text="@string/firebase_auth_note" />
-
-        <!-- Register Card Form -->
-        <com.google.android.material.card.MaterialCardView
+        <!-- Top Indigo Brand Hero -->
+        <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="28dp"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="2dp"
-            app:strokeWidth="1dp"
-            app:strokeColor="@color/bounty_surface_container"
-            app:cardBackgroundColor="@color/bounty_surface">
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingTop="14dp"
+            android:paddingBottom="26dp">
 
+            <ImageView
+                android:id="@+id/btn_register_back"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_circle_translucent"
+                android:padding="9dp"
+                android:src="@drawable/ic_back"
+                app:tint="@color/white"
+                android:contentDescription="@string/back_action" />
+
+            <TextView
+                style="@style/BountyHeading"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="14dp"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                android:textColor="@color/white"
+                android:letterSpacing="-0.02"
+                android:text="@string/register_title" />
+
+            <TextView
+                style="@style/BountyBody"
+                android:layout_width="wrap_content"
+                android:layout_marginTop="6dp"
+                android:textSize="14sp"
+                android:textColor="#D5D7FF"
+                android:text="@string/register_hero_subtitle" />
+        </LinearLayout>
+
+        <!-- Curved White Form Sheet -->
+        <LinearLayout
+            android:id="@+id/register_sheet"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_sheet_top_rounded"
+            android:orientation="vertical"
+            android:paddingHorizontal="24dp"
+            android:paddingTop="28dp"
+            android:paddingBottom="28dp">
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/auth_loading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="16dp"
+                android:indeterminate="true"
+                android:visibility="gone" />
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/name_layout"
+                style="@style/BountyTextInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/name_label">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/name_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="name"
+                    android:imeOptions="actionNext"
+                    android:inputType="textPersonName|textCapWords"
+                    android:maxLength="80"
+                    android:singleLine="true" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/email_layout"
+                style="@style/BountyTextInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:hint="@string/email_label">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/email_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="emailAddress"
+                    android:imeOptions="actionNext"
+                    android:inputType="textEmailAddress"
+                    android:maxLength="254"
+                    android:singleLine="true" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.textfield.TextInputLayout
+                android:id="@+id/password_layout"
+                style="@style/BountyTextInput"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:hint="@string/password_label"
+                app:endIconMode="password_toggle">
+
+                <com.google.android.material.textfield.TextInputEditText
+                    android:id="@+id/password_input"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:autofillHints="newPassword"
+                    android:imeOptions="actionDone"
+                    android:inputType="textPassword"
+                    android:maxLength="128"
+                    android:singleLine="true" />
+            </com.google.android.material.textfield.TextInputLayout>
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/register_button"
+                style="@style/BountyButton"
+                android:layout_marginTop="24dp"
+                android:text="@string/register_action" />
+
+            <!-- Divider "atau" -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="20dp">
+                android:layout_marginVertical="18dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/name_layout"
-                    style="@style/BountyTextInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/name_label">
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:background="@color/bounty_outline_variant" />
 
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/name_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:autofillHints="name"
-                        android:imeOptions="actionNext"
-                        android:inputType="textPersonName|textCapWords"
-                        android:maxLength="80"
-                        android:singleLine="true" />
-                </com.google.android.material.textfield.TextInputLayout>
+                <TextView
+                    style="@style/BountyCaption"
+                    android:layout_width="wrap_content"
+                    android:paddingHorizontal="14dp"
+                    android:text="@string/auth_or_divider" />
 
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/email_layout"
-                    style="@style/BountyTextInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:hint="@string/email_label">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/email_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:autofillHints="emailAddress"
-                        android:imeOptions="actionNext"
-                        android:inputType="textEmailAddress"
-                        android:maxLength="254"
-                        android:singleLine="true" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.textfield.TextInputLayout
-                    android:id="@+id/password_layout"
-                    style="@style/BountyTextInput"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="16dp"
-                    android:hint="@string/password_label"
-                    app:endIconMode="password_toggle">
-
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/password_input"
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:autofillHints="newPassword"
-                        android:imeOptions="actionDone"
-                        android:inputType="textPassword"
-                        android:maxLength="128"
-                        android:singleLine="true" />
-                </com.google.android.material.textfield.TextInputLayout>
-
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/register_button"
-                    style="@style/BountyButton"
-                    android:layout_marginTop="24dp"
-                    android:text="@string/register_action" />
+                <View
+                    android:layout_width="0dp"
+                    android:layout_height="1dp"
+                    android:layout_weight="1"
+                    android:background="@color/bounty_outline_variant" />
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
 
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/login_link"
-            style="@style/Widget.Material3.Button.TextButton"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="16dp"
-            android:minHeight="48dp"
-            android:text="@string/login_link"
-            android:textColor="@color/bounty_primary" />
+            <!-- Continue with Google Button -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/google_register_button"
+                android:layout_width="match_parent"
+                android:layout_height="52dp"
+                app:cardCornerRadius="16dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="1.5dp"
+                app:strokeColor="@color/bounty_surface_container"
+                app:cardBackgroundColor="@color/bounty_surface">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:gravity="center"
+                    android:orientation="horizontal"
+                    android:paddingHorizontal="16dp">
+
+                    <ImageView
+                        android:layout_width="22dp"
+                        android:layout_height="22dp"
+                        android:src="@drawable/ic_google"
+                        android:contentDescription="@null"
+                        android:importantForAccessibility="no" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:fontFamily="@font/nunito"
+                        android:text="@string/continue_with_google"
+                        android:textColor="@color/bounty_text"
+                        android:textSize="15sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <View
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:layout_weight="1" />
+
+            <com.google.android.material.button.MaterialButton
+                android:id="@+id/login_link"
+                style="@style/Widget.Material3.Button.TextButton"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:minHeight="48dp"
+                android:text="@string/login_link"
+                android:textColor="@color/bounty_primary"
+                android:textStyle="bold" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

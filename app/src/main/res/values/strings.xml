@@ -167,4 +167,10 @@
     <string name="find_friends_hint">Cari nama atau email hunter...</string>
     <string name="chat_list_title">Pesan</string>
     <string name="chat_input_hint">Tulis pesan...</string>
+    <string name="continue_with_google">Lanjutkan dengan Google</string>
+    <string name="auth_or_divider">atau</string>
+    <string name="google_auth_canceled">Login Google dibatalkan.</string>
+    <string name="google_auth_not_enabled">Login Google belum diaktifkan di Firebase Console.</string>
+    <string name="login_hero_subtitle">Siap berburu tantangan &amp; kumpulkan hadiah seru?</string>
+    <string name="register_hero_subtitle">Buat akunmu dan mulai petualangan di Bounty!</string>
 </resources>

@@ -2,7 +2,10 @@ package id.ac.binus.bounty.activities
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.view.WindowInsetsControllerCompat
 import com.google.android.material.textfield.TextInputEditText
 import com.google.android.material.textfield.TextInputLayout
 import id.ac.binus.bounty.R
@@ -19,15 +22,19 @@ class RegisterActivity : AppCompatActivity() {
             return
         }
         setContentView(R.layout.activity_register)
-        ScreenInsets.apply(this)
+        ScreenInsets.applyHeroEdgeToEdge(this, findViewById(R.id.register_sheet))
+        WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = false
+
         val name = findViewById<TextInputEditText>(R.id.name_input)
         val email = findViewById<TextInputEditText>(R.id.email_input)
         val password = findViewById<TextInputEditText>(R.id.password_input)
         val nameLayout = findViewById<TextInputLayout>(R.id.name_layout)
         val emailLayout = findViewById<TextInputLayout>(R.id.email_layout)
         val passwordLayout = findViewById<TextInputLayout>(R.id.password_layout)
-        val registerBtn = findViewById<android.view.View>(R.id.register_button)
-        ViewMotion.applySpringPress(registerBtn) {
+
+        ViewMotion.applySpringPress(findViewById(R.id.btn_register_back)) { finish() }
+
+        ViewMotion.applySpringPress(findViewById(R.id.register_button)) {
             nameLayout.error = null
             emailLayout.error = null
             passwordLayout.error = null
@@ -61,18 +68,44 @@ class RegisterActivity : AppCompatActivity() {
                 }
             }
         }
-        val loginLink = findViewById<android.view.View>(R.id.login_link)
-        ViewMotion.applySpringPress(loginLink) { finish() }
+
+        ViewMotion.applySpringPress(findViewById(R.id.google_register_button)) {
+            nameLayout.error = null
+            emailLayout.error = null
+            passwordLayout.error = null
+            setBusy(true)
+            FirebaseAccountRepository.signInWithGoogle(this) { result ->
+                runOnUiThread {
+                    setBusy(false)
+                    result.onSuccess { account ->
+                        SessionManager(this).cacheFirebaseUser(account.uid, account.name, account.email)
+                        openHome()
+                    }.onFailure { error ->
+                        Toast.makeText(
+                            this,
+                            getString(FirebaseAccountRepository.errorMessage(error, false)),
+                            Toast.LENGTH_LONG
+                        ).show()
+                    }
+                }
+            }
+        }
+
+        ViewMotion.applySpringPress(findViewById(R.id.login_link)) { finish() }
     }
 
     private fun setBusy(busy: Boolean) {
-        findViewById<android.view.View>(R.id.register_button).isEnabled = !busy
-        findViewById<android.view.View>(R.id.login_link).isEnabled = !busy
+        findViewById<View>(R.id.auth_loading).visibility = if (busy) View.VISIBLE else View.GONE
+        findViewById<View>(R.id.register_button).isEnabled = !busy
+        findViewById<View>(R.id.google_register_button).isEnabled = !busy
+        findViewById<View>(R.id.login_link).isEnabled = !busy
     }
 
     private fun openHome() {
-        startActivity(Intent(this, MainActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK))
+        startActivity(
+            Intent(this, MainActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        )
         finish()
     }
 }

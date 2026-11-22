@@ -1,8 +1,10 @@
 package id.ac.binus.bounty.data
 
+import android.app.Activity
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.FirebaseAuthException
 import com.google.firebase.auth.FirebaseUser
+import com.google.firebase.auth.OAuthProvider
 import com.google.firebase.auth.UserProfileChangeRequest
 import com.google.firebase.FirebaseNetworkException
 import com.google.firebase.firestore.FieldValue
@@ -42,12 +44,27 @@ object FirebaseAccountRepository {
             .addOnFailureListener { callback(Result.failure(it)) }
     }
 
+    fun signInWithGoogle(activity: Activity, callback: (Result<FirebaseAccount>) -> Unit) {
+        val provider = OAuthProvider.newBuilder("google.com")
+            .addCustomParameter("prompt", "select_account")
+            .build()
+        val pending = auth.pendingAuthResult
+        val task = pending ?: auth.startActivityForSignInWithProvider(activity, provider)
+        task.addOnSuccessListener { result ->
+            val user = result.user
+            if (user == null) callback(Result.failure(IllegalStateException("Missing account")))
+            else loadOrCreateProfile(user, callback)
+        }.addOnFailureListener { callback(Result.failure(it)) }
+    }
+
     private fun loadOrCreateProfile(user: FirebaseUser, callback: (Result<FirebaseAccount>) -> Unit) {
         val reference = firestore.collection("users").document(user.uid)
         reference.get()
             .addOnSuccessListener { snapshot ->
+                val fallbackName = user.email?.substringBefore("@")?.takeIf(String::isNotBlank)
                 val name = snapshot.getString("displayName")?.takeIf(String::isNotBlank)
                     ?: user.displayName?.takeIf(String::isNotBlank)
+                    ?: fallbackName
                 if (name == null) {
                     failAndSignOut(IllegalStateException("Account profile is missing"), callback)
                 } else if (snapshot.exists()) {
@@ -94,6 +111,9 @@ object FirebaseAccountRepository {
             || error.message?.contains("INVALID_LOGIN_CREDENTIALS") == true) -> R.string.login_failed
         !login && error is FirebaseAuthException
             && error.errorCode.contains("EMAIL_ALREADY_IN_USE") -> R.string.duplicate_email
+        error is FirebaseAuthException && error.errorCode.contains("OPERATION_NOT_ALLOWED") ->
+            R.string.google_auth_not_enabled
+        error.message?.contains("canceled", ignoreCase = true) == true -> R.string.google_auth_canceled
         else -> R.string.firebase_profile_error
     }
 }
