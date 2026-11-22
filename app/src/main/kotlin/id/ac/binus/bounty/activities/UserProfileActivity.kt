@@ -106,19 +106,13 @@ class UserProfileActivity : AppCompatActivity() {
     }
 
     private fun openChatWithTarget() {
-        // Wired to ChatRoomActivity in Phase 2; safe reflection/explicit launch
-        try {
-            val clazz = Class.forName("id.ac.binus.bounty.activities.ChatRoomActivity")
-            startActivity(
-                Intent(this, clazz)
-                    .putExtra(EXTRA_USER_ID, targetUser.id)
-                    .putExtra(EXTRA_USER_NAME, targetUser.name)
-                    .putExtra(EXTRA_USER_EMAIL, targetUser.email)
-                    .putExtra(EXTRA_USER_AVATAR, targetUser.avatarUrl)
-            )
-        } catch (_: ClassNotFoundException) {
-            Toast.makeText(this, "Membuka ruang obrolan...", Toast.LENGTH_SHORT).show()
-        }
+        startActivity(
+            Intent(this, ChatRoomActivity::class.java)
+                .putExtra(EXTRA_USER_ID, targetUser.id)
+                .putExtra(EXTRA_USER_NAME, targetUser.name)
+                .putExtra(EXTRA_USER_EMAIL, targetUser.email)
+                .putExtra(EXTRA_USER_AVATAR, targetUser.avatarUrl)
+        )
     }
 
     private fun updateFriendButton() {

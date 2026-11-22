@@ -257,6 +257,8 @@ class MainActivity : AppCompatActivity() {
                     onSeeAllClick = { navigation?.selectedItemId = R.id.nav_leaderboard },
                     onFollowToggle = { hunter -> toggleFollowUser(hunter) },
                     onHunterClick = { hunter -> openUserProfile(SocialUser(hunter.id, hunter.name, hunter.email, hunter.avatarUrl)) },
+                    onSearchFriendsClick = { openFindFriends() },
+                    onChatClick = { startActivity(Intent(this@MainActivity, ChatListActivity::class.java)) },
                     onLoadHuntersClick = { demoUsersModel.load(ApiClient.getApi()) }
                 ).apply {
                     followedUserIds = FirebaseSocialRepository.getFollowedIds(this@MainActivity)
@@ -505,6 +507,8 @@ class MainActivity : AppCompatActivity() {
         private val onSeeAllClick: () -> Unit,
         private val onFollowToggle: (User) -> Unit,
         private val onHunterClick: (User) -> Unit,
+        private val onSearchFriendsClick: () -> Unit,
+        private val onChatClick: () -> Unit,
         private val onLoadHuntersClick: () -> Unit
     ) : RecyclerView.Adapter<HomeHeaderAdapter.ViewHolder>() {
 
@@ -559,6 +563,12 @@ class MainActivity : AppCompatActivity() {
             root.findViewById<TextView>(R.id.stat_created_count)?.text = createdCount.toString()
             root.findViewById<TextView>(R.id.stat_leaderboard_rank)?.text = if (leaderboardRank > 0) "#$leaderboardRank" else "#1"
 
+            root.findViewById<View>(R.id.btn_home_search_friends)?.let {
+                ViewMotion.applySpringPress(it) { onSearchFriendsClick() }
+            }
+            root.findViewById<View>(R.id.btn_home_chat)?.let {
+                ViewMotion.applySpringPress(it) { onChatClick() }
+            }
             root.findViewById<View>(R.id.home_quick_create_btn)?.let {
                 ViewMotion.applySpringPress(it) { onCreateClick() }
             }
@@ -963,12 +973,7 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun openFindFriends() {
-        try {
-            val clazz = Class.forName("id.ac.binus.bounty.activities.FindFriendsActivity")
-            startActivity(Intent(this, clazz))
-        } catch (_: ClassNotFoundException) {
-            showToast("Fitur cari teman segera dibuka.")
-        }
+        startActivity(Intent(this, FindFriendsActivity::class.java))
     }
 
     private fun showToast(message: String) {

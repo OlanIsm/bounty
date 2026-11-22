@@ -1,0 +1,156 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    android:background="@color/bounty_primary">
+
+    <!-- Top Indigo Header (Reference 1 Middle Phone) -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="16dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="14dp">
+
+        <ImageView
+            android:id="@+id/btn_chat_room_back"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_circle_translucent"
+            android:padding="9dp"
+            android:src="@drawable/ic_back"
+            app:tint="@color/white"
+            android:contentDescription="@string/back_action" />
+
+        <LinearLayout
+            android:id="@+id/chat_room_header_profile"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:orientation="vertical"
+            android:paddingHorizontal="12dp">
+
+            <TextView
+                android:id="@+id/chat_room_friend_name"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:fontFamily="@font/nunito"
+                android:textColor="@color/white"
+                android:textSize="17sp"
+                android:textStyle="bold"
+                android:maxLines="1"
+                android:ellipsize="end" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <View
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:background="@drawable/bg_online_dot" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="5dp"
+                    android:fontFamily="@font/nunito"
+                    android:textColor="#D5D7FF"
+                    android:textSize="11sp"
+                    android:text="Online" />
+            </LinearLayout>
+        </LinearLayout>
+
+        <ImageView
+            android:id="@+id/btn_chat_room_profile"
+            android:layout_width="40dp"
+            android:layout_height="40dp"
+            android:background="@drawable/bg_circle_translucent"
+            android:padding="9dp"
+            android:src="@drawable/ic_profile"
+            app:tint="@color/white"
+            android:contentDescription="@string/profile_title" />
+    </LinearLayout>
+
+    <!-- Curved Chat Sheet -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="1"
+        android:background="@drawable/bg_sheet_top_rounded"
+        android:orientation="vertical">
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/chat_messages_list"
+            android:layout_width="match_parent"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:clipToPadding="false"
+            android:paddingHorizontal="16dp"
+            android:paddingTop="16dp"
+            android:paddingBottom="12dp" />
+
+        <TextView
+            android:id="@+id/chat_room_empty"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginVertical="24dp"
+            android:gravity="center"
+            android:fontFamily="@font/nunito"
+            android:textColor="@color/bounty_text_secondary"
+            android:textSize="13sp"
+            android:text="Mulai percakapan dengan mengirim pesan pertama!"
+            android:visibility="gone" />
+
+        <!-- Bottom Composer Bar (Reference 1 Pill Input + Circular Primary Send Button) -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="@color/bounty_surface"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:paddingHorizontal="14dp"
+            android:paddingVertical="10dp"
+            android:elevation="4dp">
+
+            <EditText
+                android:id="@+id/chat_message_input"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:minHeight="46dp"
+                android:maxLines="4"
+                android:background="@drawable/bg_chat_input"
+                android:fontFamily="@font/nunito"
+                android:hint="@string/chat_input_hint"
+                android:imeOptions="actionSend"
+                android:inputType="textCapSentences|textMultiLine"
+                android:paddingHorizontal="18dp"
+                android:paddingVertical="10dp"
+                android:textColor="@color/bounty_text"
+                android:textColorHint="@color/bounty_text_secondary"
+                android:textSize="14sp" />
+
+            <ImageView
+                android:id="@+id/btn_chat_send"
+                android:layout_width="46dp"
+                android:layout_height="46dp"
+                android:layout_marginStart="10dp"
+                android:background="@drawable/bg_reward"
+                android:backgroundTint="@color/bounty_primary"
+                android:padding="12dp"
+                android:src="@drawable/ic_send"
+                app:tint="@color/white"
+                android:contentDescription="Kirim pesan" />
+        </LinearLayout>
+    </LinearLayout>
+</LinearLayout>

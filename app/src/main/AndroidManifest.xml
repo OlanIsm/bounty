@@ -14,6 +14,11 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Bounty">
         <activity android:name=".activities.UserProfileActivity" android:exported="false" />
+        <activity android:name=".activities.FindFriendsActivity" android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
+        <activity android:name=".activities.ChatListActivity" android:exported="false" />
+        <activity android:name=".activities.ChatRoomActivity" android:exported="false"
+            android:windowSoftInputMode="adjustResize" />
         <activity android:name=".activities.ReviewProofActivity" android:exported="false" />
         <activity android:name=".activities.SubmitProofActivity" android:exported="false"
             android:windowSoftInputMode="adjustResize" />

@@ -16,26 +16,55 @@
         android:paddingTop="16dp"
         android:paddingBottom="12dp">
 
-        <!-- Top Greeting (Clean typography, no avatar icon) -->
+        <!-- Top Greeting + Top-Right Social Icons (Search Add Friend + Chat) -->
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:gravity="center_vertical"
+            android:orientation="horizontal">
 
-            <TextView
-                android:id="@+id/welcome_text"
-                style="@style/BountyHeading"
-                android:textSize="22sp"
-                android:textColor="@color/white"
-                android:textStyle="bold"
-                android:letterSpacing="-0.02" />
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:orientation="vertical">
 
-            <TextView
-                android:id="@+id/home_user_subtitle"
-                style="@style/BountyCaption"
-                android:textSize="12sp"
-                android:textColor="#D5D7FF"
-                android:text="Bounty Hunter • Siap berburu!" />
+                <TextView
+                    android:id="@+id/welcome_text"
+                    style="@style/BountyHeading"
+                    android:textSize="22sp"
+                    android:textColor="@color/white"
+                    android:textStyle="bold"
+                    android:letterSpacing="-0.02" />
+
+                <TextView
+                    android:id="@+id/home_user_subtitle"
+                    style="@style/BountyCaption"
+                    android:textSize="12sp"
+                    android:textColor="#D5D7FF"
+                    android:text="Bounty Hunter • Siap berburu!" />
+            </LinearLayout>
+
+            <ImageView
+                android:id="@+id/btn_home_search_friends"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:layout_marginEnd="10dp"
+                android:background="@drawable/bg_circle_translucent"
+                android:padding="9dp"
+                android:src="@drawable/ic_search"
+                app:tint="@color/white"
+                android:contentDescription="@string/find_friends_title" />
+
+            <ImageView
+                android:id="@+id/btn_home_chat"
+                android:layout_width="40dp"
+                android:layout_height="40dp"
+                android:background="@drawable/bg_circle_translucent"
+                android:padding="9dp"
+                android:src="@drawable/ic_chat"
+                app:tint="@color/white"
+                android:contentDescription="@string/chat_list_title" />
         </LinearLayout>
 
         <!-- Balance Card -->
