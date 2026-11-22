@@ -19,6 +19,14 @@
         <item name="colorOnSurface">@color/bounty_text</item>
         <item name="colorOutline">@color/bounty_outline_variant</item>
         <item name="materialAlertDialogTheme">@style/BountyDialog</item>
+        <item name="android:windowAnimationStyle">@style/BountyWindowAnimations</item>
+    </style>
+
+    <style name="BountyWindowAnimations" parent="@android:style/Animation.Activity">
+        <item name="android:activityOpenEnterAnimation">@anim/bounty_open_enter</item>
+        <item name="android:activityOpenExitAnimation">@anim/bounty_open_exit</item>
+        <item name="android:activityCloseEnterAnimation">@anim/bounty_close_enter</item>
+        <item name="android:activityCloseExitAnimation">@anim/bounty_close_exit</item>
     </style>
 
     <style name="Theme.Bounty" parent="Base.Theme.Bounty" />

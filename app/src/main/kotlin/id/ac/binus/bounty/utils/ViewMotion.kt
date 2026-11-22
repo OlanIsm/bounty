@@ -4,24 +4,26 @@ import android.animation.AnimatorSet
 import android.animation.ObjectAnimator
 import android.animation.ValueAnimator
 import android.annotation.SuppressLint
+import android.app.Activity
+import android.os.Build
 import android.view.MotionEvent
 import android.view.View
+import android.view.ViewGroup
 import android.view.animation.AccelerateDecelerateInterpolator
-import android.view.animation.DecelerateInterpolator
 import android.view.animation.LinearInterpolator
-import android.view.animation.OvershootInterpolator
+import android.view.animation.PathInterpolator
 import id.ac.binus.bounty.R
 
 /**
- * Fluid, tactile motion utilities inspired by Apple Designing Fluid Interfaces (WWDC)
+ * Soothing ease-in-out motion utilities inspired by Apple Fluid Interfaces
  * and Emil Kowalski design engineering principles:
- * - Instant response on pointer-down (scale to 0.96f, 90ms ease-out)
- * - Natural spring bounce on release (scale to 1.0f, OvershootInterpolator)
- * - Enter transitions: scale from 0.95f + alpha fade (nothing appears from nothing)
+ * - Soft tactile press (scale to 0.97f, 110ms ease-out) & calm settle (220ms ease-in-out)
+ * - Smooth enter transitions with gentle vertical glide + alpha fade
+ * - In-place auth morph transitions (hero cross-fade + rising form sheet)
  */
 object ViewMotion {
-    private val springInterpolator = OvershootInterpolator(1.4f)
-    private val pressInterpolator = DecelerateInterpolator(1.8f)
+    private val soothingEase = PathInterpolator(0.42f, 0f, 0.2f, 1f)
+    private val gentleOut = PathInterpolator(0.22f, 1f, 0.36f, 1f)
 
     @SuppressLint("ClickableViewAccessibility")
     @JvmStatic
@@ -30,21 +32,21 @@ object ViewMotion {
             when (event.actionMasked) {
                 MotionEvent.ACTION_DOWN -> {
                     v.animate()
-                        .scaleX(0.96f)
-                        .scaleY(0.96f)
-                        .setDuration(90)
-                        .setInterpolator(pressInterpolator)
+                        .scaleX(0.97f)
+                        .scaleY(0.97f)
+                        .setDuration(110)
+                        .setInterpolator(soothingEase)
                         .start()
                 }
                 MotionEvent.ACTION_UP -> {
                     v.animate()
                         .scaleX(1.0f)
                         .scaleY(1.0f)
-                        .setDuration(180)
-                        .setInterpolator(springInterpolator)
+                        .setDuration(220)
+                        .setInterpolator(gentleOut)
                         .start()
                     if (onClick != null) {
-                        v.postDelayed({ onClick.invoke() }, 50)
+                        v.postDelayed({ onClick.invoke() }, 45)
                     } else {
                         v.performClick()
                     }
@@ -53,8 +55,8 @@ object ViewMotion {
                     v.animate()
                         .scaleX(1.0f)
                         .scaleY(1.0f)
-                        .setDuration(160)
-                        .setInterpolator(springInterpolator)
+                        .setDuration(200)
+                        .setInterpolator(gentleOut)
                         .start()
                 }
             }
@@ -65,21 +67,84 @@ object ViewMotion {
     @JvmStatic
     fun animateEntrance(view: View, delayMs: Long = 0) {
         view.alpha = 0f
-        view.scaleX = 0.95f
-        view.scaleY = 0.95f
-        view.translationY = 24f
+        view.scaleX = 0.975f
+        view.scaleY = 0.975f
+        view.translationY = 18f
 
         val alphaAnim = ObjectAnimator.ofFloat(view, View.ALPHA, 0f, 1f)
-        val scaleXAnim = ObjectAnimator.ofFloat(view, View.SCALE_X, 0.95f, 1f)
-        val scaleYAnim = ObjectAnimator.ofFloat(view, View.SCALE_Y, 0.95f, 1f)
-        val transYAnim = ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, 24f, 0f)
+        val scaleXAnim = ObjectAnimator.ofFloat(view, View.SCALE_X, 0.975f, 1f)
+        val scaleYAnim = ObjectAnimator.ofFloat(view, View.SCALE_Y, 0.975f, 1f)
+        val transYAnim = ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, 18f, 0f)
 
         AnimatorSet().apply {
             playTogether(alphaAnim, scaleXAnim, scaleYAnim, transYAnim)
-            duration = 260
+            duration = 320
             startDelay = delayMs
-            interpolator = DecelerateInterpolator(1.6f)
+            interpolator = soothingEase
             start()
+        }
+    }
+
+    /**
+     * Suppresses default horizontal slide when morphing between Login and Register.
+     */
+    @Suppress("DEPRECATION")
+    @JvmStatic
+    fun disableWindowTransition(activity: Activity, opening: Boolean) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            val type = if (opening) Activity.OVERRIDE_TRANSITION_OPEN else Activity.OVERRIDE_TRANSITION_CLOSE
+            activity.overrideActivityTransition(type, 0, 0)
+        } else {
+            activity.overridePendingTransition(0, 0)
+        }
+    }
+
+    /**
+     * Smooth in-place morph for Login <-> Sign Up:
+     * hero mascot + title cross-fade gently while the form sheet rises up smoothly
+     * and its children stagger in with a calming ease-in-out curve.
+     */
+    @JvmStatic
+    fun animateAuthMorph(heroContainer: View?, sheet: View) {
+        val density = sheet.resources.displayMetrics.density
+        heroContainer?.let { hero ->
+            hero.alpha = 0f
+            hero.scaleX = 0.94f
+            hero.scaleY = 0.94f
+            hero.translationY = -10f * density
+            hero.animate()
+                .alpha(1f)
+                .scaleX(1f)
+                .scaleY(1f)
+                .translationY(0f)
+                .setDuration(380)
+                .setInterpolator(soothingEase)
+                .start()
+        }
+
+        sheet.translationY = 34f * density
+        sheet.alpha = 0.92f
+        sheet.animate()
+            .translationY(0f)
+            .alpha(1f)
+            .setDuration(360)
+            .setInterpolator(soothingEase)
+            .start()
+
+        if (sheet is ViewGroup) {
+            for (i in 0 until sheet.childCount) {
+                val child = sheet.getChildAt(i)
+                if (child.visibility == View.GONE) continue
+                child.alpha = 0f
+                child.translationY = 14f * density
+                child.animate()
+                    .alpha(1f)
+                    .translationY(0f)
+                    .setStartDelay(55L + (i * 35L))
+                    .setDuration(300)
+                    .setInterpolator(soothingEase)
+                    .start()
+            }
         }
     }
 

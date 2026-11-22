@@ -795,8 +795,8 @@ class MainActivity : AppCompatActivity() {
                 iconContainer?.animate()
                     ?.scaleX(targetScale)
                     ?.scaleY(targetScale)
-                    ?.setDuration(200)
-                    ?.setInterpolator(android.view.animation.OvershootInterpolator(1.2f))
+                    ?.setDuration(260)
+                    ?.setInterpolator(android.view.animation.PathInterpolator(0.42f, 0f, 0.2f, 1f))
                     ?.start()
             }
         }

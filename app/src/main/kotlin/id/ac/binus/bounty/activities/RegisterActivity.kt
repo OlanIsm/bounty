@@ -28,6 +28,10 @@ class RegisterActivity : AppCompatActivity() {
             findViewById(R.id.auth_hero_burst),
             findViewById(R.id.auth_hero_mascot)
         )
+        ViewMotion.animateAuthMorph(
+            findViewById(R.id.auth_hero_container),
+            findViewById(R.id.register_sheet)
+        )
 
         val name = findViewById<TextInputEditText>(R.id.name_input)
         val email = findViewById<TextInputEditText>(R.id.email_input)
@@ -36,7 +40,7 @@ class RegisterActivity : AppCompatActivity() {
         val emailLayout = findViewById<TextInputLayout>(R.id.email_layout)
         val passwordLayout = findViewById<TextInputLayout>(R.id.password_layout)
 
-        ViewMotion.applySpringPress(findViewById(R.id.btn_register_back)) { finish() }
+        ViewMotion.applySpringPress(findViewById(R.id.btn_register_back)) { finishWithMorph() }
 
         ViewMotion.applySpringPress(findViewById(R.id.register_button)) {
             nameLayout.error = null
@@ -95,7 +99,20 @@ class RegisterActivity : AppCompatActivity() {
             }
         }
 
-        ViewMotion.applySpringPress(findViewById(R.id.login_link)) { finish() }
+        ViewMotion.applySpringPress(findViewById(R.id.login_link)) { finishWithMorph() }
+    }
+
+    private fun finishWithMorph() {
+        LoginActivity.returningFromRegister = true
+        finish()
+        ViewMotion.disableWindowTransition(this, opening = false)
+    }
+
+    @Suppress("DEPRECATION")
+    override fun onBackPressed() {
+        LoginActivity.returningFromRegister = true
+        super.onBackPressed()
+        ViewMotion.disableWindowTransition(this, opening = false)
     }
 
     private fun setBusy(busy: Boolean) {

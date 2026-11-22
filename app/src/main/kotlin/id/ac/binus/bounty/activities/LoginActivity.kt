@@ -28,6 +28,10 @@ class LoginActivity : AppCompatActivity() {
             findViewById(R.id.auth_hero_burst),
             findViewById(R.id.auth_hero_mascot)
         )
+        ViewMotion.animateAuthMorph(
+            findViewById(R.id.auth_hero_container),
+            findViewById(R.id.login_sheet)
+        )
 
         val email = findViewById<TextInputEditText>(R.id.email_input)
         val password = findViewById<TextInputEditText>(R.id.password_input)
@@ -83,7 +87,23 @@ class LoginActivity : AppCompatActivity() {
 
         ViewMotion.applySpringPress(findViewById(R.id.register_link)) {
             startActivity(Intent(this, RegisterActivity::class.java))
+            ViewMotion.disableWindowTransition(this, opening = true)
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (returningFromRegister) {
+            returningFromRegister = false
+            ViewMotion.animateAuthMorph(
+                findViewById(R.id.auth_hero_container),
+                findViewById(R.id.login_sheet)
+            )
+        }
+    }
+
+    companion object {
+        internal var returningFromRegister = false
     }
 
     private fun setBusy(busy: Boolean) {

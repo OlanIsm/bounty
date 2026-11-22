@@ -14,6 +14,7 @@
 
         <!-- Expansive Indigo Visual Hero with Mascot -->
         <LinearLayout
+            android:id="@+id/auth_hero_container"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"
