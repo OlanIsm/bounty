@@ -12,61 +12,100 @@
         android:layout_height="wrap_content"
         android:orientation="vertical">
 
-        <!-- Top Indigo Brand Hero -->
-        <LinearLayout
+        <!-- Expansive Indigo Visual Hero with Mascot -->
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
+            android:layout_height="0dp"
+            android:layout_weight="1"
+            android:minHeight="240dp"
             android:paddingHorizontal="20dp"
-            android:paddingTop="14dp"
-            android:paddingBottom="26dp">
+            android:paddingTop="12dp"
+            android:paddingBottom="20dp">
 
             <ImageView
                 android:id="@+id/btn_register_back"
                 android:layout_width="40dp"
                 android:layout_height="40dp"
+                android:layout_gravity="top|start"
                 android:background="@drawable/bg_circle_translucent"
                 android:padding="9dp"
                 android:src="@drawable/ic_back"
                 app:tint="@color/white"
                 android:contentDescription="@string/back_action" />
 
-            <TextView
-                style="@style/BountyHeading"
-                android:layout_width="wrap_content"
-                android:layout_marginTop="14dp"
-                android:textSize="28sp"
-                android:textStyle="bold"
-                android:textColor="@color/white"
-                android:letterSpacing="-0.02"
-                android:text="@string/register_title" />
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingTop="10dp">
 
-            <TextView
-                style="@style/BountyBody"
-                android:layout_width="wrap_content"
-                android:layout_marginTop="6dp"
-                android:textSize="14sp"
-                android:textColor="#D5D7FF"
-                android:text="@string/register_hero_subtitle" />
-        </LinearLayout>
+                <FrameLayout
+                    android:layout_width="175dp"
+                    android:layout_height="160dp"
+                    android:clipChildren="false"
+                    android:clipToPadding="false">
 
-        <!-- Curved White Form Sheet -->
+                    <ImageView
+                        android:id="@+id/auth_hero_burst"
+                        android:layout_width="175dp"
+                        android:layout_height="175dp"
+                        android:layout_gravity="center"
+                        android:alpha="0.28"
+                        android:src="@drawable/bg_radiant_burst"
+                        android:contentDescription="@null"
+                        android:importantForAccessibility="no" />
+
+                    <ImageView
+                        android:id="@+id/auth_hero_mascot"
+                        android:layout_width="150dp"
+                        android:layout_height="150dp"
+                        android:layout_gravity="center"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/mascot_leaderboard"
+                        android:contentDescription="@null"
+                        android:importantForAccessibility="no" />
+                </FrameLayout>
+
+                <TextView
+                    style="@style/BountyHeading"
+                    android:layout_width="wrap_content"
+                    android:layout_marginTop="6dp"
+                    android:gravity="center"
+                    android:textSize="26sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/white"
+                    android:letterSpacing="-0.02"
+                    android:text="@string/register_title" />
+
+                <TextView
+                    style="@style/BountyBody"
+                    android:layout_width="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:gravity="center"
+                    android:textSize="13sp"
+                    android:textColor="#D5D7FF"
+                    android:text="@string/register_hero_subtitle" />
+            </LinearLayout>
+        </FrameLayout>
+
+        <!-- Compact Curved White Form Sheet (No Empty Space) -->
         <LinearLayout
             android:id="@+id/register_sheet"
             android:layout_width="match_parent"
-            android:layout_height="0dp"
-            android:layout_weight="1"
+            android:layout_height="wrap_content"
             android:background="@drawable/bg_sheet_top_rounded"
             android:orientation="vertical"
             android:paddingHorizontal="24dp"
-            android:paddingTop="28dp"
-            android:paddingBottom="28dp">
+            android:paddingTop="24dp"
+            android:paddingBottom="18dp">
 
             <com.google.android.material.progressindicator.LinearProgressIndicator
                 android:id="@+id/auth_loading"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
+                android:layout_marginBottom="12dp"
                 android:indeterminate="true"
                 android:visibility="gone" />
 
@@ -93,7 +132,7 @@
                 style="@style/BountyTextInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="12dp"
                 android:hint="@string/email_label">
 
                 <com.google.android.material.textfield.TextInputEditText
@@ -112,7 +151,7 @@
                 style="@style/BountyTextInput"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
+                android:layout_marginTop="12dp"
                 android:hint="@string/password_label"
                 app:endIconMode="password_toggle">
 
@@ -130,14 +169,14 @@
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/register_button"
                 style="@style/BountyButton"
-                android:layout_marginTop="24dp"
+                android:layout_marginTop="18dp"
                 android:text="@string/register_action" />
 
             <!-- Divider "atau" -->
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginVertical="18dp"
+                android:layout_marginVertical="14dp"
                 android:gravity="center_vertical"
                 android:orientation="horizontal">
 
@@ -148,10 +187,13 @@
                     android:background="@color/bounty_outline_variant" />
 
                 <TextView
-                    style="@style/BountyCaption"
                     android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/nunito"
                     android:paddingHorizontal="14dp"
-                    android:text="@string/auth_or_divider" />
+                    android:text="@string/auth_or_divider"
+                    android:textColor="@color/bounty_text_secondary"
+                    android:textSize="13sp" />
 
                 <View
                     android:layout_width="0dp"
@@ -164,7 +206,7 @@
             <com.google.android.material.card.MaterialCardView
                 android:id="@+id/google_register_button"
                 android:layout_width="match_parent"
-                android:layout_height="52dp"
+                android:layout_height="50dp"
                 app:cardCornerRadius="16dp"
                 app:cardElevation="1dp"
                 app:strokeWidth="1.5dp"
@@ -197,18 +239,13 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <View
-                android:layout_width="0dp"
-                android:layout_height="0dp"
-                android:layout_weight="1" />
-
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/login_link"
                 style="@style/Widget.Material3.Button.TextButton"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:minHeight="48dp"
+                android:layout_marginTop="10dp"
+                android:minHeight="44dp"
                 android:text="@string/login_link"
                 android:textColor="@color/bounty_primary"
                 android:textStyle="bold" />

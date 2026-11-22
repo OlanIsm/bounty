@@ -1,5 +1,6 @@
 USE PONYTAIL, CAVEMAN skills before executing anything or even talk
 USE emilkowalski design skill before making any layout or design changes
+DONT PUSH SECRET, ENV, API, OR ANYTHING THATS CREDENTIAL TO GITHUB
 always push to github with detailed commit messages
 if the task took longer than usual, divide the task and push to github first then push the 2nd one
 

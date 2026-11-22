@@ -24,6 +24,10 @@ class RegisterActivity : AppCompatActivity() {
         setContentView(R.layout.activity_register)
         ScreenInsets.applyHeroEdgeToEdge(this, findViewById(R.id.register_sheet))
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = false
+        ViewMotion.startSuccessBurstAnimation(
+            findViewById(R.id.auth_hero_burst),
+            findViewById(R.id.auth_hero_mascot)
+        )
 
         val name = findViewById<TextInputEditText>(R.id.name_input)
         val email = findViewById<TextInputEditText>(R.id.email_input)

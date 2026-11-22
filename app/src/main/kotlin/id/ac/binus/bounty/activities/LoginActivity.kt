@@ -24,6 +24,10 @@ class LoginActivity : AppCompatActivity() {
         setContentView(R.layout.activity_login)
         ScreenInsets.applyHeroEdgeToEdge(this, findViewById(R.id.login_sheet))
         WindowInsetsControllerCompat(window, window.decorView).isAppearanceLightStatusBars = false
+        ViewMotion.startSuccessBurstAnimation(
+            findViewById(R.id.auth_hero_burst),
+            findViewById(R.id.auth_hero_mascot)
+        )
 
         val email = findViewById<TextInputEditText>(R.id.email_input)
         val password = findViewById<TextInputEditText>(R.id.password_input)
