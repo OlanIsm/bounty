@@ -87,6 +87,20 @@ object ViewMotion {
 
     @Suppress("DEPRECATION")
     @JvmStatic
+    fun applySlideUpFromBottom(activity: Activity) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            activity.overrideActivityTransition(
+                Activity.OVERRIDE_TRANSITION_OPEN,
+                R.anim.bounty_slide_in_bottom,
+                R.anim.bounty_slide_out_top
+            )
+        } else {
+            activity.overridePendingTransition(R.anim.bounty_slide_in_bottom, R.anim.bounty_slide_out_top)
+        }
+    }
+
+    @Suppress("DEPRECATION")
+    @JvmStatic
     fun applySlideFromRight(activity: Activity, opening: Boolean) {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
             if (opening) {

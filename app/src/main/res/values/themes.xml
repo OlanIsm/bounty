@@ -31,6 +31,11 @@
 
     <style name="Theme.Bounty" parent="Base.Theme.Bounty" />
 
+    <style name="Theme.Bounty.Splash" parent="Theme.Bounty">
+        <item name="android:windowBackground">@color/bounty_primary</item>
+        <item name="android:windowSplashScreenBackground" tools:targetApi="s">@color/bounty_primary</item>
+    </style>
+
     <style name="BountyHeading">
         <item name="android:layout_width">match_parent</item>
         <item name="android:layout_height">wrap_content</item>
