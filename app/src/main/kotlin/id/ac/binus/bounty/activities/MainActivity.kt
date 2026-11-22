@@ -843,13 +843,6 @@ class MainActivity : AppCompatActivity() {
         if (demoUsersModel.state.value == null) demoUsersModel.load(ApiClient.getApi())
         bindDemoUsers()
 
-        findViewById<View?>(R.id.logout_button)?.let { logoutBtn ->
-            ViewMotion.applySpringPress(logoutBtn) {
-                SessionManager(this).logout()
-                openLogin()
-            }
-        }
-
         findViewById<View?>(R.id.btn_profile_settings)?.let { btn ->
             ViewMotion.applySpringPress(btn) { showProfileSettingsSheet() }
         }

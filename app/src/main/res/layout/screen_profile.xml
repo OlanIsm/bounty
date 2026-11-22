@@ -386,23 +386,6 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Compact Logout Button (preserved for quick access & existing tests) -->
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/logout_button"
-                style="@style/Widget.Material3.Button.TonalButton"
-                android:layout_width="match_parent"
-                android:layout_height="48dp"
-                android:layout_marginTop="24dp"
-                app:cornerRadius="16dp"
-                app:icon="@drawable/ic_logout"
-                app:iconGravity="textStart"
-                app:iconTint="@color/bounty_on_error_container"
-                app:backgroundTint="@color/bounty_error_container"
-                android:textColor="@color/bounty_on_error_container"
-                android:textSize="14sp"
-                android:textStyle="bold"
-                android:text="@string/logout_action" />
-
             <!-- Hidden Compatibility Container for Tests / Retrofit -->
             <LinearLayout
                 android:id="@+id/legacy_demo_users_wrapper"
