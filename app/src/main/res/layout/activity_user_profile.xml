@@ -1,0 +1,328 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:fillViewport="true"
+    android:background="@color/bounty_primary">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:background="@color/bounty_background">
+
+        <!-- Top Cover Banner + Overlapping Avatar -->
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
+
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="128dp"
+                android:background="@drawable/bg_detail_hero"
+                android:paddingHorizontal="16dp"
+                android:paddingTop="12dp">
+
+                <ImageView
+                    android:id="@+id/btn_user_profile_back"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:layout_gravity="top|start"
+                    android:background="@drawable/bg_circle_translucent"
+                    android:padding="9dp"
+                    android:src="@drawable/ic_back"
+                    app:tint="@color/white"
+                    android:contentDescription="@string/back_action" />
+            </FrameLayout>
+
+            <!-- Curved Sheet + Identity -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="96dp"
+                android:background="@drawable/bg_sheet_top_rounded"
+                android:gravity="center_horizontal"
+                android:orientation="vertical"
+                android:paddingTop="56dp"
+                android:paddingHorizontal="20dp"
+                android:paddingBottom="16dp">
+
+                <TextView
+                    android:id="@+id/other_profile_name"
+                    style="@style/BountyHeading"
+                    android:layout_width="wrap_content"
+                    android:gravity="center"
+                    android:textSize="22sp"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/other_profile_subtitle"
+                    style="@style/BountyCaption"
+                    android:layout_width="wrap_content"
+                    android:gravity="center"
+                    android:layout_marginTop="2dp"
+                    android:textSize="13sp"
+                    android:text="Bounty Hunter &amp; Creator" />
+
+                <!-- Action Buttons Row (Chat | + Tambah Teman) -->
+                <LinearLayout
+                    android:id="@+id/other_profile_actions"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:gravity="center_vertical"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:id="@+id/btn_other_chat"
+                        android:layout_width="46dp"
+                        android:layout_height="46dp"
+                        android:background="@drawable/bg_reward"
+                        android:backgroundTint="@color/bounty_surface_container_low"
+                        android:padding="11dp"
+                        android:src="@drawable/ic_chat"
+                        app:tint="@color/bounty_primary"
+                        android:contentDescription="@string/chat_action" />
+
+                    <TextView
+                        android:id="@+id/btn_other_friend_toggle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="12dp"
+                        android:background="@drawable/bg_btn_duolingo_3d_primary"
+                        android:fontFamily="@font/nunito"
+                        android:paddingHorizontal="28dp"
+                        android:paddingTop="10dp"
+                        android:paddingBottom="14dp"
+                        android:text="@string/add_friend_action"
+                        android:textColor="@color/white"
+                        android:textSize="14sp"
+                        android:textStyle="bold" />
+                </LinearLayout>
+
+                <!-- 3-Column Stats Row -->
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="20dp"
+                    android:orientation="horizontal"
+                    android:gravity="center">
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/other_stat_joined"
+                            style="@style/BountyHeading"
+                            android:layout_width="wrap_content"
+                            android:textSize="20sp"
+                            android:text="0" />
+
+                        <TextView
+                            style="@style/BountyCaption"
+                            android:layout_width="wrap_content"
+                            android:textSize="12sp"
+                            android:text="@string/profile_stat_joined_label" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="28dp"
+                        android:background="@color/bounty_surface_container" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/other_stat_created"
+                            style="@style/BountyHeading"
+                            android:layout_width="wrap_content"
+                            android:textSize="20sp"
+                            android:text="0" />
+
+                        <TextView
+                            style="@style/BountyCaption"
+                            android:layout_width="wrap_content"
+                            android:textSize="12sp"
+                            android:text="@string/profile_stat_created_label" />
+                    </LinearLayout>
+
+                    <View
+                        android:layout_width="1dp"
+                        android:layout_height="28dp"
+                        android:background="@color/bounty_surface_container" />
+
+                    <LinearLayout
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_weight="1"
+                        android:gravity="center"
+                        android:orientation="vertical">
+
+                        <TextView
+                            android:id="@+id/other_stat_completed"
+                            style="@style/BountyHeading"
+                            android:layout_width="wrap_content"
+                            android:textSize="20sp"
+                            android:text="0" />
+
+                        <TextView
+                            style="@style/BountyCaption"
+                            android:layout_width="wrap_content"
+                            android:textSize="12sp"
+                            android:text="@string/profile_stat_completed_label" />
+                    </LinearLayout>
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Overlapping Avatar -->
+            <FrameLayout
+                android:layout_width="92dp"
+                android:layout_height="92dp"
+                android:layout_gravity="top|center_horizontal"
+                android:layout_marginTop="52dp"
+                android:background="@drawable/bg_avatar_ring"
+                android:elevation="4dp"
+                android:padding="4dp">
+
+                <ImageView
+                    android:id="@+id/other_profile_avatar"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:src="@drawable/ic_avatar"
+                    android:contentDescription="@null"
+                    android:importantForAccessibility="no" />
+            </FrameLayout>
+        </FrameLayout>
+
+        <!-- Portfolio Content -->
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="16dp"
+            android:paddingBottom="32dp">
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/bounty_surface_container" />
+
+            <TextView
+                style="@style/BountySection"
+                android:layout_marginTop="16dp"
+                android:textSize="17sp"
+                android:text="@string/profile_portfolio_title" />
+
+            <com.google.android.material.button.MaterialButtonToggleGroup
+                android:id="@+id/other_portfolio_toggle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                app:singleSelection="true"
+                app:selectionRequired="true"
+                app:checkedButton="@id/other_tab_all">
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/other_tab_all"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:text="@string/portfolio_tab_all"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="12dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/other_tab_joined"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:text="@string/portfolio_tab_joined"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="12dp" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/other_tab_created"
+                    style="?attr/materialButtonOutlinedStyle"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:text="@string/portfolio_tab_created"
+                    android:textSize="12sp"
+                    android:textStyle="bold"
+                    app:cornerRadius="12dp" />
+            </com.google.android.material.button.MaterialButtonToggleGroup>
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/other_portfolio_loading"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:indeterminate="true"
+                android:visibility="gone" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/other_portfolio_list"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="10dp"
+                android:nestedScrollingEnabled="false"
+                android:clipToPadding="false" />
+
+            <!-- Empty State (Other User Profile with exact requested copy) -->
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/other_portfolio_empty"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="1dp"
+                app:strokeWidth="1dp"
+                app:strokeColor="@color/bounty_surface_container"
+                app:cardBackgroundColor="@color/bounty_surface"
+                android:visibility="gone">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:gravity="center"
+                    android:padding="28dp">
+
+                    <ImageView
+                        android:layout_width="56dp"
+                        android:layout_height="56dp"
+                        android:src="@drawable/ic_sad_robot"
+                        android:contentDescription="@null"
+                        android:importantForAccessibility="no" />
+
+                    <TextView
+                        android:id="@+id/other_portfolio_empty_text"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp"
+                        android:gravity="center"
+                        android:fontFamily="@font/nunito"
+                        android:textSize="14sp"
+                        android:textColor="@color/bounty_text_secondary"
+                        android:lineSpacingMultiplier="1.25"
+                        android:text="@string/portfolio_empty_other" />
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+        </LinearLayout>
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>

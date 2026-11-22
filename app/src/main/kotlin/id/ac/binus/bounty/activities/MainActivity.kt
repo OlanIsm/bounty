@@ -23,12 +23,14 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.ViewModelProvider
 import androidx.recyclerview.widget.ConcatAdapter
+import androidx.recyclerview.widget.GridLayoutManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import com.bumptech.glide.Glide
 import androidx.core.widget.doAfterTextChanged
 import com.google.android.material.appbar.MaterialToolbar
 import com.google.android.material.bottomnavigation.BottomNavigationView
+import com.google.android.material.bottomsheet.BottomSheetDialog
 import com.google.android.material.button.MaterialButton
 import com.google.android.material.button.MaterialButtonToggleGroup
 import com.google.android.material.snackbar.Snackbar
@@ -39,7 +41,10 @@ import android.widget.Toast
 import id.ac.binus.bounty.adapters.ChallengeAdapter
 import id.ac.binus.bounty.adapters.LeaderboardAdapter
 import id.ac.binus.bounty.adapters.LeaderboardItem
+import id.ac.binus.bounty.adapters.PortfolioChallengeAdapter
 import id.ac.binus.bounty.data.FirebaseBountyRepository
+import id.ac.binus.bounty.data.FirebaseSocialRepository
+import id.ac.binus.bounty.data.SocialUser
 import id.ac.binus.bounty.models.Challenge
 import id.ac.binus.bounty.models.User
 import id.ac.binus.bounty.network.ApiClient
@@ -74,6 +79,10 @@ class MainActivity : AppCompatActivity() {
     private var leaderboardRawChallenges: List<Challenge> = emptyList()
     private var isLeaderboardCreatorsSelected: Boolean = true
     private var leaderboardRequest = 0
+    private var profilePortfolioAdapter: PortfolioChallengeAdapter? = null
+    private var profileRawChallenges: List<Challenge> = emptyList()
+    private var profilePortfolioTab = 0
+    private var profileRequest = 0
     private val backToHome = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
             navigation?.setSelectedItemId(R.id.nav_home)
@@ -166,6 +175,15 @@ class MainActivity : AppCompatActivity() {
         refreshBalance()
         if (navigation != null && (selectedDestination == R.id.nav_home || selectedDestination == R.id.nav_my_challenges)) loadFeed()
         else if (navigation != null && selectedDestination == R.id.nav_leaderboard) loadLeaderboardData()
+        else if (navigation != null && selectedDestination == R.id.nav_profile) {
+            SessionManager(this).getCurrentUser()?.let { loadProfilePortfolio(it) }
+        }
+        if (selectedDestination == R.id.nav_home) {
+            homeHeaderAdapter?.let {
+                it.followedUserIds = FirebaseSocialRepository.getFollowedIds(this)
+                it.notifyItemChanged(0)
+            }
+        }
     }
 
     private fun showScreen(destination: Int): Boolean {
@@ -204,7 +222,7 @@ class MainActivity : AppCompatActivity() {
         val insetsController = WindowInsetsControllerCompat(window, window.decorView)
         val rootLayout = findViewById<View>(R.id.main)
         toolbar.setTitle(title)
-        if (destination == R.id.nav_my_challenges || destination == R.id.nav_home) {
+        if (destination == R.id.nav_my_challenges || destination == R.id.nav_home || destination == R.id.nav_profile) {
             toolbar.visibility = View.GONE
             rootLayout?.setBackgroundResource(R.color.bounty_primary)
             insetsController.isAppearanceLightStatusBars = false
@@ -238,9 +256,10 @@ class MainActivity : AppCompatActivity() {
                     onCreateClick = { navigation?.selectedItemId = R.id.nav_create },
                     onSeeAllClick = { navigation?.selectedItemId = R.id.nav_leaderboard },
                     onFollowToggle = { hunter -> toggleFollowUser(hunter) },
+                    onHunterClick = { hunter -> openUserProfile(SocialUser(hunter.id, hunter.name, hunter.email, hunter.avatarUrl)) },
                     onLoadHuntersClick = { demoUsersModel.load(ApiClient.getApi()) }
                 ).apply {
-                    followedUserIds = getFollowedUserIds()
+                    followedUserIds = FirebaseSocialRepository.getFollowedIds(this@MainActivity)
                     demoUsersModel.state.value?.let { demoUsers = it.users }
                 }
                 list.adapter = ConcatAdapter(homeHeaderAdapter!!, feedAdapter!!)
@@ -452,26 +471,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun getFollowedUserIds(): Set<String> {
-        val prefs = getSharedPreferences("bounty_follows", MODE_PRIVATE)
-        return prefs.getStringSet("followed_ids", emptySet()) ?: emptySet()
+    private fun toggleFollowUser(targetUser: User) {
+        val currentUid = SessionManager(this).getCurrentUser()?.id ?: return
+        val social = SocialUser(targetUser.id, targetUser.name, targetUser.email, targetUser.avatarUrl)
+        FirebaseSocialRepository.toggleFriend(this, currentUid, social) { nowFriend ->
+            val msg = if (nowFriend) "Berteman dengan ${targetUser.name}!" else "Batal berteman dengan ${targetUser.name}"
+            Toast.makeText(this, msg, Toast.LENGTH_SHORT).show()
+            homeHeaderAdapter?.let {
+                it.followedUserIds = FirebaseSocialRepository.getFollowedIds(this)
+                it.notifyItemChanged(0)
+            }
+        }
     }
 
-    private fun toggleFollowUser(targetUser: User) {
-        val prefs = getSharedPreferences("bounty_follows", MODE_PRIVATE)
-        val ids = getFollowedUserIds().toMutableSet()
-        if (ids.contains(targetUser.id)) {
-            ids.remove(targetUser.id)
-            Toast.makeText(this, "Batal mengikuti ${targetUser.name}", Toast.LENGTH_SHORT).show()
-        } else {
-            ids.add(targetUser.id)
-            Toast.makeText(this, "Mengikuti ${targetUser.name}! 🎉", Toast.LENGTH_SHORT).show()
+    private fun openUserProfile(target: SocialUser) {
+        val current = SessionManager(this).getCurrentUser()
+        if (current != null && current.id == target.id) {
+            navigation?.selectedItemId = R.id.nav_profile
+            return
         }
-        prefs.edit().putStringSet("followed_ids", ids).apply()
-        homeHeaderAdapter?.let {
-            it.followedUserIds = ids
-            it.notifyItemChanged(0)
-        }
+        startActivity(
+            Intent(this, UserProfileActivity::class.java)
+                .putExtra(UserProfileActivity.EXTRA_USER_ID, target.id)
+                .putExtra(UserProfileActivity.EXTRA_USER_NAME, target.name)
+                .putExtra(UserProfileActivity.EXTRA_USER_EMAIL, target.email)
+                .putExtra(UserProfileActivity.EXTRA_USER_AVATAR, target.avatarUrl)
+        )
     }
 
     private class HomeHeaderAdapter(
@@ -479,6 +504,7 @@ class MainActivity : AppCompatActivity() {
         private val onCreateClick: () -> Unit,
         private val onSeeAllClick: () -> Unit,
         private val onFollowToggle: (User) -> Unit,
+        private val onHunterClick: (User) -> Unit,
         private val onLoadHuntersClick: () -> Unit
     ) : RecyclerView.Adapter<HomeHeaderAdapter.ViewHolder>() {
 
@@ -576,6 +602,9 @@ class MainActivity : AppCompatActivity() {
                 } else {
                     followBtn.text = "+ Ikuti"
                     followBtn.setBackgroundResource(R.drawable.bg_btn_duolingo_3d_primary)
+                }
+                ViewMotion.applySpringPress(hunterView) {
+                    onHunterClick(hunter)
                 }
                 ViewMotion.applySpringPress(followBtn) {
                     onFollowToggle(hunter)
@@ -811,51 +840,134 @@ class MainActivity : AppCompatActivity() {
             }
         }
 
-        findViewById<View?>(R.id.menu_edit_profile)?.let { btn ->
-            ViewMotion.applySpringPress(btn) {
-                showToast("Profil tersinkronisasi dengan akun login.")
-            }
+        findViewById<View?>(R.id.btn_profile_settings)?.let { btn ->
+            ViewMotion.applySpringPress(btn) { showProfileSettingsSheet() }
+        }
+        findViewById<View?>(R.id.btn_profile_settings_pill)?.let { btn ->
+            ViewMotion.applySpringPress(btn) { showProfileSettingsSheet() }
+        }
+        findViewById<View?>(R.id.btn_profile_create)?.let { btn ->
+            ViewMotion.applySpringPress(btn) { navigation?.selectedItemId = R.id.nav_create }
+        }
+        findViewById<View?>(R.id.btn_profile_friends)?.let { btn ->
+            ViewMotion.applySpringPress(btn) { openFindFriends() }
+        }
+        findViewById<View?>(R.id.btn_profile_explore_challenges)?.let { btn ->
+            ViewMotion.applySpringPress(btn) { navigation?.selectedItemId = R.id.nav_home }
         }
 
-        findViewById<View?>(R.id.menu_activity_history)?.let { btn ->
-            ViewMotion.applySpringPress(btn) {
-                navigation?.selectedItemId = R.id.nav_my_challenges
+        val currentUser = user ?: return
+        val portfolioList = findViewById<RecyclerView?>(R.id.profile_portfolio_list)
+        if (portfolioList != null) {
+            portfolioList.layoutManager = GridLayoutManager(this, 2)
+            profilePortfolioAdapter = PortfolioChallengeAdapter(currentUser.id) { challenge ->
+                startActivity(
+                    Intent(this, ChallengeDetailActivity::class.java)
+                        .putExtra(ChallengeDetailActivity.EXTRA_CLOUD_CHALLENGE_ID, challenge.cloudId)
+                )
             }
+            portfolioList.adapter = profilePortfolioAdapter
+            portfolioList.itemAnimator = null
         }
 
-        findViewById<com.google.android.material.switchmaterial.SwitchMaterial>(R.id.switch_notifications)
+        val toggle = findViewById<MaterialButtonToggleGroup?>(R.id.profile_portfolio_toggle)
+        toggle?.addOnButtonCheckedListener { _, checkedId, isChecked ->
+            if (!isChecked) return@addOnButtonCheckedListener
+            profilePortfolioTab = when (checkedId) {
+                R.id.portfolio_tab_joined -> 1
+                R.id.portfolio_tab_created -> 2
+                else -> 0
+            }
+            renderOwnPortfolio(currentUser)
+        }
+
+        findViewById<TextView?>(R.id.profile_stat_friends)?.text =
+            FirebaseSocialRepository.getFollowedIds(this).size.toString()
+
+        loadProfilePortfolio(currentUser)
+    }
+
+    private fun loadProfilePortfolio(user: User) {
+        if (selectedDestination != R.id.nav_profile) return
+        val loading = findViewById<View?>(R.id.profile_portfolio_loading)
+        loading?.visibility = View.VISIBLE
+        findViewById<TextView?>(R.id.profile_stat_friends)?.text =
+            FirebaseSocialRepository.getFollowedIds(this).size.toString()
+
+        val request = ++profileRequest
+        FirebaseBountyRepository.loadChallenges(user.id, false) { result ->
+            if (isDestroyed || isFinishing || request != profileRequest || selectedDestination != R.id.nav_profile) {
+                return@loadChallenges
+            }
+            loading?.visibility = View.GONE
+            val all = result.getOrNull().orEmpty()
+            profileRawChallenges = all.filter {
+                it.creatorId == user.id || it.participantId == user.id
+            }
+            val joined = profileRawChallenges.count { it.participantId == user.id }
+            val created = profileRawChallenges.count { it.creatorId == user.id }
+            findViewById<TextView?>(R.id.profile_stat_joined)?.text = joined.toString()
+            findViewById<TextView?>(R.id.profile_stat_created)?.text = created.toString()
+            renderOwnPortfolio(user)
+        }
+    }
+
+    private fun renderOwnPortfolio(user: User) {
+        if (selectedDestination != R.id.nav_profile) return
+        val filtered = when (profilePortfolioTab) {
+            1 -> profileRawChallenges.filter { it.participantId == user.id }
+            2 -> profileRawChallenges.filter { it.creatorId == user.id }
+            else -> profileRawChallenges
+        }
+        val list = findViewById<RecyclerView?>(R.id.profile_portfolio_list)
+        val emptyCard = findViewById<View?>(R.id.profile_portfolio_empty)
+        val emptyText = findViewById<TextView?>(R.id.profile_portfolio_empty_text)
+        profilePortfolioAdapter?.submitList(filtered)
+        if (filtered.isEmpty()) {
+            list?.visibility = View.GONE
+            emptyCard?.visibility = View.VISIBLE
+            emptyText?.setText(R.string.portfolio_empty_self)
+        } else {
+            list?.visibility = View.VISIBLE
+            emptyCard?.visibility = View.GONE
+        }
+    }
+
+    private fun showProfileSettingsSheet() {
+        val dialog = BottomSheetDialog(this)
+        val sheet = layoutInflater.inflate(R.layout.dialog_profile_settings, null)
+        dialog.setContentView(sheet)
+
+        sheet.findViewById<View?>(R.id.menu_edit_profile)?.setOnClickListener {
+            showToast("Profil tersinkronisasi dengan akun login.")
+            dialog.dismiss()
+        }
+        sheet.findViewById<com.google.android.material.switchmaterial.SwitchMaterial?>(R.id.switch_notifications)
             ?.setOnCheckedChangeListener { _, isChecked ->
                 showToast(if (isChecked) "Notifikasi tantangan diaktifkan." else "Notifikasi tantangan dinonaktifkan.")
             }
-
-        findViewById<View?>(R.id.menu_theme)?.let { btn ->
-            ViewMotion.applySpringPress(btn) {
-                showToast("Tema mengikuti preferensi sistem perangkat.")
-            }
+        sheet.findViewById<View?>(R.id.menu_security)?.setOnClickListener {
+            showToast("Akun terlindungi oleh autentikasi Firebase.")
+            dialog.dismiss()
         }
-
-        findViewById<View?>(R.id.menu_language)?.let { btn ->
-            ViewMotion.applySpringPress(btn) {
-                showToast("Bahasa saat ini: Bahasa Indonesia.")
-            }
+        sheet.findViewById<View?>(R.id.menu_about)?.setOnClickListener {
+            showToast("Bounty v1.0.0 • Dibuat untuk Coursework Android.")
+            dialog.dismiss()
         }
-
-        findViewById<View?>(R.id.menu_security)?.let { btn ->
-            ViewMotion.applySpringPress(btn) {
-                showToast("Akun terlindungi oleh autentikasi Firebase.")
-            }
+        sheet.findViewById<View?>(R.id.sheet_logout_button)?.setOnClickListener {
+            dialog.dismiss()
+            SessionManager(this).logout()
+            openLogin()
         }
+        dialog.show()
+    }
 
-        findViewById<View?>(R.id.menu_help)?.let { btn ->
-            ViewMotion.applySpringPress(btn) {
-                showToast("Bounty MVP: Aplikasi tantangan dan reward seru.")
-            }
-        }
-
-        findViewById<View?>(R.id.menu_about)?.let { btn ->
-            ViewMotion.applySpringPress(btn) {
-                showToast("Bounty v1.0.0 • Dibuat untuk Coursework Android.")
-            }
+    private fun openFindFriends() {
+        try {
+            val clazz = Class.forName("id.ac.binus.bounty.activities.FindFriendsActivity")
+            startActivity(Intent(this, clazz))
+        } catch (_: ClassNotFoundException) {
+            showToast("Fitur cari teman segera dibuka.")
         }
     }
 
@@ -867,7 +979,9 @@ class MainActivity : AppCompatActivity() {
         val screen = findViewById<View>(R.id.leaderboard_screen) ?: return
         val list = screen.findViewById<RecyclerView>(R.id.leaderboard_list)
         list.layoutManager = LinearLayoutManager(this)
-        leaderboardAdapter = LeaderboardAdapter()
+        leaderboardAdapter = LeaderboardAdapter { item ->
+            openUserProfile(SocialUser(item.userId, item.name, "", item.avatarUrl))
+        }
         list.adapter = leaderboardAdapter
         list.itemAnimator = null
 

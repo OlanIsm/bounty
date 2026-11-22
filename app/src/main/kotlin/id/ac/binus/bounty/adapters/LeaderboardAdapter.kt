@@ -24,7 +24,9 @@ data class LeaderboardItem(
     val isCurrentUser: Boolean
 )
 
-class LeaderboardAdapter : RecyclerView.Adapter<LeaderboardAdapter.ViewHolder>() {
+class LeaderboardAdapter(
+    private val onUserClick: ((LeaderboardItem) -> Unit)? = null
+) : RecyclerView.Adapter<LeaderboardAdapter.ViewHolder>() {
 
     private val items = mutableListOf<LeaderboardItem>()
 
@@ -140,7 +142,9 @@ class LeaderboardAdapter : RecyclerView.Adapter<LeaderboardAdapter.ViewHolder>()
             .circleCrop()
             .into(holder.avatar)
 
-        ViewMotion.applySpringPress(holder.card)
+        ViewMotion.applySpringPress(holder.card) {
+            onUserClick?.invoke(item)
+        }
     }
 
     override fun getItemCount(): Int = items.size

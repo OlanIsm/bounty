@@ -142,4 +142,29 @@
     <string name="challenge_canceled">Tantangan berhasil dibatalkan.</string>
     <string name="confirm_cancel_title">Are you sure?</string>
     <string name="confirm_cancel_message">Yakin ingin membatalkan tantangan ini? Status akan kembali terbuka untuk hunter lain.</string>
+
+    <!-- Social Portfolio, Friends & Chat -->
+    <string name="profile_settings_sheet_title">Pengaturan Akun</string>
+    <string name="profile_bio_default">Siap berburu &amp; berbagi challenge di Bounty!</string>
+    <string name="profile_create_cta">+ Buat Challenge</string>
+    <string name="profile_stat_joined_label">Diikuti</string>
+    <string name="profile_stat_created_label">Diberikan</string>
+    <string name="profile_stat_friends_label">Teman</string>
+    <string name="profile_stat_completed_label">Selesai</string>
+    <string name="profile_portfolio_title">Portofolio Challenge</string>
+    <string name="portfolio_tab_all">Semua</string>
+    <string name="portfolio_tab_joined">Diikuti</string>
+    <string name="portfolio_tab_created">Diberikan</string>
+    <string name="portfolio_role_hunter">Hunter</string>
+    <string name="portfolio_role_creator">Creator</string>
+    <string name="portfolio_empty_self">Anda belum pernah mengikuti atau memberikan challenge, ayo ikuti challenge yang tersedia</string>
+    <string name="portfolio_empty_other">User ini belum pernah mengikuti atau memberikan challenge</string>
+    <string name="portfolio_cta_explore">Ikuti Challenge Tersedia</string>
+    <string name="add_friend_action">+ Tambah Teman</string>
+    <string name="friend_added_action">✓ Berteman</string>
+    <string name="chat_action">Chat</string>
+    <string name="find_friends_title">Cari &amp; Tambah Teman</string>
+    <string name="find_friends_hint">Cari nama atau email hunter...</string>
+    <string name="chat_list_title">Pesan</string>
+    <string name="chat_input_hint">Tulis pesan...</string>
 </resources>
