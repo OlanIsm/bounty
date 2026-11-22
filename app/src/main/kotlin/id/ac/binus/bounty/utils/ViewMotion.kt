@@ -22,7 +22,7 @@ import id.ac.binus.bounty.R
  * - In-place auth morph transitions (hero cross-fade + rising form sheet)
  */
 object ViewMotion {
-    private val soothingEase = PathInterpolator(0.42f, 0f, 0.2f, 1f)
+    private val soothingEase = PathInterpolator(0.2f, 0f, 0f, 1f)
     private val gentleOut = PathInterpolator(0.22f, 1f, 0.36f, 1f)
 
     @SuppressLint("ClickableViewAccessibility")
@@ -34,7 +34,7 @@ object ViewMotion {
                     v.animate()
                         .scaleX(0.97f)
                         .scaleY(0.97f)
-                        .setDuration(110)
+                        .setDuration(80)
                         .setInterpolator(soothingEase)
                         .start()
                 }
@@ -42,11 +42,11 @@ object ViewMotion {
                     v.animate()
                         .scaleX(1.0f)
                         .scaleY(1.0f)
-                        .setDuration(220)
+                        .setDuration(160)
                         .setInterpolator(gentleOut)
                         .start()
                     if (onClick != null) {
-                        v.postDelayed({ onClick.invoke() }, 45)
+                        onClick.invoke()
                     } else {
                         v.performClick()
                     }
@@ -55,7 +55,7 @@ object ViewMotion {
                     v.animate()
                         .scaleX(1.0f)
                         .scaleY(1.0f)
-                        .setDuration(200)
+                        .setDuration(150)
                         .setInterpolator(gentleOut)
                         .start()
                 }
@@ -67,22 +67,15 @@ object ViewMotion {
     @JvmStatic
     fun animateEntrance(view: View, delayMs: Long = 0) {
         view.alpha = 0f
-        view.scaleX = 0.975f
-        view.scaleY = 0.975f
-        view.translationY = 18f
-
-        val alphaAnim = ObjectAnimator.ofFloat(view, View.ALPHA, 0f, 1f)
-        val scaleXAnim = ObjectAnimator.ofFloat(view, View.SCALE_X, 0.975f, 1f)
-        val scaleYAnim = ObjectAnimator.ofFloat(view, View.SCALE_Y, 0.975f, 1f)
-        val transYAnim = ObjectAnimator.ofFloat(view, View.TRANSLATION_Y, 18f, 0f)
-
-        AnimatorSet().apply {
-            playTogether(alphaAnim, scaleXAnim, scaleYAnim, transYAnim)
-            duration = 320
-            startDelay = delayMs
-            interpolator = soothingEase
-            start()
-        }
+        view.translationY = 12f
+        view.animate()
+            .alpha(1f)
+            .translationY(0f)
+            .setDuration(200)
+            .setStartDelay(delayMs)
+            .setInterpolator(soothingEase)
+            .withLayer()
+            .start()
     }
 
     @Suppress("DEPRECATION")
@@ -153,21 +146,23 @@ object ViewMotion {
         }
         incomingView.animate().cancel()
         incomingView.translationX = width * direction
-        incomingView.alpha = 0.94f
+        incomingView.alpha = 0.96f
         incomingView.animate()
             .translationX(0f)
             .alpha(1f)
-            .setDuration(300)
+            .setDuration(210)
             .setInterpolator(soothingEase)
+            .withLayer()
             .start()
 
         if (outgoingView != null && outgoingView !== incomingView) {
             outgoingView.animate().cancel()
             outgoingView.animate()
                 .translationX(-width * direction)
-                .alpha(0.86f)
-                .setDuration(300)
+                .alpha(0.90f)
+                .setDuration(210)
                 .setInterpolator(soothingEase)
+                .withLayer()
                 .withEndAction {
                     outgoingView.translationX = 0f
                     outgoingView.alpha = 1f

@@ -317,10 +317,14 @@ class MainActivity : AppCompatActivity() {
                     applyMyChallengesFilter()
                 }
             }
-            if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) loadFeed()
+            if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+                incomingView.post { loadFeed() }
+            }
         }
         user?.let(::bindUser)
-        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) refreshBalance()
+        if (lifecycle.currentState.isAtLeast(Lifecycle.State.STARTED)) {
+            incomingView.post { refreshBalance() }
+        }
         return true
     }
 
@@ -625,31 +629,35 @@ class MainActivity : AppCompatActivity() {
                 seeAllBtn?.visibility = View.VISIBLE
             }
 
-            // Followed users container
+            // Followed users container (skip re-inflating if unchanged)
             val container = root.findViewById<LinearLayout>(R.id.home_followed_users_container)
-            container?.removeAllViews()
-            val inflater = LayoutInflater.from(root.context)
-            demoUsers.take(8).forEach { hunter ->
-                val hunterView = inflater.inflate(R.layout.item_home_hunter, container, false)
-                hunterView.findViewById<TextView>(R.id.hunter_name).text = hunter.name
-                val img = hunterView.findViewById<ImageView>(R.id.hunter_avatar)
-                Glide.with(img).load(hunter.avatarUrl).placeholder(R.drawable.ic_avatar).error(R.drawable.ic_avatar).circleCrop().into(img)
-                val followBtn = hunterView.findViewById<TextView>(R.id.hunter_follow_btn)
-                val isFollowing = followedUserIds.contains(hunter.id)
-                if (isFollowing) {
-                    followBtn.text = "✓ Diikuti"
-                    followBtn.setBackgroundResource(R.drawable.bg_btn_duolingo_3d_green)
-                } else {
-                    followBtn.text = "+ Ikuti"
-                    followBtn.setBackgroundResource(R.drawable.bg_btn_duolingo_3d_primary)
+            val signature = demoUsers.take(8).joinToString(",") { "${it.id}:${followedUserIds.contains(it.id)}" }
+            if (container != null && container.tag != signature) {
+                container.tag = signature
+                container.removeAllViews()
+                val inflater = LayoutInflater.from(root.context)
+                demoUsers.take(8).forEach { hunter ->
+                    val hunterView = inflater.inflate(R.layout.item_home_hunter, container, false)
+                    hunterView.findViewById<TextView>(R.id.hunter_name).text = hunter.name
+                    val img = hunterView.findViewById<ImageView>(R.id.hunter_avatar)
+                    Glide.with(img).load(hunter.avatarUrl).placeholder(R.drawable.ic_avatar).error(R.drawable.ic_avatar).circleCrop().into(img)
+                    val followBtn = hunterView.findViewById<TextView>(R.id.hunter_follow_btn)
+                    val isFollowing = followedUserIds.contains(hunter.id)
+                    if (isFollowing) {
+                        followBtn.text = "✓ Diikuti"
+                        followBtn.setBackgroundResource(R.drawable.bg_btn_duolingo_3d_green)
+                    } else {
+                        followBtn.text = "+ Ikuti"
+                        followBtn.setBackgroundResource(R.drawable.bg_btn_duolingo_3d_primary)
+                    }
+                    ViewMotion.applySpringPress(hunterView) {
+                        onHunterClick(hunter)
+                    }
+                    ViewMotion.applySpringPress(followBtn) {
+                        onFollowToggle(hunter)
+                    }
+                    container.addView(hunterView)
                 }
-                ViewMotion.applySpringPress(hunterView) {
-                    onHunterClick(hunter)
-                }
-                ViewMotion.applySpringPress(followBtn) {
-                    onFollowToggle(hunter)
-                }
-                container?.addView(hunterView)
             }
 
             val emptyContainer = root.findViewById<View>(R.id.home_empty_container)
@@ -719,6 +727,8 @@ class MainActivity : AppCompatActivity() {
     }
 
     private fun bindDemoUsers() {
+        val wrapper = findViewById<View?>(R.id.legacy_demo_users_wrapper)
+        if (wrapper != null && wrapper.visibility == View.GONE) return
         val list = findViewById<LinearLayout?>(R.id.demo_users_list) ?: return
         val state = demoUsersModel.state.value ?: return
         findViewById<View>(R.id.demo_users_loading).visibility = if (state.loading) View.VISIBLE else View.GONE
