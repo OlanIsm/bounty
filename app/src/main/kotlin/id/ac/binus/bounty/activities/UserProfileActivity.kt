@@ -113,6 +113,7 @@ class UserProfileActivity : AppCompatActivity() {
                 .putExtra(EXTRA_USER_EMAIL, targetUser.email)
                 .putExtra(EXTRA_USER_AVATAR, targetUser.avatarUrl)
         )
+        ViewMotion.applySlideFromRight(this, opening = true)
     }
 
     private fun updateFriendButton() {

@@ -85,6 +85,84 @@ object ViewMotion {
         }
     }
 
+    @Suppress("DEPRECATION")
+    @JvmStatic
+    fun applySlideFromRight(activity: Activity, opening: Boolean) {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+            if (opening) {
+                activity.overrideActivityTransition(
+                    Activity.OVERRIDE_TRANSITION_OPEN,
+                    R.anim.bounty_slide_in_right,
+                    R.anim.bounty_slide_out_left
+                )
+            } else {
+                activity.overrideActivityTransition(
+                    Activity.OVERRIDE_TRANSITION_CLOSE,
+                    R.anim.bounty_slide_in_left,
+                    R.anim.bounty_slide_out_right
+                )
+            }
+        } else {
+            if (opening) {
+                activity.overridePendingTransition(R.anim.bounty_slide_in_right, R.anim.bounty_slide_out_left)
+            } else {
+                activity.overridePendingTransition(R.anim.bounty_slide_in_left, R.anim.bounty_slide_out_right)
+            }
+        }
+    }
+
+    /**
+     * Directional horizontal slide between bottom-nav destinations:
+     * slideLeft = true when navigating to a tab on the right (old slides left, new enters from right),
+     * slideLeft = false when navigating to a tab on the left (old slides right, new enters from left).
+     */
+    @JvmStatic
+    fun animateHorizontalTabSwap(
+        container: ViewGroup,
+        outgoingView: View?,
+        incomingView: View,
+        slideLeft: Boolean
+    ) {
+        // Clean up any stale exiting views from rapid tab taps
+        for (i in container.childCount - 1 downTo 0) {
+            val child = container.getChildAt(i)
+            if (child !== outgoingView && child !== incomingView) {
+                child.animate().cancel()
+                container.removeView(child)
+            }
+        }
+        val width = (container.width.takeIf { it > 0 } ?: container.resources.displayMetrics.widthPixels).toFloat()
+        val direction = if (slideLeft) 1f else -1f
+
+        if (incomingView.parent == null) {
+            container.addView(incomingView)
+        }
+        incomingView.animate().cancel()
+        incomingView.translationX = width * direction
+        incomingView.alpha = 0.94f
+        incomingView.animate()
+            .translationX(0f)
+            .alpha(1f)
+            .setDuration(300)
+            .setInterpolator(soothingEase)
+            .start()
+
+        if (outgoingView != null && outgoingView !== incomingView) {
+            outgoingView.animate().cancel()
+            outgoingView.animate()
+                .translationX(-width * direction)
+                .alpha(0.86f)
+                .setDuration(300)
+                .setInterpolator(soothingEase)
+                .withEndAction {
+                    outgoingView.translationX = 0f
+                    outgoingView.alpha = 1f
+                    container.removeView(outgoingView)
+                }
+                .start()
+        }
+    }
+
     /**
      * Suppresses default horizontal slide when morphing between Login and Register.
      */

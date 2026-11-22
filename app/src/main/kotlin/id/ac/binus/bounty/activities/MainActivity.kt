@@ -64,6 +64,7 @@ import java.time.format.DateTimeParseException
 class MainActivity : AppCompatActivity() {
     private var navigation: BottomNavigationView? = null
     private var selectedDestination = R.id.nav_home
+    private var currentScreenView: View? = null
     private var feedRequest = 0
     private var feedAdapter: ChallengeAdapter? = null
     private var homeHeaderAdapter: HomeHeaderAdapter? = null
@@ -186,6 +187,15 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
+    private fun destinationIndex(destination: Int): Int = when (destination) {
+        R.id.nav_home -> 0
+        R.id.nav_my_challenges -> 1
+        R.id.nav_create -> 2
+        R.id.nav_leaderboard -> 3
+        R.id.nav_profile -> 4
+        else -> 0
+    }
+
     private fun showScreen(destination: Int): Boolean {
         val (layout, title) = when (destination) {
             R.id.nav_home -> R.layout.screen_home to R.string.home_title
@@ -196,12 +206,15 @@ class MainActivity : AppCompatActivity() {
             else -> return false
         }
         val content = findViewById<FrameLayout>(R.id.screen_content)
+        val outgoingView = currentScreenView
+        val oldIndex = destinationIndex(selectedDestination)
+        val newIndex = destinationIndex(destination)
         if (selectedDestination == R.id.nav_create && destination != R.id.nav_create && createScreen != null) {
             createScreen?.clearFocus()
             WindowInsetsControllerCompat(window, content).hide(WindowInsetsCompat.Type.ime())
         }
-        content.removeAllViews()
-        if (destination == R.id.nav_create) {
+
+        val incomingView: View = if (destination == R.id.nav_create) {
             if (createScreen == null) {
                 createScreen = layoutInflater.inflate(layout, content, false).also { screen ->
                     createState?.let(screen::restoreHierarchyState)
@@ -211,13 +224,26 @@ class MainActivity : AppCompatActivity() {
                         .setEndIconOnClickListener { chooseDeadline() }
                 }
             }
-            content.addView(createScreen)
-            ViewMotion.animateEntrance(createScreen!!)
-            updatePublishState()
+            (createScreen!!.parent as? ViewGroup)?.removeView(createScreen)
+            createScreen!!
         } else {
-            val inflated = layoutInflater.inflate(layout, content, true)
-            ViewMotion.animateEntrance(inflated)
+            layoutInflater.inflate(layout, content, false)
         }
+
+        if (outgoingView == null || destination == selectedDestination) {
+            content.removeAllViews()
+            content.addView(incomingView)
+            ViewMotion.animateEntrance(incomingView)
+        } else {
+            ViewMotion.animateHorizontalTabSwap(
+                container = content,
+                outgoingView = outgoingView,
+                incomingView = incomingView,
+                slideLeft = newIndex > oldIndex
+            )
+        }
+        currentScreenView = incomingView
+        if (destination == R.id.nav_create) updatePublishState()
         val toolbar = findViewById<MaterialToolbar>(R.id.main_toolbar)
         val insetsController = WindowInsetsControllerCompat(window, window.decorView)
         val rootLayout = findViewById<View>(R.id.main)
@@ -239,11 +265,11 @@ class MainActivity : AppCompatActivity() {
         backToHome.isEnabled = destination != R.id.nav_home
         val user = SessionManager(this).getCurrentUser()
         if (destination == R.id.nav_profile) {
-            setupProfileScreen(user)
+            setupProfileScreen(user, incomingView)
         } else if (destination == R.id.nav_leaderboard) {
-            setupLeaderboardScreen()
+            setupLeaderboardScreen(incomingView)
         } else if (destination == R.id.nav_home || destination == R.id.nav_my_challenges) {
-            val list = findViewById<RecyclerView>(R.id.challenge_list)
+            val list = incomingView.findViewById<RecyclerView>(R.id.challenge_list)
             list.layoutManager = LinearLayoutManager(this)
             feedAdapter = ChallengeAdapter { challenge ->
                 startActivity(Intent(this, ChallengeDetailActivity::class.java)
@@ -258,7 +284,10 @@ class MainActivity : AppCompatActivity() {
                     onFollowToggle = { hunter -> toggleFollowUser(hunter) },
                     onHunterClick = { hunter -> openUserProfile(SocialUser(hunter.id, hunter.name, hunter.email, hunter.avatarUrl)) },
                     onSearchFriendsClick = { openFindFriends() },
-                    onChatClick = { startActivity(Intent(this@MainActivity, ChatListActivity::class.java)) },
+                    onChatClick = {
+                        startActivity(Intent(this@MainActivity, ChatListActivity::class.java))
+                        ViewMotion.applySlideFromRight(this@MainActivity, opening = true)
+                    },
                     onLoadHuntersClick = { demoUsersModel.load(ApiClient.getApi()) }
                 ).apply {
                     followedUserIds = FirebaseSocialRepository.getFollowedIds(this@MainActivity)
@@ -266,14 +295,14 @@ class MainActivity : AppCompatActivity() {
                 }
                 list.adapter = ConcatAdapter(homeHeaderAdapter!!, feedAdapter!!)
             } else list.adapter = feedAdapter
-            val retryFeed = findViewById<View>(R.id.feed_retry)
+            val retryFeed = incomingView.findViewById<View>(R.id.feed_retry)
             ViewMotion.applySpringPress(retryFeed) { loadFeed() }
             if (destination == R.id.nav_my_challenges) {
-                val createFirst = findViewById<View>(R.id.empty_create_challenge)
+                val createFirst = incomingView.findViewById<View>(R.id.empty_create_challenge)
                 ViewMotion.applySpringPress(createFirst) {
                     navigation?.selectedItemId = R.id.nav_create
                 }
-                val toggleGroup = findViewById<MaterialButtonToggleGroup>(R.id.challenge_toggle_group)
+                val toggleGroup = incomingView.findViewById<MaterialButtonToggleGroup>(R.id.challenge_toggle_group)
                 toggleGroup?.check(if (isMyChallengesOwnSelected) R.id.toggle_own else R.id.toggle_other)
                 toggleGroup?.addOnButtonCheckedListener { _, checkedId, isChecked ->
                     if (isChecked) {
@@ -281,7 +310,7 @@ class MainActivity : AppCompatActivity() {
                         applyMyChallengesFilter()
                     }
                 }
-                val searchInput = findViewById<TextInputEditText>(R.id.challenge_search_input)
+                val searchInput = incomingView.findViewById<TextInputEditText>(R.id.challenge_search_input)
                 searchInput?.setText(myChallengesSearchQuery)
                 searchInput?.doAfterTextChanged { text ->
                     myChallengesSearchQuery = text?.toString().orEmpty()
@@ -373,7 +402,7 @@ class MainActivity : AppCompatActivity() {
         val screenId = if (selectedDestination == R.id.nav_my_challenges) R.id.my_challenges_screen else R.id.home_screen
         val isMyChallenges = selectedDestination == R.id.nav_my_challenges
         val user = SessionManager(this).getCurrentUser() ?: return
-        val home = findViewById<View>(screenId) ?: return
+        val home = currentScreenView?.takeIf { it.id == screenId } ?: findViewById<View>(screenId) ?: return
         val request = ++feedRequest
         home.findViewById<View>(R.id.feed_loading).visibility = View.VISIBLE
         home.findViewById<View>(R.id.feed_message)?.visibility = View.GONE
@@ -384,7 +413,7 @@ class MainActivity : AppCompatActivity() {
             homeHeaderAdapter?.errorMessage = null
         }
         FirebaseBountyRepository.loadChallenges(user.id, false) { result ->
-            if (isDestroyed || isFinishing || request != feedRequest || findViewById<View>(screenId) !== home) return@loadChallenges
+            if (isDestroyed || isFinishing || request != feedRequest || currentScreenView !== home) return@loadChallenges
             val list = home.findViewById<RecyclerView>(R.id.challenge_list)
             home.findViewById<View>(R.id.feed_loading).visibility = View.GONE
             if (result.isSuccess) {
@@ -429,7 +458,8 @@ class MainActivity : AppCompatActivity() {
 
     private fun applyMyChallengesFilter() {
         if (selectedDestination != R.id.nav_my_challenges) return
-        val screen = findViewById<View>(R.id.my_challenges_screen) ?: return
+        val screen = currentScreenView?.takeIf { it.id == R.id.my_challenges_screen }
+            ?: findViewById<View>(R.id.my_challenges_screen) ?: return
         val user = SessionManager(this).getCurrentUser() ?: return
         val list = screen.findViewById<RecyclerView>(R.id.challenge_list)
         val feedMessage = screen.findViewById<TextView>(R.id.feed_message)
@@ -835,32 +865,32 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    private fun setupProfileScreen(user: User?) {
-        val retryUsers = findViewById<View?>(R.id.demo_users_retry)
+    private fun setupProfileScreen(user: User?, root: View) {
+        val retryUsers = root.findViewById<View?>(R.id.demo_users_retry)
         if (retryUsers != null) {
             ViewMotion.applySpringPress(retryUsers) { demoUsersModel.load(ApiClient.getApi()) }
         }
         if (demoUsersModel.state.value == null) demoUsersModel.load(ApiClient.getApi())
         bindDemoUsers()
 
-        findViewById<View?>(R.id.btn_profile_settings)?.let { btn ->
+        root.findViewById<View?>(R.id.btn_profile_settings)?.let { btn ->
             ViewMotion.applySpringPress(btn) { showProfileSettingsSheet() }
         }
-        findViewById<View?>(R.id.btn_profile_settings_pill)?.let { btn ->
+        root.findViewById<View?>(R.id.btn_profile_settings_pill)?.let { btn ->
             ViewMotion.applySpringPress(btn) { showProfileSettingsSheet() }
         }
-        findViewById<View?>(R.id.btn_profile_create)?.let { btn ->
+        root.findViewById<View?>(R.id.btn_profile_create)?.let { btn ->
             ViewMotion.applySpringPress(btn) { navigation?.selectedItemId = R.id.nav_create }
         }
-        findViewById<View?>(R.id.btn_profile_friends)?.let { btn ->
+        root.findViewById<View?>(R.id.btn_profile_friends)?.let { btn ->
             ViewMotion.applySpringPress(btn) { openFindFriends() }
         }
-        findViewById<View?>(R.id.btn_profile_explore_challenges)?.let { btn ->
+        root.findViewById<View?>(R.id.btn_profile_explore_challenges)?.let { btn ->
             ViewMotion.applySpringPress(btn) { navigation?.selectedItemId = R.id.nav_home }
         }
 
         val currentUser = user ?: return
-        val portfolioList = findViewById<RecyclerView?>(R.id.profile_portfolio_list)
+        val portfolioList = root.findViewById<RecyclerView?>(R.id.profile_portfolio_list)
         if (portfolioList != null) {
             portfolioList.layoutManager = GridLayoutManager(this, 2)
             profilePortfolioAdapter = PortfolioChallengeAdapter(currentUser.id) { challenge ->
@@ -873,7 +903,7 @@ class MainActivity : AppCompatActivity() {
             portfolioList.itemAnimator = null
         }
 
-        val toggle = findViewById<MaterialButtonToggleGroup?>(R.id.profile_portfolio_toggle)
+        val toggle = root.findViewById<MaterialButtonToggleGroup?>(R.id.profile_portfolio_toggle)
         toggle?.addOnButtonCheckedListener { _, checkedId, isChecked ->
             if (!isChecked) return@addOnButtonCheckedListener
             profilePortfolioTab = when (checkedId) {
@@ -884,7 +914,7 @@ class MainActivity : AppCompatActivity() {
             renderOwnPortfolio(currentUser)
         }
 
-        findViewById<TextView?>(R.id.profile_stat_friends)?.text =
+        root.findViewById<TextView?>(R.id.profile_stat_friends)?.text =
             FirebaseSocialRepository.getFollowedIds(this).size.toString()
 
         loadProfilePortfolio(currentUser)
@@ -973,8 +1003,7 @@ class MainActivity : AppCompatActivity() {
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show()
     }
 
-    private fun setupLeaderboardScreen() {
-        val screen = findViewById<View>(R.id.leaderboard_screen) ?: return
+    private fun setupLeaderboardScreen(screen: View) {
         val list = screen.findViewById<RecyclerView>(R.id.leaderboard_list)
         list.layoutManager = LinearLayoutManager(this)
         leaderboardAdapter = LeaderboardAdapter { item ->

@@ -43,7 +43,7 @@ class ChatListActivity : AppCompatActivity() {
         findViewById<TextView>(R.id.chat_list_greeting).text =
             getString(R.string.welcome_user, user.name)
 
-        ViewMotion.applySpringPress(findViewById(R.id.btn_chat_list_back)) { finish() }
+        ViewMotion.applySpringPress(findViewById(R.id.btn_chat_list_back)) { finishWithSlide() }
         ViewMotion.applySpringPress(findViewById(R.id.btn_chat_find_friends)) { openFindFriends() }
         ViewMotion.applySpringPress(findViewById(R.id.btn_chat_empty_find)) { openFindFriends() }
         findViewById<View>(R.id.fab_new_chat).setOnClickListener { openFindFriends() }
@@ -52,6 +52,17 @@ class ChatListActivity : AppCompatActivity() {
         list.layoutManager = LinearLayoutManager(this)
         threadAdapter = ChatThreadAdapter { friend -> openChatRoom(friend) }
         list.adapter = threadAdapter
+
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finishWithSlide()
+            }
+        })
+    }
+
+    private fun finishWithSlide() {
+        finish()
+        ViewMotion.applySlideFromRight(this, opening = false)
     }
 
     override fun onResume() {
@@ -110,6 +121,7 @@ class ChatListActivity : AppCompatActivity() {
                 .putExtra(UserProfileActivity.EXTRA_USER_EMAIL, friend.email)
                 .putExtra(UserProfileActivity.EXTRA_USER_AVATAR, friend.avatarUrl)
         )
+        ViewMotion.applySlideFromRight(this, opening = true)
     }
 
     private class ChatThreadAdapter(

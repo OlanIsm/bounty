@@ -55,7 +55,12 @@ class ChatRoomActivity : AppCompatActivity() {
         )
 
         findViewById<TextView>(R.id.chat_room_friend_name).text = friend.name
-        ViewMotion.applySpringPress(findViewById(R.id.btn_chat_room_back)) { finish() }
+        ViewMotion.applySpringPress(findViewById(R.id.btn_chat_room_back)) { finishWithSlide() }
+        onBackPressedDispatcher.addCallback(this, object : androidx.activity.OnBackPressedCallback(true) {
+            override fun handleOnBackPressed() {
+                finishWithSlide()
+            }
+        })
 
         val openFriendProfile = {
             startActivity(
@@ -109,6 +114,11 @@ class ChatRoomActivity : AppCompatActivity() {
         if (messages.isNotEmpty()) {
             list.scrollToPosition(messages.size - 1)
         }
+    }
+
+    private fun finishWithSlide() {
+        finish()
+        ViewMotion.applySlideFromRight(this, opening = false)
     }
 
     override fun onDestroy() {
