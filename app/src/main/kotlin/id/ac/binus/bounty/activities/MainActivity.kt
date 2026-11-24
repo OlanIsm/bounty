@@ -50,6 +50,8 @@ import id.ac.binus.bounty.models.User
 import id.ac.binus.bounty.network.ApiClient
 import id.ac.binus.bounty.network.RandomUserApi
 import id.ac.binus.bounty.network.RandomUserResponse
+import id.ac.binus.bounty.utils.AppTutorialController
+import id.ac.binus.bounty.utils.AppTutorialOverlay
 import id.ac.binus.bounty.utils.ChallengeDisplay
 import id.ac.binus.bounty.utils.ScreenInsets
 import id.ac.binus.bounty.utils.SessionManager
@@ -84,8 +86,10 @@ class MainActivity : AppCompatActivity() {
     private var profileRawChallenges: List<Challenge> = emptyList()
     private var profilePortfolioTab = 0
     private var profileRequest = 0
+    private var tutorialController: AppTutorialController? = null
     private val backToHome = object : OnBackPressedCallback(false) {
         override fun handleOnBackPressed() {
+            if (tutorialController?.handleBackPressed() == true) return
             navigation?.setSelectedItemId(R.id.nav_home)
         }
     }
@@ -111,12 +115,26 @@ class MainActivity : AppCompatActivity() {
             val handled = showScreen(item.itemId)
             if (handled) {
                 applyNavSelectionEffect(nav, item.itemId)
+                tutorialController?.onDestinationChanged(item.itemId)
             }
             handled
         }
         val destination = savedInstanceState?.getInt("selected_destination", R.id.nav_home) ?: R.id.nav_home
         nav.selectedItemId = if (nav.menu.findItem(destination) == null) R.id.nav_home else destination
         nav.setOnItemReselectedListener { }
+
+        findViewById<AppTutorialOverlay?>(R.id.tutorial_overlay)?.let { overlay ->
+            tutorialController = AppTutorialController(
+                activity = this,
+                overlay = overlay,
+                getSelectedDestination = { selectedDestination },
+                navigateToDestination = { destId -> navigation?.selectedItemId = destId },
+                findNavItemView = { destId -> navigation?.findViewById(destId) },
+                onActiveStateChanged = { active ->
+                    backToHome.isEnabled = active || selectedDestination != R.id.nav_home
+                }
+            )
+        }
     }
 
     override fun onPostCreate(savedInstanceState: Bundle?) {
@@ -159,6 +177,12 @@ class MainActivity : AppCompatActivity() {
             return
         }
         bindUser(user)
+        tutorialController?.startIfFirstTime(user.id)
+    }
+
+    override fun onDestroy() {
+        tutorialController?.destroy()
+        super.onDestroy()
     }
 
     override fun onSaveInstanceState(outState: Bundle) {
@@ -262,7 +286,7 @@ class MainActivity : AppCompatActivity() {
             insetsController.isAppearanceLightStatusBars = true
         }
         selectedDestination = destination
-        backToHome.isEnabled = destination != R.id.nav_home
+        backToHome.isEnabled = destination != R.id.nav_home || tutorialController?.isActive == true
         val user = SessionManager(this).getCurrentUser()
         if (destination == R.id.nav_profile) {
             setupProfileScreen(user, incomingView)
@@ -992,6 +1016,10 @@ class MainActivity : AppCompatActivity() {
         sheet.findViewById<View?>(R.id.menu_security)?.setOnClickListener {
             showToast("Akun terlindungi oleh autentikasi Firebase.")
             dialog.dismiss()
+        }
+        sheet.findViewById<View?>(R.id.menu_replay_tutorial)?.setOnClickListener {
+            dialog.dismiss()
+            tutorialController?.start(fromBeginning = true)
         }
         sheet.findViewById<View?>(R.id.menu_about)?.setOnClickListener {
             showToast("Bounty v1.0.0 • Dibuat untuk Coursework Android.")

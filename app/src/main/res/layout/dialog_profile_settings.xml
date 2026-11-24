@@ -179,6 +179,53 @@
                 android:background="@color/bounty_surface_container" />
 
             <LinearLayout
+                android:id="@+id/menu_replay_tutorial"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:gravity="center_vertical"
+                android:padding="14dp"
+                android:background="?attr/selectableItemBackground">
+
+                <ImageView
+                    android:layout_width="20dp"
+                    android:layout_height="20dp"
+                    android:src="@drawable/ic_target"
+                    app:tint="@color/bounty_primary"
+                    android:contentDescription="@null" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_marginStart="14dp"
+                    android:orientation="vertical">
+
+                    <TextView
+                        style="@style/BountyHeading"
+                        android:textSize="14sp"
+                        android:text="@string/profile_setting_tutorial" />
+
+                    <TextView
+                        style="@style/BountyCaption"
+                        android:textSize="12sp"
+                        android:text="@string/profile_setting_tutorial_desc" />
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="18dp"
+                    android:layout_height="18dp"
+                    android:src="@drawable/ic_chevron_right"
+                    android:contentDescription="@null" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginStart="48dp"
+                android:background="@color/bounty_surface_container" />
+
+            <LinearLayout
                 android:id="@+id/menu_about"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"

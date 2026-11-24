@@ -55,4 +55,12 @@
             app:itemTextAppearanceInactive="@style/BountyNavigationLabelInactive"
             app:itemActiveIndicatorStyle="@style/BountyNavigationIndicator" />
     </com.google.android.material.card.MaterialCardView>
+
+    <!-- Interactive Mascot Walkthrough Spotlight Overlay -->
+    <id.ac.binus.bounty.utils.AppTutorialOverlay
+        android:id="@+id/tutorial_overlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:elevation="24dp"
+        android:visibility="gone" />
 </RelativeLayout>

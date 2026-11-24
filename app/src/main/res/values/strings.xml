@@ -173,4 +173,55 @@
     <string name="google_auth_not_enabled">Login Google belum diaktifkan di Firebase Console.</string>
     <string name="login_hero_subtitle">Siap berburu tantangan &amp; kumpulkan hadiah seru?</string>
     <string name="register_hero_subtitle">Buat akunmu dan mulai petualangan di Bounty!</string>
+
+    <!-- Interactive Mascot Walkthrough Tutorial -->
+    <string name="profile_setting_tutorial">Panduan Aplikasi</string>
+    <string name="profile_setting_tutorial_desc">Ulangi tur interaktif bersama Kapten Bounty</string>
+    <string name="tutorial_step_counter">Langkah %1$d / %2$d</string>
+    <string name="tutorial_skip">Lewati</string>
+    <string name="tutorial_prev">Kembali</string>
+    <string name="tutorial_next">Lanjut</string>
+    <string name="tutorial_start_cta">Mulai Tur</string>
+    <string name="tutorial_finish_cta">Siap Berburu!</string>
+    <string name="tutorial_tap_highlighted">Ketuk tombol yang disorot untuk lanjut</string>
+    <string name="tutorial_tap_challenge_tab">Ketuk tab Challenge yang disorot di bawah</string>
+    <string name="tutorial_tap_create_tab">Ketuk tombol + yang disorot di tengah</string>
+    <string name="tutorial_tap_leaderboard_tab">Ketuk tab Leaderboard yang disorot di bawah</string>
+    <string name="tutorial_tap_profile_tab">Ketuk tab Profile yang disorot di bawah</string>
+
+    <string name="tutorial_step_welcome_title">Ahoy! Selamat datang di Bounty!</string>
+    <string name="tutorial_step_welcome_body">Aku Kapten Bounty! Yuk keliling sebentar biar kamu paham cara ambil challenge, bikin tantangan, chat, dan tambah teman.</string>
+
+    <string name="tutorial_step_balance_title">Demo Balance &amp; Hadiah</string>
+    <string name="tutorial_step_balance_body">Ini saldo demo kamu. Setiap challenge yang kamu selesaikan dan disetujui kreator, hadiah demonya otomatis masuk ke sini!</string>
+
+    <string name="tutorial_step_friends_title">Sistem Pertemanan</string>
+    <string name="tutorial_step_friends_body">Ketuk ikon pencarian ini kapan saja untuk mencari hunter lain, melihat profil mereka, dan menambahkan teman baru.</string>
+
+    <string name="tutorial_step_chat_title">Chat Real-Time</string>
+    <string name="tutorial_step_chat_body">Ketuk ikon pesan ini untuk chat langsung dengan teman atau kreator challenge—pas buat diskusi detail misi!</string>
+
+    <string name="tutorial_step_tap_challenges_title">Jelajahi Daftar Challenge</string>
+    <string name="tutorial_step_tap_challenges_body">Sekarang coba ketuk tab Challenge yang disorot di bawah untuk melihat halaman daftar misi!</string>
+
+    <string name="tutorial_step_challenges_info_title">Ambil &amp; Pantau Challenge</string>
+    <string name="tutorial_step_challenges_info_body">Filter antara Tantangan Saya dan Orang Lain di sini. Buka kartu challenge mana saja untuk tekan Accept, selesaikan misi, lalu kirim bukti foto!</string>
+
+    <string name="tutorial_step_tap_create_title">Mau Bikin Tantangan?</string>
+    <string name="tutorial_step_tap_create_body">Sekarang ketuk tombol + di tengah untuk melihat halaman pembuatan challenge baru!</string>
+
+    <string name="tutorial_step_create_info_title">Buat Challenge Sendiri</string>
+    <string name="tutorial_step_create_info_body">Di form ini kamu bisa isi judul, deskripsi, nominal reward demo, dan batas waktu lalu tekan Publish. Nggak perlu isi sekarang kok, lanjut yuk!</string>
+
+    <string name="tutorial_step_tap_leaderboard_title">Cek Papan Peringkat</string>
+    <string name="tutorial_step_tap_leaderboard_body">Penasaran siapa hunter dan kreator paling aktif? Ketuk tab Leaderboard di bawah!</string>
+
+    <string name="tutorial_step_leaderboard_info_title">Leaderboard Hunter &amp; Kreator</string>
+    <string name="tutorial_step_leaderboard_info_body">Bandingkan peringkat Pemberi Challenge dan Penerima Challenge di sini. Kamu juga bisa ketuk nama hunter untuk lihat profil dan berteman!</string>
+
+    <string name="tutorial_step_tap_profile_title">Buka Profil Kamu</string>
+    <string name="tutorial_step_tap_profile_body">Terakhir, ketuk tab Profile yang disorot di bawah untuk melihat halaman profilmu!</string>
+
+    <string name="tutorial_step_profile_finish_title">Semua Siap, Kapten!</string>
+    <string name="tutorial_step_profile_finish_body">Di Profile kamu bisa lihat statistik, jumlah teman, dan portofolio challenge. Mau ulangi panduan ini? Buka ikon Pengaturan di kanan atas kapan saja!</string>
 </resources>
